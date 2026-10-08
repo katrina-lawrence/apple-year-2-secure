@@ -185,19 +185,26 @@ private struct FollowupsTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \FollowupEntity.appointmentAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
+    @State private var hideCompleted = false
     @State private var followupPendingDelete: FollowupEntity?
+
+    private var displayedFollowups: [FollowupEntity] {
+        hideCompleted ? followups.filter { $0.completedAtUTC == nil } : followups
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                if followups.isEmpty {
+                Toggle("Hide Completed", isOn: $hideCompleted)
+
+                if displayedFollowups.isEmpty {
                     ContentUnavailableView(
                         "No Followups",
                         systemImage: "calendar",
-                        description: Text("Add a followup from a note.")
+                        description: Text(hideCompleted ? "No incomplete followups." : "Add a followup from a note.")
                     )
                 } else {
-                    ForEach(followups) { followup in
+                    ForEach(displayedFollowups) { followup in
                         NavigationLink {
                             FollowupDetailView(followup: followup)
                         } label: {
