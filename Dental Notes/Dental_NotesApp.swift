@@ -5,7 +5,7 @@ import SwiftUI
 struct Dental_NotesApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppLockGateView()
         }
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self])
     }
