@@ -124,11 +124,11 @@ private enum NoteFollowupAIService {
         }
     }
 
-    static func generateProposals(from noteText: String, now: Date = Date()) async throws -> [ProposedFollowup] {
+    static func generateProposals(from noteText: String, referenceDate: Date) async throws -> [ProposedFollowup] {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedNote.isEmpty else { return [] }
 
-        let nowISO = ISO8601DateFormatter().string(from: now)
+        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
         let session = LanguageModelSession(instructions: """
         You generate practical dental followups from a note.
         Return JSON-compatible structured output only through the provided schema.
@@ -154,7 +154,7 @@ private enum NoteFollowupAIService {
         Use "absolute" only when a specific date is clearly present or strongly implied.
         Do not include low-confidence followups.
 
-        Current time: \(nowISO)
+        Reference date (note created date): \(referenceISO)
 
         Note:
         \(trimmedNote)
@@ -166,12 +166,12 @@ private enum NoteFollowupAIService {
             guard !description.isEmpty else { return nil }
             guard draft.confidence >= 0.8 else { return nil }
 
-            guard let date = resolvedDate(from: draft, now: now) else { return nil }
+            guard let date = resolvedDate(from: draft, referenceDate: referenceDate) else { return nil }
             return ProposedFollowup(descriptionText: description, appointmentAtUTC: date)
         }
     }
 
-    private static func resolvedDate(from draft: AIFollowupDraft, now: Date) -> Date? {
+    private static func resolvedDate(from draft: AIFollowupDraft, referenceDate: Date) -> Date? {
         let type = draft.scheduleType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
         if type == "relative",
@@ -191,7 +191,7 @@ private enum NoteFollowupAIService {
             }
 
             if let component {
-                return Calendar.current.date(byAdding: component, value: offsetValue, to: now)
+                return Calendar.current.date(byAdding: component, value: offsetValue, to: referenceDate)
             }
         }
 
@@ -220,7 +220,7 @@ private enum NoteFollowupAIService {
 #else
 private enum NoteFollowupAIService {
     static func isAvailable() -> Bool { false }
-    static func generateProposals(from noteText: String, now: Date = Date()) async throws -> [ProposedFollowup] { [] }
+    static func generateProposals(from noteText: String, referenceDate: Date) async throws -> [ProposedFollowup] { [] }
 }
 #endif
 
@@ -513,7 +513,10 @@ private struct NoteDetailView: View {
 
         Task {
             do {
-                let generated = try await NoteFollowupAIService.generateProposals(from: note.value)
+                let generated = try await NoteFollowupAIService.generateProposals(
+                    from: note.value,
+                    referenceDate: note.createdAtUTC
+                )
                 await MainActor.run {
                     proposedFollowups = generated
                     aiHasProcessed = true
