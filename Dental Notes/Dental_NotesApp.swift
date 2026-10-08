@@ -1,10 +1,4 @@
-//
-//  Dental_NotesApp.swift
-//  Dental Notes
-//
-//  Created by Vincent on 2026-10-07.
-//
-
+import SwiftData
 import SwiftUI
 
 @main
@@ -13,5 +7,6 @@ struct Dental_NotesApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [NoteEntity.self, FollowupEntity.self])
     }
 }
