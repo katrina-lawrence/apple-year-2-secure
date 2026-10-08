@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 private enum TextLimits {
-    static let maxLength = 512
+    static let maxLength = 2048
     static let previewLength = 80
 }
 
@@ -468,7 +468,7 @@ private struct NoteEditorSheet: View {
                             .foregroundStyle(isTooLong ? .red : .secondary)
                     }
                     if isTooLong {
-                        Text("Note must be 512 characters or fewer.")
+                        Text("Note must be 2048 characters or fewer.")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
@@ -549,7 +549,7 @@ private struct FollowupEditorSheet: View {
                             .foregroundStyle(isTooLong ? .red : .secondary)
                     }
                     if isTooLong {
-                        Text("Description must be 512 characters or fewer.")
+                        Text("Description must be 2048 characters or fewer.")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }
