@@ -43,25 +43,30 @@ final class AppLockViewModel: ObservableObject {
             .deviceOwnerAuthentication,
             localizedReason: "Unlock My Dental Companion"
         ) { [weak self] success, error in
-            Task { @MainActor in
+            Task { [weak self, success, error] in
                 guard let self else { return }
-                self.isAuthenticating = false
-
-                if success {
-                    self.isUnlocked = true
-                    self.errorMessage = nil
-                    return
-                }
-
-                self.isUnlocked = false
-
-                if let laError = error as? LAError,
-                   laError.code == .userCancel || laError.code == .systemCancel || laError.code == .appCancel {
-                    self.errorMessage = nil
-                } else {
-                    self.errorMessage = error?.localizedDescription ?? "Authentication failed."
-                }
+                await self.handleAuthenticationResult(success: success, error: error)
             }
+        }
+    }
+
+    @MainActor
+    private func handleAuthenticationResult(success: Bool, error: Error?) {
+        isAuthenticating = false
+
+        if success {
+            isUnlocked = true
+            errorMessage = nil
+            return
+        }
+
+        isUnlocked = false
+
+        if let laError = error as? LAError,
+           laError.code == .userCancel || laError.code == .systemCancel || laError.code == .appCancel {
+            errorMessage = nil
+        } else {
+            errorMessage = error?.localizedDescription ?? "Authentication failed."
         }
     }
 }
