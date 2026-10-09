@@ -1235,7 +1235,11 @@ private struct FollowupDetailView: View {
                     Text(AppDateFormatter.display(followup.editedAtUTC))
                 }
                 LabeledContent("Completed") {
-                    Text(followup.completedAtUTC.map(AppDateFormatter.display) ?? "Not completed")
+                    if let completedAtUTC = followup.completedAtUTC {
+                        Text(AppDateFormatter.display(completedAtUTC))
+                    } else {
+                        Text("Not completed")
+                    }
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Description")
