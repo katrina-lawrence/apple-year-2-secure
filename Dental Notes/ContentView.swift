@@ -1,3 +1,5 @@
+import Foundation
+import Security
 import SwiftData
 import SwiftUI
 #if canImport(FoundationModels)
@@ -96,6 +98,99 @@ private struct ProposedFollowup: Identifiable, Hashable {
     }
 }
 
+private enum AIProviderMethod: String, CaseIterable, Identifiable {
+    case appleIntelligence
+    case thirdParty
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .appleIntelligence:
+            return "Apple Intelligence"
+        case .thirdParty:
+            return "Third-party provider"
+        }
+    }
+}
+
+private enum AppSettingsKeys {
+    static let aiProviderMethod = "ai_provider_method"
+    static let thirdPartyBaseURL = "third_party_base_url"
+    static let thirdPartyModelID = "third_party_model_id"
+    static let thirdPartyConfigLocked = "third_party_config_locked"
+}
+
+private struct ThirdPartyAIConfig {
+    var baseURL: String
+    var modelID: String
+    var apiKey: String?
+
+    var isValid: Bool {
+        !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !modelID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+}
+
+private enum AppSettingsStore {
+    static func currentProvider(rawValue: String) -> AIProviderMethod {
+        AIProviderMethod(rawValue: rawValue) ?? .appleIntelligence
+    }
+
+    static func thirdPartyConfig(baseURL: String, modelID: String) -> ThirdPartyAIConfig {
+        ThirdPartyAIConfig(
+            baseURL: baseURL.trimmingCharacters(in: .whitespacesAndNewlines),
+            modelID: modelID.trimmingCharacters(in: .whitespacesAndNewlines),
+            apiKey: KeychainService.readThirdPartyAPIKey()
+        )
+    }
+}
+
+private enum KeychainService {
+    private static let service = "com.vincentdragnea.DentalNotes.ai"
+    private static let account = "third_party_api_key"
+
+    static func saveThirdPartyAPIKey(_ apiKey: String) -> Bool {
+        let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return deleteThirdPartyAPIKey() }
+        guard let data = trimmed.data(using: .utf8) else { return false }
+
+        _ = deleteThirdPartyAPIKey()
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecValueData as String: data
+        ]
+        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
+    }
+
+    static func readThirdPartyAPIKey() -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let data = item as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func deleteThirdPartyAPIKey() -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        return status == errSecSuccess || status == errSecItemNotFound
+    }
+}
+
 #if canImport(FoundationModels)
 @Generable
 private struct AIFollowupDraft {
@@ -112,8 +207,56 @@ private struct AIFollowupDraftList {
     var followups: [AIFollowupDraft]
 }
 
+private enum AIServiceError: Error {
+    case unsupportedProvider
+    case invalidConfiguration
+    case invalidURL
+    case invalidResponse
+    case badHTTPStatus(Int)
+    case decodingFailed
+}
+
+private struct ThirdPartyAnthropicMessagesRequest: Encodable {
+    struct Message: Encodable {
+        struct ContentBlock: Encodable {
+            let type: String
+            let text: String
+        }
+
+        let role: String
+        let content: [ContentBlock]
+    }
+
+    let model: String
+    let max_tokens: Int
+    let system: String
+    let messages: [Message]
+}
+
+private struct ThirdPartyAnthropicMessagesResponse: Decodable {
+    struct ContentBlock: Decodable {
+        let type: String
+        let text: String?
+    }
+
+    let content: [ContentBlock]
+}
+
+private struct ThirdPartyAIFollowupDraft: Decodable {
+    let descriptionText: String
+    let confidence: Double
+    let scheduleType: String
+    let offsetValue: Int?
+    let offsetUnit: String?
+    let absoluteAtISO8601UTC: String?
+}
+
+private struct ThirdPartyAIFollowupDraftList: Decodable {
+    let followups: [ThirdPartyAIFollowupDraft]
+}
+
 private enum NoteFollowupAIService {
-    static func isAvailable() -> Bool {
+    static func isAppleAvailable() -> Bool {
         switch SystemLanguageModel.default.availability {
         case .available:
             return true
@@ -124,7 +267,41 @@ private enum NoteFollowupAIService {
         }
     }
 
-    static func generateProposals(from noteText: String, referenceDate: Date) async throws -> [ProposedFollowup] {
+    static func generateProposals(
+        from noteText: String,
+        referenceDate: Date,
+        provider: AIProviderMethod,
+        thirdPartyConfig: ThirdPartyAIConfig?
+    ) async throws -> [ProposedFollowup] {
+        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedNote.isEmpty else { return [] }
+
+        let drafts: [AIFollowupDraft]
+        switch provider {
+        case .appleIntelligence:
+            drafts = try await generateDraftsWithApple(noteText: trimmedNote, referenceDate: referenceDate)
+        case .thirdParty:
+            guard let config = thirdPartyConfig, config.isValid else {
+                throw AIServiceError.invalidConfiguration
+            }
+            drafts = try await generateDraftsWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
+        }
+
+        return normalizedProposals(from: drafts, referenceDate: referenceDate)
+    }
+
+    private static func normalizedProposals(from drafts: [AIFollowupDraft], referenceDate: Date) -> [ProposedFollowup] {
+        drafts.prefix(8).compactMap { draft in
+            let description = draft.descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !description.isEmpty else { return nil }
+            guard draft.confidence >= 0.8 else { return nil }
+
+            guard let date = resolvedDate(from: draft, referenceDate: referenceDate) else { return nil }
+            return ProposedFollowup(descriptionText: description, appointmentAtUTC: date)
+        }
+    }
+
+    private static func generateDraftsWithApple(noteText: String, referenceDate: Date) async throws -> [AIFollowupDraft] {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedNote.isEmpty else { return [] }
 
@@ -161,14 +338,145 @@ private enum NoteFollowupAIService {
         """
 
         let response = try await session.respond(to: prompt, generating: AIFollowupDraftList.self)
-        return response.content.followups.prefix(8).compactMap { draft in
-            let description = draft.descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !description.isEmpty else { return nil }
-            guard draft.confidence >= 0.8 else { return nil }
+        return response.content.followups
+    }
 
-            guard let date = resolvedDate(from: draft, referenceDate: referenceDate) else { return nil }
-            return ProposedFollowup(descriptionText: description, appointmentAtUTC: date)
+    private static func generateDraftsWithThirdParty(
+        noteText: String,
+        referenceDate: Date,
+        config: ThirdPartyAIConfig
+    ) async throws -> [AIFollowupDraft] {
+        guard let endpoint = anthropicMessagesURL(from: config.baseURL) else {
+            throw AIServiceError.invalidURL
         }
+
+        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
+        let systemPrompt = """
+        You generate practical dental followups from a note.
+        Return strict JSON only.
+        """
+        let userPrompt = """
+        Analyze the following dental note and propose followups only when confidence is high.
+        It is valid to return zero followups.
+        Respond as JSON object:
+        {
+          "followups": [
+            {
+              "descriptionText": "string",
+              "confidence": 0.0,
+              "scheduleType": "relative or absolute",
+              "offsetValue": 1,
+              "offsetUnit": "days|months|years",
+              "absoluteAtISO8601UTC": "2026-10-10T09:30:00Z"
+            }
+          ]
+        }
+
+        Rules:
+        - confidence is [0,1]
+        - include only high-confidence followups
+        - scheduleType "relative" for in X days/months/years
+        - scheduleType "absolute" only for specific date in note
+        - if relative, absoluteAtISO8601UTC should be null
+        - if absolute, offsetValue and offsetUnit should be null
+
+        Reference date (note created date): \(referenceISO)
+        Note:
+        \(noteText)
+        """
+
+        let requestBody = ThirdPartyAnthropicMessagesRequest(
+            model: config.modelID,
+            max_tokens: 1200,
+            system: systemPrompt,
+            messages: [
+                .init(
+                    role: "user",
+                    content: [
+                        .init(type: "text", text: userPrompt)
+                    ]
+                )
+            ]
+        )
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 60
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+        if let apiKey = config.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines), !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        }
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw AIServiceError.invalidResponse
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw AIServiceError.badHTTPStatus(http.statusCode)
+        }
+
+        let decoded = try JSONDecoder().decode(ThirdPartyAnthropicMessagesResponse.self, from: data)
+        let content = decoded.content
+            .filter { $0.type == "text" }
+            .compactMap(\.text)
+            .joined(separator: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !content.isEmpty else {
+            throw AIServiceError.invalidResponse
+        }
+
+        let cleaned = cleanedJSONText(from: content)
+        guard let contentData = cleaned.data(using: .utf8),
+              let thirdPartyDraftList = try? JSONDecoder().decode(ThirdPartyAIFollowupDraftList.self, from: contentData) else {
+            throw AIServiceError.decodingFailed
+        }
+        return thirdPartyDraftList.followups.map { draft in
+            AIFollowupDraft(
+                descriptionText: draft.descriptionText,
+                confidence: draft.confidence,
+                scheduleType: draft.scheduleType,
+                offsetValue: draft.offsetValue,
+                offsetUnit: draft.offsetUnit,
+                absoluteAtISO8601UTC: draft.absoluteAtISO8601UTC
+            )
+        }
+    }
+
+    private static func anthropicMessagesURL(from baseURL: String) -> URL? {
+        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard var url = URL(string: trimmed) else { return nil }
+
+        if url.path.hasSuffix("/messages") {
+            return url
+        }
+        if url.path.hasSuffix("/v1") {
+            url.append(path: "messages")
+            return url
+        }
+        if url.path.isEmpty || url.path == "/" {
+            url.append(path: "v1/messages")
+            return url
+        }
+
+        url.append(path: "messages")
+        return url
+    }
+
+    private static func cleanedJSONText(from raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.hasPrefix("```") else { return trimmed }
+
+        var lines = trimmed.components(separatedBy: .newlines)
+        if !lines.isEmpty {
+            lines.removeFirst()
+        }
+        if let last = lines.last,
+           last.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("```") {
+            lines.removeLast()
+        }
+        return lines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func resolvedDate(from draft: AIFollowupDraft, referenceDate: Date) -> Date? {
@@ -218,9 +526,30 @@ private enum NoteFollowupAIService {
     }
 }
 #else
+private enum AIServiceError: Error {
+    case unsupportedProvider
+    case invalidConfiguration
+}
+
 private enum NoteFollowupAIService {
-    static func isAvailable() -> Bool { false }
-    static func generateProposals(from noteText: String, referenceDate: Date) async throws -> [ProposedFollowup] { [] }
+    static func isAppleAvailable() -> Bool { false }
+
+    static func generateProposals(
+        from noteText: String,
+        referenceDate: Date,
+        provider: AIProviderMethod,
+        thirdPartyConfig: ThirdPartyAIConfig?
+    ) async throws -> [ProposedFollowup] {
+        let _ = noteText
+        let _ = referenceDate
+        let _ = thirdPartyConfig
+        switch provider {
+        case .appleIntelligence:
+            throw AIServiceError.unsupportedProvider
+        case .thirdParty:
+            throw AIServiceError.unsupportedProvider
+        }
+    }
 }
 #endif
 
@@ -246,6 +575,7 @@ private struct NotesTabView: View {
     @Query private var allFollowups: [FollowupEntity]
 
     @State private var showingCreateNote = false
+    @State private var showingSettings = false
     @State private var notePendingDelete: NoteEntity?
 
     var body: some View {
@@ -282,6 +612,13 @@ private struct NotesTabView: View {
             }
             .navigationTitle("Notes")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showingCreateNote = true
@@ -292,6 +629,9 @@ private struct NotesTabView: View {
             }
             .sheet(isPresented: $showingCreateNote) {
                 NoteEditorSheet()
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .alert("Delete Note?", isPresented: Binding(get: {
                 notePendingDelete != nil
@@ -393,9 +733,151 @@ private struct FollowupsTabView: View {
     }
 }
 
+private struct SettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
+    @AppStorage(AppSettingsKeys.thirdPartyBaseURL) private var storedThirdPartyBaseURL = ""
+    @AppStorage(AppSettingsKeys.thirdPartyModelID) private var storedThirdPartyModelID = ""
+    @AppStorage(AppSettingsKeys.thirdPartyConfigLocked) private var thirdPartyConfigLocked = false
+
+    @State private var thirdPartyBaseURLInput = ""
+    @State private var thirdPartyModelIDInput = ""
+    @State private var apiKeyInput = ""
+    @State private var settingsMessage: String?
+    @State private var settingsError: String?
+
+    private var selectedProvider: AIProviderMethod {
+        AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
+    }
+
+    private var canSaveThirdPartyConfig: Bool {
+        !thirdPartyBaseURLInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !thirdPartyModelIDInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("AI Method") {
+                    Picker("Provider", selection: Binding(
+                        get: { selectedProvider },
+                        set: { newValue in
+                            providerMethodRawValue = newValue.rawValue
+                            settingsMessage = nil
+                            settingsError = nil
+                        })
+                    ) {
+                        ForEach(AIProviderMethod.allCases) { method in
+                            Text(method.title).tag(method)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                if selectedProvider == .thirdParty {
+                    Section("Third-party Provider") {
+                        TextField("Base URL", text: $thirdPartyBaseURLInput)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .disabled(thirdPartyConfigLocked)
+
+                        TextField("Model ID", text: $thirdPartyModelIDInput)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .disabled(thirdPartyConfigLocked)
+
+                        SecureField("API Key (optional)", text: $apiKeyInput)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .disabled(thirdPartyConfigLocked)
+
+                        if thirdPartyConfigLocked {
+                            Text("Configuration saved. Press Edit to modify. API key is hidden after saving.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text("Uses Anthropic-style Messages API (`/v1/messages`).")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+
+                        if let settingsMessage {
+                            Text(settingsMessage)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        if let settingsError {
+                            Text(settingsError)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
+
+                        if thirdPartyConfigLocked {
+                            Button("Edit") {
+                                thirdPartyConfigLocked = false
+                                apiKeyInput = ""
+                                settingsMessage = nil
+                                settingsError = nil
+                            }
+                        } else {
+                            Button("Save") {
+                                saveThirdPartyConfiguration()
+                            }
+                            .disabled(!canSaveThirdPartyConfig)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear {
+                thirdPartyBaseURLInput = storedThirdPartyBaseURL
+                thirdPartyModelIDInput = storedThirdPartyModelID
+            }
+        }
+    }
+
+    private func saveThirdPartyConfiguration() {
+        settingsError = nil
+        settingsMessage = nil
+
+        let trimmedBaseURL = thirdPartyBaseURLInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedModelID = thirdPartyModelIDInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedBaseURL.isEmpty, !trimmedModelID.isEmpty else {
+            settingsError = "Base URL and Model ID are required."
+            return
+        }
+
+        storedThirdPartyBaseURL = trimmedBaseURL
+        storedThirdPartyModelID = trimmedModelID
+        thirdPartyBaseURLInput = trimmedBaseURL
+        thirdPartyModelIDInput = trimmedModelID
+
+        let keySaved = KeychainService.saveThirdPartyAPIKey(apiKeyInput)
+        guard keySaved else {
+            settingsError = "Could not save API key securely."
+            return
+        }
+
+        apiKeyInput = ""
+        thirdPartyConfigLocked = true
+        settingsMessage = "Third-party configuration saved."
+    }
+}
+
 private struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+
+    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
+    @AppStorage(AppSettingsKeys.thirdPartyBaseURL) private var thirdPartyBaseURL = ""
+    @AppStorage(AppSettingsKeys.thirdPartyModelID) private var thirdPartyModelID = ""
 
     let note: NoteEntity
 
@@ -413,6 +895,23 @@ private struct NoteDetailView: View {
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
+    }
+
+    private var selectedProvider: AIProviderMethod {
+        AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
+    }
+
+    private var thirdPartyConfig: ThirdPartyAIConfig {
+        AppSettingsStore.thirdPartyConfig(baseURL: thirdPartyBaseURL, modelID: thirdPartyModelID)
+    }
+
+    private var canProcessWithCurrentProvider: Bool {
+        switch selectedProvider {
+        case .appleIntelligence:
+            return aiAvailable
+        case .thirdParty:
+            return thirdPartyConfig.isValid
+        }
     }
 
     private var duplicateAlertBinding: Binding<Bool> {
@@ -479,7 +978,7 @@ private struct NoteDetailView: View {
             Text("A similar followup already exists for this note. Create this one anyway?")
         }
         .onAppear {
-            aiAvailable = NoteFollowupAIService.isAvailable()
+            aiAvailable = NoteFollowupAIService.isAppleAvailable()
         }
     }
 
@@ -494,7 +993,7 @@ private struct NoteDetailView: View {
             }
 
             AIProcessingControls(
-                aiAvailable: aiAvailable,
+                canProcess: canProcessWithCurrentProvider,
                 isProcessingWithAI: isProcessingWithAI,
                 aiProcessError: aiProcessError,
                 aiHasProcessed: aiHasProcessed,
@@ -515,7 +1014,9 @@ private struct NoteDetailView: View {
             do {
                 let generated = try await NoteFollowupAIService.generateProposals(
                     from: note.value,
-                    referenceDate: note.createdAtUTC
+                    referenceDate: note.createdAtUTC,
+                    provider: selectedProvider,
+                    thirdPartyConfig: selectedProvider == .thirdParty ? thirdPartyConfig : nil
                 )
                 await MainActor.run {
                     proposedFollowups = generated
@@ -641,7 +1142,7 @@ private struct ExistingFollowupsList: View {
 }
 
 private struct AIProcessingControls: View {
-    let aiAvailable: Bool
+    let canProcess: Bool
     let isProcessingWithAI: Bool
     let aiProcessError: String?
     let aiHasProcessed: Bool
@@ -650,7 +1151,7 @@ private struct AIProcessingControls: View {
     let onCreateProposal: (ProposedFollowup) -> Void
 
     var body: some View {
-        if aiAvailable {
+        if canProcess {
             Button {
                 onProcess()
             } label: {

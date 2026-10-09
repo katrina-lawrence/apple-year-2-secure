@@ -41,7 +41,7 @@ final class AppLockViewModel: ObservableObject {
 
         context.evaluatePolicy(
             .deviceOwnerAuthentication,
-            localizedReason: "Unlock Dental Notes"
+            localizedReason: "Unlock My Dental Companion"
         ) { [weak self] success, error in
             Task { @MainActor in
                 guard let self else { return }
@@ -110,7 +110,7 @@ private struct LockScreenView: View {
                 .foregroundStyle(.tint)
 
             VStack(spacing: 8) {
-                Text("Dental Notes Locked")
+                Text("My Dental Companion Locked")
                     .font(.title2)
                     .fontWeight(.semibold)
 
