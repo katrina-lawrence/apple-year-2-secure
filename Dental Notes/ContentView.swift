@@ -15,17 +15,32 @@ private enum TextLimits {
 final class NoteEntity {
     @Attribute(.unique) var id: UUID
     var value: String
+    var summary: String?
+    var balanceDueAmount: Decimal?
+    var balanceDueCurrency: String?
+    var categories: [String]?
+    var appointmentTiming: String?
     var createdAtUTC: Date
     var editedAtUTC: Date
 
     init(
         id: UUID = UUID(),
         value: String,
+        summary: String? = nil,
+        balanceDueAmount: Decimal? = nil,
+        balanceDueCurrency: String? = nil,
+        categories: [String]? = nil,
+        appointmentTiming: String? = nil,
         createdAtUTC: Date = Date(),
         editedAtUTC: Date = Date()
     ) {
         self.id = id
         self.value = value
+        self.summary = summary
+        self.balanceDueAmount = balanceDueAmount
+        self.balanceDueCurrency = balanceDueCurrency
+        self.categories = categories
+        self.appointmentTiming = appointmentTiming
         self.createdAtUTC = createdAtUTC
         self.editedAtUTC = editedAtUTC
     }
@@ -35,6 +50,7 @@ final class NoteEntity {
 final class FollowupEntity {
     @Attribute(.unique) var id: UUID
     var descriptionText: String
+    var category: String?
     var noteID: UUID
     var appointmentAtUTC: Date
     var createdAtUTC: Date
@@ -44,6 +60,7 @@ final class FollowupEntity {
     init(
         id: UUID = UUID(),
         descriptionText: String,
+        category: String? = nil,
         noteID: UUID,
         appointmentAtUTC: Date,
         createdAtUTC: Date = Date(),
@@ -52,6 +69,7 @@ final class FollowupEntity {
     ) {
         self.id = id
         self.descriptionText = descriptionText
+        self.category = category
         self.noteID = noteID
         self.appointmentAtUTC = appointmentAtUTC
         self.createdAtUTC = createdAtUTC
@@ -70,6 +88,34 @@ private enum AppDateFormatter {
 
     static func display(_ date: Date) -> String {
         dateTime.string(from: date)
+    }
+}
+
+private enum CurrencyDisplayFormatter {
+    private static let decimalFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+
+    static func format(amount: Decimal, currency: String?) -> String {
+        let trimmedCurrency = currency?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let number = NSDecimalNumber(decimal: amount)
+
+        if trimmedCurrency.count == 3, trimmedCurrency.unicodeScalars.allSatisfy(CharacterSet.letters.contains) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.currencyCode = trimmedCurrency.uppercased()
+            if let value = formatter.string(from: number) {
+                return value
+            }
+        }
+
+        let amountText = decimalFormatter.string(from: number) ?? number.stringValue
+        let symbol = trimmedCurrency.isEmpty ? "$" : trimmedCurrency
+        return "\(symbol)\(amountText)"
     }
 }
 
@@ -214,6 +260,10 @@ private enum AIServiceError: Error {
     case invalidResponse
     case badHTTPStatus(Int)
     case decodingFailed
+    case missingPromptResource(String)
+    case unreadablePromptResource(String)
+    case emptyPromptResource(String)
+    case unresolvedPromptPlaceholders
 }
 
 private struct ThirdPartyAnthropicMessagesRequest: Encodable {
@@ -253,6 +303,49 @@ private struct ThirdPartyAIFollowupDraft: Decodable {
 
 private struct ThirdPartyAIFollowupDraftList: Decodable {
     let followups: [ThirdPartyAIFollowupDraft]
+}
+
+private struct AIPromptTemplates {
+    let system: String
+    let user: String
+}
+
+private enum AIPromptTemplateLoader {
+    private static let systemTemplateName = "PromptSystem"
+    private static let userTemplateName = "PromptUser"
+    private static let placeholderReferenceISO = "{{referenceISO}}"
+    private static let placeholderNoteText = "{{noteText}}"
+
+    static func render(noteText: String, referenceDate: Date) throws -> AIPromptTemplates {
+        let system = try loadTemplate(named: systemTemplateName)
+        let userTemplate = try loadTemplate(named: userTemplateName)
+
+        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
+        let user = userTemplate
+            .replacingOccurrences(of: placeholderReferenceISO, with: referenceISO)
+            .replacingOccurrences(of: placeholderNoteText, with: noteText)
+
+        if user.contains("{{") || user.contains("}}") {
+            throw AIServiceError.unresolvedPromptPlaceholders
+        }
+
+        return AIPromptTemplates(system: system, user: user)
+    }
+
+    private static func loadTemplate(named resourceName: String) throws -> String {
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "md") else {
+            throw AIServiceError.missingPromptResource(resourceName)
+        }
+        guard let content = try? String(contentsOf: url, encoding: .utf8) else {
+            throw AIServiceError.unreadablePromptResource(resourceName)
+        }
+
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw AIServiceError.emptyPromptResource(resourceName)
+        }
+        return trimmed
+    }
 }
 
 private enum NoteFollowupAIService {
@@ -305,39 +398,10 @@ private enum NoteFollowupAIService {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedNote.isEmpty else { return [] }
 
-        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
-        let session = LanguageModelSession(instructions: """
-        You generate practical dental followups from a note.
-        Return JSON-compatible structured output only through the provided schema.
-        Keep suggestions concise and clinically relevant.
-        """)
-        let prompt = """
-        Analyze the following dental note and propose followups only when confidence is high.
-        It is valid to return zero followups.
+        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
+        let session = LanguageModelSession(instructions: prompts.system)
 
-        For each followup include:
-        - descriptionText: a clear short action.
-        - confidence: decimal in [0, 1].
-        - scheduleType: "relative" or "absolute".
-        - If scheduleType is "relative":
-          - offsetValue: positive integer.
-          - offsetUnit: "days", "months", or "years".
-          - absoluteAtISO8601UTC should be null.
-        - If scheduleType is "absolute":
-          - absoluteAtISO8601UTC: valid ISO-8601 datetime string in UTC (example: 2026-10-10T09:30:00Z).
-          - offsetValue and offsetUnit should be null.
-
-        Use "relative" for timelines like "in 7 days", "in 6 months", "in 1 year".
-        Use "absolute" only when a specific date is clearly present or strongly implied.
-        Do not include low-confidence followups.
-
-        Reference date (note created date): \(referenceISO)
-
-        Note:
-        \(trimmedNote)
-        """
-
-        let response = try await session.respond(to: prompt, generating: AIFollowupDraftList.self)
+        let response = try await session.respond(to: prompts.user, generating: AIFollowupDraftList.self)
         return response.content.followups
     }
 
@@ -346,54 +410,24 @@ private enum NoteFollowupAIService {
         referenceDate: Date,
         config: ThirdPartyAIConfig
     ) async throws -> [AIFollowupDraft] {
+        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedNote.isEmpty else { return [] }
+
         guard let endpoint = anthropicMessagesURL(from: config.baseURL) else {
             throw AIServiceError.invalidURL
         }
 
-        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
-        let systemPrompt = """
-        You generate practical dental followups from a note.
-        Return strict JSON only.
-        """
-        let userPrompt = """
-        Analyze the following dental note and propose followups only when confidence is high.
-        It is valid to return zero followups.
-        Respond as JSON object:
-        {
-          "followups": [
-            {
-              "descriptionText": "string",
-              "confidence": 0.0,
-              "scheduleType": "relative or absolute",
-              "offsetValue": 1,
-              "offsetUnit": "days|months|years",
-              "absoluteAtISO8601UTC": "2026-10-10T09:30:00Z"
-            }
-          ]
-        }
-
-        Rules:
-        - confidence is [0,1]
-        - include only high-confidence followups
-        - scheduleType "relative" for in X days/months/years
-        - scheduleType "absolute" only for specific date in note
-        - if relative, absoluteAtISO8601UTC should be null
-        - if absolute, offsetValue and offsetUnit should be null
-
-        Reference date (note created date): \(referenceISO)
-        Note:
-        \(noteText)
-        """
+        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
 
         let requestBody = ThirdPartyAnthropicMessagesRequest(
             model: config.modelID,
             max_tokens: 1200,
-            system: systemPrompt,
+            system: prompts.system,
             messages: [
                 .init(
                     role: "user",
                     content: [
-                        .init(type: "text", text: userPrompt)
+                        .init(type: "text", text: prompts.user)
                     ]
                 )
             ]
@@ -1093,6 +1127,27 @@ private struct NoteDetailView: View {
 private struct NoteMetadataSection: View {
     let note: NoteEntity
 
+    private var trimmedSummary: String? {
+        let value = note.summary?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
+    private var trimmedAppointmentTiming: String? {
+        let value = note.appointmentTiming?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
+    private var normalizedCategories: [String] {
+        (note.categories ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
+    private var formattedBalance: String? {
+        guard let amount = note.balanceDueAmount else { return nil }
+        return CurrencyDisplayFormatter.format(amount: amount, currency: note.balanceDueCurrency)
+    }
+
     var body: some View {
         Section("Note") {
             LabeledContent("Created") {
@@ -1103,6 +1158,47 @@ private struct NoteMetadataSection: View {
                 Text(AppDateFormatter.display(note.editedAtUTC))
                     .multilineTextAlignment(.trailing)
             }
+
+            if let summary = trimmedSummary {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Summary")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(summary)
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
+            if let formattedBalance {
+                LabeledContent("Balance Due") {
+                    Text(formattedBalance)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+
+            if !normalizedCategories.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Categories")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(normalizedCategories.joined(separator: ", "))
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
+            if let appointmentTiming = trimmedAppointmentTiming {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Appointment Timing")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(appointmentTiming)
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 Text("Content")
                     .font(.caption)
@@ -1222,6 +1318,11 @@ private struct FollowupDetailView: View {
         notes.first { $0.id == followup.noteID }
     }
 
+    private var trimmedCategory: String? {
+        let value = followup.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
     var body: some View {
         List {
             Section("Appointment") {
@@ -1241,6 +1342,14 @@ private struct FollowupDetailView: View {
                         Text("Not completed")
                     }
                 }
+
+                if let category = trimmedCategory {
+                    LabeledContent("Category") {
+                        Text(category)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Description")
                         .font(.caption)
