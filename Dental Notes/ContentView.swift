@@ -135,13 +135,24 @@ private extension String {
 private struct ProposedFollowup: Identifiable, Hashable {
     let id: UUID
     let descriptionText: String
+    let category: String?
     let appointmentAtUTC: Date
 
-    init(id: UUID = UUID(), descriptionText: String, appointmentAtUTC: Date) {
+    init(id: UUID = UUID(), descriptionText: String, category: String? = nil, appointmentAtUTC: Date) {
         self.id = id
         self.descriptionText = descriptionText
+        self.category = category
         self.appointmentAtUTC = appointmentAtUTC
     }
+}
+
+private struct ProcessedNoteResult {
+    let summary: String?
+    let balanceDueAmount: Decimal?
+    let balanceDueCurrency: String?
+    let categories: [String]
+    let appointmentTiming: String?
+    let followups: [ProposedFollowup]
 }
 
 private enum AIProviderMethod: String, CaseIterable, Identifiable {
@@ -288,6 +299,7 @@ private enum KeychainService {
 @Generable
 private struct AIFollowupDraft {
     var descriptionText: String
+    var category: String?
     var confidence: Double
     var scheduleType: String
     var offsetValue: Int?
@@ -296,7 +308,12 @@ private struct AIFollowupDraft {
 }
 
 @Generable
-private struct AIFollowupDraftList {
+private struct AIProcessedNoteDraft {
+    var summary: String
+    var balanceDueAmount: Double?
+    var balanceDueCurrency: String?
+    var categories: [String]
+    var appointmentTiming: String?
     var followups: [AIFollowupDraft]
 }
 
@@ -341,6 +358,7 @@ private struct ThirdPartyAnthropicMessagesResponse: Decodable {
 
 private struct ThirdPartyAIFollowupDraft: Decodable {
     let descriptionText: String
+    let category: String?
     let confidence: Double
     let scheduleType: String
     let offsetValue: Int?
@@ -348,7 +366,12 @@ private struct ThirdPartyAIFollowupDraft: Decodable {
     let absoluteAtISO8601UTC: String?
 }
 
-private struct ThirdPartyAIFollowupDraftList: Decodable {
+private struct ThirdPartyAIProcessedNoteDraft: Decodable {
+    let summary: String?
+    let balanceDueAmount: Double?
+    let balanceDueCurrency: String?
+    let categories: [String]?
+    let appointmentTiming: String?
     let followups: [ThirdPartyAIFollowupDraft]
 }
 
@@ -407,58 +430,110 @@ private enum NoteFollowupAIService {
         }
     }
 
-    static func generateProposals(
+    static func processNote(
         from noteText: String,
         referenceDate: Date,
         provider: AIProviderMethod,
         thirdPartyConfig: ThirdPartyAIConfig?
-    ) async throws -> [ProposedFollowup] {
+    ) async throws -> ProcessedNoteResult {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else { return [] }
+        guard !trimmedNote.isEmpty else {
+            return ProcessedNoteResult(
+                summary: nil,
+                balanceDueAmount: nil,
+                balanceDueCurrency: nil,
+                categories: [],
+                appointmentTiming: nil,
+                followups: []
+            )
+        }
 
-        let drafts: [AIFollowupDraft]
+        let draft: AIProcessedNoteDraft
         switch provider {
         case .appleIntelligence:
-            drafts = try await generateDraftsWithApple(noteText: trimmedNote, referenceDate: referenceDate)
+            draft = try await processNoteWithApple(noteText: trimmedNote, referenceDate: referenceDate)
         case .thirdParty:
             guard let config = thirdPartyConfig, config.isValid else {
                 throw AIServiceError.invalidConfiguration
             }
-            drafts = try await generateDraftsWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
+            draft = try await processNoteWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
         }
 
-        return normalizedProposals(from: drafts, referenceDate: referenceDate)
+        return normalizeProcessedResult(from: draft, referenceDate: referenceDate)
     }
 
-    private static func normalizedProposals(from drafts: [AIFollowupDraft], referenceDate: Date) -> [ProposedFollowup] {
-        drafts.prefix(8).compactMap { draft in
-            let description = draft.descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
+    private static func normalizeProcessedResult(from draft: AIProcessedNoteDraft, referenceDate: Date) -> ProcessedNoteResult {
+        let followups: [ProposedFollowup] = draft.followups.prefix(8).compactMap { followupDraft -> ProposedFollowup? in
+            let description = followupDraft.descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !description.isEmpty else { return nil }
-            guard draft.confidence >= 0.8 else { return nil }
+            guard followupDraft.confidence >= 0.8 else { return nil }
 
-            guard let date = resolvedDate(from: draft, referenceDate: referenceDate) else { return nil }
-            return ProposedFollowup(descriptionText: description, appointmentAtUTC: date)
+            guard let date = resolvedDate(from: followupDraft, referenceDate: referenceDate) else { return nil }
+            let category = trimmedOrNil(followupDraft.category)
+            return ProposedFollowup(descriptionText: description, category: category, appointmentAtUTC: date)
         }
+
+        let summary = trimmedOrNil(draft.summary)
+        let amount: Decimal?
+        if let balance = draft.balanceDueAmount {
+            amount = NSDecimalNumber(value: balance).decimalValue
+        } else {
+            amount = nil
+        }
+        let currency = amount == nil ? nil : normalizedCurrency(draft.balanceDueCurrency)
+
+        var seenCategories = Set<String>()
+        let categories = (draft.categories)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .filter { seenCategories.insert($0.lowercased()).inserted }
+
+        return ProcessedNoteResult(
+            summary: summary,
+            balanceDueAmount: amount,
+            balanceDueCurrency: currency,
+            categories: categories,
+            appointmentTiming: trimmedOrNil(draft.appointmentTiming),
+            followups: followups
+        )
     }
 
-    private static func generateDraftsWithApple(noteText: String, referenceDate: Date) async throws -> [AIFollowupDraft] {
+    private static func processNoteWithApple(noteText: String, referenceDate: Date) async throws -> AIProcessedNoteDraft {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else { return [] }
+        guard !trimmedNote.isEmpty else {
+            return AIProcessedNoteDraft(
+                summary: "",
+                balanceDueAmount: nil,
+                balanceDueCurrency: nil,
+                categories: [],
+                appointmentTiming: nil,
+                followups: []
+            )
+        }
 
         let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
         let session = LanguageModelSession(instructions: prompts.system)
 
-        let response = try await session.respond(to: prompts.user, generating: AIFollowupDraftList.self)
-        return response.content.followups
+        let response = try await session.respond(to: prompts.user, generating: AIProcessedNoteDraft.self)
+        return response.content
     }
 
-    private static func generateDraftsWithThirdParty(
+    private static func processNoteWithThirdParty(
         noteText: String,
         referenceDate: Date,
         config: ThirdPartyAIConfig
-    ) async throws -> [AIFollowupDraft] {
+    ) async throws -> AIProcessedNoteDraft {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else { return [] }
+        guard !trimmedNote.isEmpty else {
+            return AIProcessedNoteDraft(
+                summary: "",
+                balanceDueAmount: nil,
+                balanceDueCurrency: nil,
+                categories: [],
+                appointmentTiming: nil,
+                followups: []
+            )
+        }
 
         guard let endpoint = anthropicMessagesURL(from: config.baseURL) else {
             throw AIServiceError.invalidURL
@@ -510,19 +585,28 @@ private enum NoteFollowupAIService {
 
         let cleaned = cleanedJSONText(from: content)
         guard let contentData = cleaned.data(using: .utf8),
-              let thirdPartyDraftList = try? JSONDecoder().decode(ThirdPartyAIFollowupDraftList.self, from: contentData) else {
+              let thirdPartyDraftList = try? JSONDecoder().decode(ThirdPartyAIProcessedNoteDraft.self, from: contentData) else {
             throw AIServiceError.decodingFailed
         }
-        return thirdPartyDraftList.followups.map { draft in
-            AIFollowupDraft(
-                descriptionText: draft.descriptionText,
-                confidence: draft.confidence,
-                scheduleType: draft.scheduleType,
-                offsetValue: draft.offsetValue,
-                offsetUnit: draft.offsetUnit,
-                absoluteAtISO8601UTC: draft.absoluteAtISO8601UTC
-            )
-        }
+
+        return AIProcessedNoteDraft(
+            summary: thirdPartyDraftList.summary ?? "",
+            balanceDueAmount: thirdPartyDraftList.balanceDueAmount,
+            balanceDueCurrency: thirdPartyDraftList.balanceDueCurrency,
+            categories: thirdPartyDraftList.categories ?? [],
+            appointmentTiming: thirdPartyDraftList.appointmentTiming,
+            followups: thirdPartyDraftList.followups.map { draft in
+                AIFollowupDraft(
+                    descriptionText: draft.descriptionText,
+                    category: draft.category,
+                    confidence: draft.confidence,
+                    scheduleType: draft.scheduleType,
+                    offsetValue: draft.offsetValue,
+                    offsetUnit: draft.offsetUnit,
+                    absoluteAtISO8601UTC: draft.absoluteAtISO8601UTC
+                )
+            }
+        )
     }
 
     private static func anthropicMessagesURL(from baseURL: String) -> URL? {
@@ -605,6 +689,16 @@ private enum NoteFollowupAIService {
         formatter.formatOptions = [.withInternetDateTime]
         return formatter.date(from: raw)
     }
+
+    private static func trimmedOrNil(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private static func normalizedCurrency(_ value: String?) -> String? {
+        guard let trimmed = trimmedOrNil(value) else { return nil }
+        return trimmed.uppercased()
+    }
 }
 #else
 private enum AIServiceError: Error {
@@ -615,12 +709,12 @@ private enum AIServiceError: Error {
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool { false }
 
-    static func generateProposals(
+    static func processNote(
         from noteText: String,
         referenceDate: Date,
         provider: AIProviderMethod,
         thirdPartyConfig: ThirdPartyAIConfig?
-    ) async throws -> [ProposedFollowup] {
+    ) async throws -> ProcessedNoteResult {
         let _ = noteText
         let _ = referenceDate
         let _ = thirdPartyConfig
@@ -1120,14 +1214,15 @@ private struct NoteDetailView: View {
 
         Task {
             do {
-                let generated = try await NoteFollowupAIService.generateProposals(
+                let processed = try await NoteFollowupAIService.processNote(
                     from: note.value,
                     referenceDate: note.createdAtUTC,
                     provider: selectedProvider,
                     thirdPartyConfig: selectedProvider == .thirdParty ? thirdPartyConfig : nil
                 )
                 await MainActor.run {
-                    proposedFollowups = generated
+                    applyProcessedNoteResult(processed)
+                    proposedFollowups = processed.followups
                     aiHasProcessed = true
                     isProcessingWithAI = false
                 }
@@ -1154,6 +1249,7 @@ private struct NoteDetailView: View {
         let now = Date()
         let followup = FollowupEntity(
             descriptionText: proposal.descriptionText,
+            category: proposal.category,
             noteID: note.id,
             appointmentAtUTC: proposal.appointmentAtUTC,
             createdAtUTC: now,
@@ -1195,6 +1291,16 @@ private struct NoteDetailView: View {
             CharacterSet.alphanumerics.contains(scalar) ? Character(scalar) : " "
         }
         return String(scalars).replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func applyProcessedNoteResult(_ result: ProcessedNoteResult) {
+        note.summary = result.summary
+        note.balanceDueAmount = result.balanceDueAmount
+        note.balanceDueCurrency = result.balanceDueCurrency
+        note.categories = result.categories
+        note.appointmentTiming = result.appointmentTiming
+        note.editedAtUTC = Date()
+        try? modelContext.save()
     }
 }
 
@@ -1332,7 +1438,7 @@ private struct AIProcessingControls: View {
             if isProcessingWithAI {
                 HStack(spacing: 8) {
                     ProgressView()
-                    Text("Generating proposals…")
+                    Text("Processing note…")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -1360,9 +1466,19 @@ private struct AIFollowupProposalRow: View {
     let proposal: ProposedFollowup
     let onCreate: (ProposedFollowup) -> Void
 
+    private var trimmedCategory: String? {
+        let value = proposal.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(proposal.descriptionText)
+            if let trimmedCategory {
+                Text(trimmedCategory)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             Text(AppDateFormatter.display(proposal.appointmentAtUTC))
                 .font(.caption)
                 .foregroundStyle(.secondary)
