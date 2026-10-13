@@ -1,5 +1,4 @@
-Analyze the following dental note and return structured note details plus followups.
-It is valid to return zero followups.
+Analyze the following dental note and extract the structured fields according to the system schema.
 
 Reference date (note created date): {{referenceISO}}
 

@@ -50,9 +50,8 @@ final class NoteEntity {
 final class FollowupEntity {
     @Attribute(.unique) var id: UUID
     var descriptionText: String
-    var category: String?
+    var type: String
     var noteID: UUID
-    var appointmentAtUTC: Date
     var createdAtUTC: Date
     var editedAtUTC: Date
     var completedAtUTC: Date?
@@ -60,18 +59,16 @@ final class FollowupEntity {
     init(
         id: UUID = UUID(),
         descriptionText: String,
-        category: String? = nil,
+        type: String,
         noteID: UUID,
-        appointmentAtUTC: Date,
         createdAtUTC: Date = Date(),
         editedAtUTC: Date = Date(),
         completedAtUTC: Date? = nil
     ) {
         self.id = id
         self.descriptionText = descriptionText
-        self.category = category
+        self.type = type
         self.noteID = noteID
-        self.appointmentAtUTC = appointmentAtUTC
         self.createdAtUTC = createdAtUTC
         self.editedAtUTC = editedAtUTC
         self.completedAtUTC = completedAtUTC
@@ -134,15 +131,13 @@ private extension String {
 
 private struct ProposedFollowup: Identifiable, Hashable {
     let id: UUID
+    let type: String
     let descriptionText: String
-    let category: String?
-    let appointmentAtUTC: Date
 
-    init(id: UUID = UUID(), descriptionText: String, category: String? = nil, appointmentAtUTC: Date) {
+    init(id: UUID = UUID(), type: String, descriptionText: String) {
         self.id = id
+        self.type = type
         self.descriptionText = descriptionText
-        self.category = category
-        self.appointmentAtUTC = appointmentAtUTC
     }
 }
 
@@ -297,24 +292,24 @@ private enum KeychainService {
 
 #if canImport(FoundationModels)
 @Generable
-private struct AIFollowupDraft {
-    var descriptionText: String
-    var category: String?
-    var confidence: Double
-    var scheduleType: String
-    var offsetValue: Int?
-    var offsetUnit: String?
-    var absoluteAtISO8601UTC: String?
+private struct AIActionDraft {
+    var type: String
+    var description: String
+}
+
+@Generable
+private struct AIBalanceDueDraft {
+    var amount: Double?
+    var currency: String?
 }
 
 @Generable
 private struct AIProcessedNoteDraft {
     var summary: String
-    var balanceDueAmount: Double?
-    var balanceDueCurrency: String?
     var categories: [String]
-    var appointmentTiming: String?
-    var followups: [AIFollowupDraft]
+    var balance_due: AIBalanceDueDraft?
+    var actions: [AIActionDraft]
+    var appointment_timing: String?
 }
 
 private enum AIServiceError: Error {
@@ -356,23 +351,22 @@ private struct ThirdPartyAnthropicMessagesResponse: Decodable {
     let content: [ContentBlock]
 }
 
-private struct ThirdPartyAIFollowupDraft: Decodable {
-    let descriptionText: String
-    let category: String?
-    let confidence: Double
-    let scheduleType: String
-    let offsetValue: Int?
-    let offsetUnit: String?
-    let absoluteAtISO8601UTC: String?
+private struct ThirdPartyAIActionDraft: Decodable {
+    let type: String?
+    let description: String?
 }
 
 private struct ThirdPartyAIProcessedNoteDraft: Decodable {
     let summary: String?
-    let balanceDueAmount: Double?
-    let balanceDueCurrency: String?
+    let balance_due: ThirdPartyAIBalanceDueDraft?
     let categories: [String]?
-    let appointmentTiming: String?
-    let followups: [ThirdPartyAIFollowupDraft]
+    let actions: [ThirdPartyAIActionDraft]?
+    let appointment_timing: String?
+}
+
+private struct ThirdPartyAIBalanceDueDraft: Decodable {
+    let amount: Double?
+    let currency: String?
 }
 
 private struct AIPromptTemplates {
@@ -459,28 +453,26 @@ private enum NoteFollowupAIService {
             draft = try await processNoteWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
         }
 
-        return normalizeProcessedResult(from: draft, referenceDate: referenceDate)
+        return normalizeProcessedResult(from: draft)
     }
 
-    private static func normalizeProcessedResult(from draft: AIProcessedNoteDraft, referenceDate: Date) -> ProcessedNoteResult {
-        let followups: [ProposedFollowup] = draft.followups.prefix(8).compactMap { followupDraft -> ProposedFollowup? in
-            let description = followupDraft.descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
+    private static func normalizeProcessedResult(from draft: AIProcessedNoteDraft) -> ProcessedNoteResult {
+        let followups: [ProposedFollowup] = draft.actions.prefix(8).compactMap { actionDraft -> ProposedFollowup? in
+            let type = actionDraft.type.trimmingCharacters(in: .whitespacesAndNewlines)
+            let description = actionDraft.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !type.isEmpty else { return nil }
             guard !description.isEmpty else { return nil }
-            guard followupDraft.confidence >= 0.8 else { return nil }
-
-            guard let date = resolvedDate(from: followupDraft, referenceDate: referenceDate) else { return nil }
-            let category = trimmedOrNil(followupDraft.category)
-            return ProposedFollowup(descriptionText: description, category: category, appointmentAtUTC: date)
+            return ProposedFollowup(type: type, descriptionText: description)
         }
 
         let summary = trimmedOrNil(draft.summary)
         let amount: Decimal?
-        if let balance = draft.balanceDueAmount {
+        if let balance = draft.balance_due?.amount {
             amount = NSDecimalNumber(value: balance).decimalValue
         } else {
             amount = nil
         }
-        let currency = amount == nil ? nil : normalizedCurrency(draft.balanceDueCurrency)
+        let currency = amount == nil ? nil : normalizedCurrency(draft.balance_due?.currency)
 
         var seenCategories = Set<String>()
         let categories = (draft.categories)
@@ -493,7 +485,7 @@ private enum NoteFollowupAIService {
             balanceDueAmount: amount,
             balanceDueCurrency: currency,
             categories: categories,
-            appointmentTiming: trimmedOrNil(draft.appointmentTiming),
+            appointmentTiming: trimmedOrNil(draft.appointment_timing),
             followups: followups
         )
     }
@@ -503,11 +495,10 @@ private enum NoteFollowupAIService {
         guard !trimmedNote.isEmpty else {
             return AIProcessedNoteDraft(
                 summary: "",
-                balanceDueAmount: nil,
-                balanceDueCurrency: nil,
                 categories: [],
-                appointmentTiming: nil,
-                followups: []
+                balance_due: nil,
+                actions: [],
+                appointment_timing: nil
             )
         }
 
@@ -527,11 +518,10 @@ private enum NoteFollowupAIService {
         guard !trimmedNote.isEmpty else {
             return AIProcessedNoteDraft(
                 summary: "",
-                balanceDueAmount: nil,
-                balanceDueCurrency: nil,
                 categories: [],
-                appointmentTiming: nil,
-                followups: []
+                balance_due: nil,
+                actions: [],
+                appointment_timing: nil
             )
         }
 
@@ -591,21 +581,18 @@ private enum NoteFollowupAIService {
 
         return AIProcessedNoteDraft(
             summary: thirdPartyDraftList.summary ?? "",
-            balanceDueAmount: thirdPartyDraftList.balanceDueAmount,
-            balanceDueCurrency: thirdPartyDraftList.balanceDueCurrency,
             categories: thirdPartyDraftList.categories ?? [],
-            appointmentTiming: thirdPartyDraftList.appointmentTiming,
-            followups: thirdPartyDraftList.followups.map { draft in
-                AIFollowupDraft(
-                    descriptionText: draft.descriptionText,
-                    category: draft.category,
-                    confidence: draft.confidence,
-                    scheduleType: draft.scheduleType,
-                    offsetValue: draft.offsetValue,
-                    offsetUnit: draft.offsetUnit,
-                    absoluteAtISO8601UTC: draft.absoluteAtISO8601UTC
+            balance_due: thirdPartyDraftList.balance_due.map {
+                AIBalanceDueDraft(amount: $0.amount, currency: $0.currency)
+            },
+            actions: (thirdPartyDraftList.actions ?? []).compactMap { action in
+                guard let type = action.type, let description = action.description else { return nil }
+                return AIActionDraft(
+                    type: type,
+                    description: description
                 )
-            }
+            },
+            appointment_timing: thirdPartyDraftList.appointment_timing
         )
     }
 
@@ -642,52 +629,6 @@ private enum NoteFollowupAIService {
             lines.removeLast()
         }
         return lines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private static func resolvedDate(from draft: AIFollowupDraft, referenceDate: Date) -> Date? {
-        let type = draft.scheduleType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-
-        if type == "relative",
-           let offsetValue = draft.offsetValue,
-           offsetValue > 0,
-           let offsetUnit = draft.offsetUnit?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
-            var component: Calendar.Component?
-            switch offsetUnit {
-            case "day", "days":
-                component = .day
-            case "month", "months":
-                component = .month
-            case "year", "years":
-                component = .year
-            default:
-                component = nil
-            }
-
-            if let component {
-                return Calendar.current.date(byAdding: component, value: offsetValue, to: referenceDate)
-            }
-        }
-
-        if let rawAbsolute = draft.absoluteAtISO8601UTC {
-            return parsedDate(from: rawAbsolute)
-        }
-
-        return nil
-    }
-
-    private static func parsedDate(from text: String) -> Date? {
-        let raw = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !raw.isEmpty else { return nil }
-
-        let formatterWithFractional = ISO8601DateFormatter()
-        formatterWithFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatterWithFractional.date(from: raw) {
-            return date
-        }
-
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: raw)
     }
 
     private static func trimmedOrNil(_ value: String?) -> String? {
@@ -841,7 +782,7 @@ private struct NotesTabView: View {
 
 private struct FollowupsTabView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \FollowupEntity.appointmentAtUTC, order: .reverse) private var followups: [FollowupEntity]
+    @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
     @State private var hideCompleted = false
     @State private var followupPendingDelete: FollowupEntity?
@@ -867,7 +808,7 @@ private struct FollowupsTabView: View {
                             FollowupDetailView(followup: followup)
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(AppDateFormatter.display(followup.appointmentAtUTC))
+                                Text(followup.type.preview())
                                     .fontWeight(.semibold)
                                 Text(followup.descriptionText.preview())
                                     .foregroundStyle(followup.completedAtUTC == nil ? .primary : .secondary)
@@ -1083,7 +1024,7 @@ private struct NoteDetailView: View {
 
     let note: NoteEntity
 
-    @Query(sort: \FollowupEntity.appointmentAtUTC, order: .reverse) private var allFollowups: [FollowupEntity]
+    @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var allFollowups: [FollowupEntity]
 
     @State private var showingEditNote = false
     @State private var showingCreateFollowup = false
@@ -1249,9 +1190,8 @@ private struct NoteDetailView: View {
         let now = Date()
         let followup = FollowupEntity(
             descriptionText: proposal.descriptionText,
-            category: proposal.category,
+            type: proposal.type,
             noteID: note.id,
-            appointmentAtUTC: proposal.appointmentAtUTC,
             createdAtUTC: now,
             editedAtUTC: now
         )
@@ -1404,7 +1344,7 @@ private struct ExistingFollowupsList: View {
                     FollowupDetailView(followup: followup)
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(AppDateFormatter.display(followup.appointmentAtUTC))
+                        Text(followup.type.preview())
                             .fontWeight(.semibold)
                         Text(followup.descriptionText.preview())
                             .foregroundStyle(followup.completedAtUTC == nil ? .primary : .secondary)
@@ -1466,22 +1406,19 @@ private struct AIFollowupProposalRow: View {
     let proposal: ProposedFollowup
     let onCreate: (ProposedFollowup) -> Void
 
-    private var trimmedCategory: String? {
-        let value = proposal.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    private var trimmedType: String? {
+        let value = proposal.type.trimmingCharacters(in: .whitespacesAndNewlines)
         return value.isEmpty ? nil : value
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(proposal.descriptionText)
-            if let trimmedCategory {
-                Text(trimmedCategory)
+            if let trimmedType {
+                Text(trimmedType)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            Text(AppDateFormatter.display(proposal.appointmentAtUTC))
-                .font(.caption)
-                .foregroundStyle(.secondary)
 
             Button("Create") {
                 onCreate(proposal)
@@ -1508,17 +1445,14 @@ private struct FollowupDetailView: View {
         notes.first { $0.id == followup.noteID }
     }
 
-    private var trimmedCategory: String? {
-        let value = followup.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    private var trimmedType: String? {
+        let value = followup.type.trimmingCharacters(in: .whitespacesAndNewlines)
         return value.isEmpty ? nil : value
     }
 
     var body: some View {
         List {
-            Section("Appointment") {
-                LabeledContent("Date") {
-                    Text(AppDateFormatter.display(followup.appointmentAtUTC))
-                }
+            Section("Followup") {
                 LabeledContent("Created") {
                     Text(AppDateFormatter.display(followup.createdAtUTC))
                 }
@@ -1533,9 +1467,9 @@ private struct FollowupDetailView: View {
                     }
                 }
 
-                if let category = trimmedCategory {
-                    LabeledContent("Category") {
-                        Text(category)
+                if let type = trimmedType {
+                    LabeledContent("Type") {
+                        Text(type)
                             .multilineTextAlignment(.trailing)
                     }
                 }
@@ -1680,30 +1614,49 @@ private struct FollowupEditorSheet: View {
     let noteID: UUID
     let existingFollowup: FollowupEntity?
 
+    @State private var typeText: String
     @State private var descriptionText: String
-    @State private var appointmentAtUTC: Date
 
     init(noteID: UUID? = nil, existingFollowup: FollowupEntity? = nil) {
         let resolvedNoteID = noteID ?? existingFollowup?.noteID ?? UUID()
         self.noteID = resolvedNoteID
         self.existingFollowup = existingFollowup
+        _typeText = State(initialValue: existingFollowup?.type ?? "")
         _descriptionText = State(initialValue: existingFollowup?.descriptionText ?? "")
-        _appointmentAtUTC = State(initialValue: existingFollowup?.appointmentAtUTC ?? Date())
     }
 
-    private var isTooLong: Bool {
+    private var isDescriptionTooLong: Bool {
         descriptionText.count > TextLimits.maxLength
+    }
+
+    private var isTypeTooLong: Bool {
+        typeText.count > TextLimits.maxLength
+    }
+
+    private var isTypeEmpty: Bool {
+        typeText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Appointment") {
-                    DatePicker(
-                        "Appointment Time",
-                        selection: $appointmentAtUTC,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
+                Section("Type") {
+                    TextField("Type", text: $typeText)
+                    HStack {
+                        Spacer()
+                        Text("\(typeText.count)/\(TextLimits.maxLength)")
+                            .font(.caption)
+                            .foregroundStyle((isTypeTooLong || isTypeEmpty) ? .red : .secondary)
+                    }
+                    if isTypeEmpty {
+                        Text("Type is required.")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else if isTypeTooLong {
+                        Text("Type must be 2048 characters or fewer.")
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
                 }
 
                 Section("Description") {
@@ -1713,9 +1666,9 @@ private struct FollowupEditorSheet: View {
                         Spacer()
                         Text("\(descriptionText.count)/\(TextLimits.maxLength)")
                             .font(.caption)
-                            .foregroundStyle(isTooLong ? .red : .secondary)
+                            .foregroundStyle(isDescriptionTooLong ? .red : .secondary)
                     }
-                    if isTooLong {
+                    if isDescriptionTooLong {
                         Text("Description must be 2048 characters or fewer.")
                             .font(.caption)
                             .foregroundStyle(.red)
@@ -1733,7 +1686,7 @@ private struct FollowupEditorSheet: View {
                     Button("Save") {
                         save()
                     }
-                    .disabled(isTooLong)
+                    .disabled(isDescriptionTooLong || isTypeTooLong || isTypeEmpty)
                 }
             }
         }
@@ -1741,15 +1694,16 @@ private struct FollowupEditorSheet: View {
 
     private func save() {
         let now = Date()
+        let trimmedType = typeText.trimmingCharacters(in: .whitespacesAndNewlines)
         if let existingFollowup {
+            existingFollowup.type = trimmedType
             existingFollowup.descriptionText = descriptionText
-            existingFollowup.appointmentAtUTC = appointmentAtUTC
             existingFollowup.editedAtUTC = now
         } else {
             let followup = FollowupEntity(
                 descriptionText: descriptionText,
+                type: trimmedType,
                 noteID: noteID,
-                appointmentAtUTC: appointmentAtUTC,
                 createdAtUTC: now,
                 editedAtUTC: now
             )
