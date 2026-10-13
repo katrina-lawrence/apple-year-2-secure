@@ -171,6 +171,13 @@ private struct ThirdPartyAIConfig {
     var baseURL: String
     var modelID: String
     var apiKey: String?
+    var baseURLOverriddenByFile: Bool
+    var modelIDOverriddenByFile: Bool
+    var apiKeyOverriddenByFile: Bool
+
+    var anyValueOverriddenByFile: Bool {
+        baseURLOverriddenByFile || modelIDOverriddenByFile || apiKeyOverriddenByFile
+    }
 
     var isValid: Bool {
         !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
@@ -178,17 +185,57 @@ private struct ThirdPartyAIConfig {
     }
 }
 
+private struct ThirdPartyAIConfigFile: Decodable {
+    let endpoint: String?
+    let model: String?
+    let apiKey: String?
+
+    private func nonEmptyTrimmed(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    var trimmedEndpoint: String? { nonEmptyTrimmed(endpoint) }
+    var trimmedModel: String? { nonEmptyTrimmed(model) }
+    var trimmedAPIKey: String? { nonEmptyTrimmed(apiKey) }
+}
+
 private enum AppSettingsStore {
+    private static let thirdPartyConfigResourceName = "ThirdPartyAIConfig"
+    private static let thirdPartyConfigExtension = "plist"
+
     static func currentProvider(rawValue: String) -> AIProviderMethod {
         AIProviderMethod(rawValue: rawValue) ?? .appleIntelligence
     }
 
     static func thirdPartyConfig(baseURL: String, modelID: String) -> ThirdPartyAIConfig {
-        ThirdPartyAIConfig(
-            baseURL: baseURL.trimmingCharacters(in: .whitespacesAndNewlines),
-            modelID: modelID.trimmingCharacters(in: .whitespacesAndNewlines),
-            apiKey: KeychainService.readThirdPartyAPIKey()
+        let fileConfig = bundledThirdPartyConfig()
+        let fileEndpoint = fileConfig?.trimmedEndpoint
+        let fileModel = fileConfig?.trimmedModel
+        let fileAPIKey = fileConfig?.trimmedAPIKey
+
+        return ThirdPartyAIConfig(
+            baseURL: fileEndpoint ?? baseURL.trimmingCharacters(in: .whitespacesAndNewlines),
+            modelID: fileModel ?? modelID.trimmingCharacters(in: .whitespacesAndNewlines),
+            apiKey: fileAPIKey ?? KeychainService.readThirdPartyAPIKey(),
+            baseURLOverriddenByFile: fileEndpoint != nil,
+            modelIDOverriddenByFile: fileModel != nil,
+            apiKeyOverriddenByFile: fileAPIKey != nil
         )
+    }
+
+    private static func bundledThirdPartyConfig() -> ThirdPartyAIConfigFile? {
+        guard let url = Bundle.main.url(
+            forResource: thirdPartyConfigResourceName,
+            withExtension: thirdPartyConfigExtension
+        ) else {
+            return nil
+        }
+        guard let data = try? Data(contentsOf: url) else {
+            return nil
+        }
+        return try? PropertyListDecoder().decode(ThirdPartyAIConfigFile.self, from: data)
     }
 }
 
@@ -435,7 +482,7 @@ private enum NoteFollowupAIService {
 
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = 180
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         if let apiKey = config.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines), !apiKey.isEmpty {
@@ -785,6 +832,21 @@ private struct SettingsView: View {
         AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
     }
 
+    private var effectiveThirdPartyConfig: ThirdPartyAIConfig {
+        AppSettingsStore.thirdPartyConfig(
+            baseURL: storedThirdPartyBaseURL,
+            modelID: storedThirdPartyModelID
+        )
+    }
+
+    private var isThirdPartyConfigFileOverrideActive: Bool {
+        effectiveThirdPartyConfig.anyValueOverriddenByFile
+    }
+
+    private var isThirdPartyEditingDisabled: Bool {
+        thirdPartyConfigLocked || isThirdPartyConfigFileOverrideActive
+    }
+
     private var canSaveThirdPartyConfig: Bool {
         !thirdPartyBaseURLInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !thirdPartyModelIDInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -814,19 +876,25 @@ private struct SettingsView: View {
                         TextField("Base URL", text: $thirdPartyBaseURLInput)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .disabled(thirdPartyConfigLocked)
+                            .disabled(isThirdPartyEditingDisabled)
 
                         TextField("Model ID", text: $thirdPartyModelIDInput)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .disabled(thirdPartyConfigLocked)
+                            .disabled(isThirdPartyEditingDisabled)
 
                         SecureField("API Key (optional)", text: $apiKeyInput)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                            .disabled(thirdPartyConfigLocked)
+                            .disabled(isThirdPartyEditingDisabled)
 
-                        if thirdPartyConfigLocked {
+                        if isThirdPartyConfigFileOverrideActive {
+                            Text("Values from ThirdPartyAIConfig.plist override in-app settings. Editing is disabled.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if thirdPartyConfigLocked && !isThirdPartyConfigFileOverrideActive {
                             Text("Configuration saved. Press Edit to modify. API key is hidden after saving.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -846,18 +914,20 @@ private struct SettingsView: View {
                                 .foregroundStyle(.red)
                         }
 
-                        if thirdPartyConfigLocked {
-                            Button("Edit") {
-                                thirdPartyConfigLocked = false
-                                apiKeyInput = ""
-                                settingsMessage = nil
-                                settingsError = nil
+                        if !isThirdPartyConfigFileOverrideActive {
+                            if thirdPartyConfigLocked {
+                                Button("Edit") {
+                                    thirdPartyConfigLocked = false
+                                    apiKeyInput = ""
+                                    settingsMessage = nil
+                                    settingsError = nil
+                                }
+                            } else {
+                                Button("Save") {
+                                    saveThirdPartyConfiguration()
+                                }
+                                .disabled(!canSaveThirdPartyConfig)
                             }
-                        } else {
-                            Button("Save") {
-                                saveThirdPartyConfiguration()
-                            }
-                            .disabled(!canSaveThirdPartyConfig)
                         }
                     }
                 }
@@ -873,6 +943,10 @@ private struct SettingsView: View {
             .onAppear {
                 thirdPartyBaseURLInput = storedThirdPartyBaseURL
                 thirdPartyModelIDInput = storedThirdPartyModelID
+                if isThirdPartyConfigFileOverrideActive {
+                    thirdPartyBaseURLInput = effectiveThirdPartyConfig.baseURL
+                    thirdPartyModelIDInput = effectiveThirdPartyConfig.modelID
+                }
             }
         }
     }

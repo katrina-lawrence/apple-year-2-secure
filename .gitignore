@@ -25,3 +25,6 @@ fastlane/test_output/
 # Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+# Local third-party API config (contains secrets)
+Dental Notes/ThirdPartyAIConfig.plist
