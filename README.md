@@ -8,6 +8,8 @@ The app can optionally load third-party AI settings from `Dental Notes/ThirdPart
 2. Replace placeholder values with your local development endpoint, model, and API key.
 3. Run the app.
 
+When `Third-party provider` is selected in Settings, endpoint/model/API key are read from this plist only.
+
 Security notes:
 - `Dental Notes/ThirdPartyAIConfig.plist` is gitignored and should stay local-only.
 - `Dental Notes/ThirdPartyAIConfig.example.plist` is safe to commit because it contains placeholders only.
