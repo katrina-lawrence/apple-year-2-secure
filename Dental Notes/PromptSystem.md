@@ -17,19 +17,6 @@ Requirements:
 - Use null for missing payment or appointment information and empty arrays when no categories or actions are found.
 - Return only JSON conforming to the supplied schema.
 
-Rules:
-- summary: brief, plain-language, factual summary of the note
-- categories: array of applicable categories found in the note (e.g. Payment, Insurance, Appointment); empty array if none
-- balance_due.amount: number only when a balance due is explicitly present, otherwise null
-- balance_due.currency: 3-letter ISO code when present (e.g. USD); null when unknown or not specified
-- actions: array of concrete follow-up actions explicitly present in the note; empty array if none
-- each action must include:
-  - type: concise free-text category/type (for example Insurance, Payment, Appointment)
-  - description: concise actionable text
-- do not include dates in actions
-- appointment_timing: only when timing is mentioned (general day/time/month/year text is acceptable), otherwise null
-- do not invent or assume missing facts
-
 JSON Schema:
 {
   "summary": "The user has a $240 dental balance, needs to contact insurance about crown coverage, and plans to book another appointment in February.",
