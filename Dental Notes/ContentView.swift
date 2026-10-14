@@ -150,6 +150,24 @@ private struct ProcessedNoteResult {
     let followups: [ProposedFollowup]
 }
 
+private struct ProcessedNotePreviewData {
+    struct Followup: Identifiable {
+        let id: UUID
+        let type: String
+        let descriptionText: String
+    }
+
+    let createdAtUTC: Date
+    let editedAtUTC: Date
+    let content: String
+    let summary: String?
+    let balanceDueAmount: Decimal?
+    let balanceDueCurrency: String?
+    let categories: [String]
+    let appointmentTiming: String?
+    let followups: [Followup]
+}
+
 private enum AIProviderMethod: String, CaseIterable, Identifiable {
     case appleIntelligence
     case thirdParty
@@ -1033,6 +1051,9 @@ private struct NoteDetailView: View {
     @State private var aiProcessError: String?
     @State private var aiHasProcessed = false
     @State private var proposedFollowups: [ProposedFollowup] = []
+    @State private var pendingProcessedResult: ProcessedNoteResult?
+    @State private var pendingProcessedEditedAtUTC: Date?
+    @State private var showingProcessApproval = false
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
@@ -1053,6 +1074,28 @@ private struct NoteDetailView: View {
         case .thirdParty:
             return thirdPartyConfig.isValid
         }
+    }
+
+    private var pendingPreviewData: ProcessedNotePreviewData? {
+        guard let pendingProcessedResult else { return nil }
+        let stagedEditedAtUTC = pendingProcessedEditedAtUTC ?? Date()
+        return ProcessedNotePreviewData(
+            createdAtUTC: note.createdAtUTC,
+            editedAtUTC: stagedEditedAtUTC,
+            content: note.value,
+            summary: pendingProcessedResult.summary,
+            balanceDueAmount: pendingProcessedResult.balanceDueAmount,
+            balanceDueCurrency: pendingProcessedResult.balanceDueCurrency,
+            categories: pendingProcessedResult.categories,
+            appointmentTiming: pendingProcessedResult.appointmentTiming,
+            followups: pendingProcessedResult.followups.map { proposal in
+                ProcessedNotePreviewData.Followup(
+                    id: proposal.id,
+                    type: proposal.type,
+                    descriptionText: proposal.descriptionText
+                )
+            }
+        )
     }
 
     var body: some View {
@@ -1089,6 +1132,17 @@ private struct NoteDetailView: View {
         } message: {
             Text("This also deletes all followups associated with this note.")
         }
+        .fullScreenCover(isPresented: $showingProcessApproval) {
+            if let pendingPreviewData {
+                ProcessedNoteApprovalPreview(
+                    preview: pendingPreviewData,
+                    onSave: applyPendingProcessedChanges,
+                    onCancel: discardPendingProcessedChanges
+                )
+            } else {
+                EmptyView()
+            }
+        }
         .onAppear {
             aiAvailable = NoteFollowupAIService.isAppleAvailable()
         }
@@ -1114,6 +1168,8 @@ private struct NoteDetailView: View {
 
         isProcessingWithAI = true
         aiProcessError = nil
+        aiHasProcessed = false
+        proposedFollowups = []
 
         Task {
             do {
@@ -1124,11 +1180,9 @@ private struct NoteDetailView: View {
                     thirdPartyConfig: selectedProvider == .thirdParty ? thirdPartyConfig : nil
                 )
                 await MainActor.run {
-                    applyProcessedNoteResult(processed)
-                    replaceFollowups(with: processed.followups)
-                    proposedFollowups = processed.followups
-                    try? modelContext.save()
-                    aiHasProcessed = true
+                    pendingProcessedResult = processed
+                    pendingProcessedEditedAtUTC = Date()
+                    showingProcessApproval = true
                     isProcessingWithAI = false
                 }
             } catch {
@@ -1140,6 +1194,29 @@ private struct NoteDetailView: View {
                 }
             }
         }
+    }
+
+    private func applyPendingProcessedChanges() {
+        guard let processed = pendingProcessedResult else { return }
+        let editedAtUTC = pendingProcessedEditedAtUTC ?? Date()
+
+        applyProcessedNoteResult(processed, editedAtUTC: editedAtUTC)
+        replaceFollowups(with: processed.followups)
+        proposedFollowups = processed.followups
+        aiHasProcessed = true
+        try? modelContext.save()
+
+        pendingProcessedResult = nil
+        pendingProcessedEditedAtUTC = nil
+        showingProcessApproval = false
+    }
+
+    private func discardPendingProcessedChanges() {
+        pendingProcessedResult = nil
+        pendingProcessedEditedAtUTC = nil
+        showingProcessApproval = false
+        aiHasProcessed = false
+        proposedFollowups = []
     }
 
     private func replaceFollowups(with followups: [ProposedFollowup]) {
@@ -1160,13 +1237,13 @@ private struct NoteDetailView: View {
         }
     }
 
-    private func applyProcessedNoteResult(_ result: ProcessedNoteResult) {
+    private func applyProcessedNoteResult(_ result: ProcessedNoteResult, editedAtUTC: Date) {
         note.summary = result.summary
         note.balanceDueAmount = result.balanceDueAmount
         note.balanceDueCurrency = result.balanceDueCurrency
         note.categories = result.categories
         note.appointmentTiming = result.appointmentTiming
-        note.editedAtUTC = Date()
+        note.editedAtUTC = editedAtUTC
     }
 }
 
@@ -1318,6 +1395,146 @@ private struct AIProcessingControls: View {
                 Text("No followup proposals were generated.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct ProcessedNoteApprovalPreview: View {
+    let preview: ProcessedNotePreviewData
+    let onSave: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ProcessedNoteMetadataSection(preview: preview)
+                Section("Followups") {
+                    ProcessedFollowupsPreviewList(followups: preview.followups)
+                }
+            }
+            .navigationTitle("Review Processed Note")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        onCancel()
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        onSave()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .interactiveDismissDisabled()
+    }
+}
+
+private struct ProcessedNoteMetadataSection: View {
+    let preview: ProcessedNotePreviewData
+
+    private var trimmedSummary: String? {
+        let value = preview.summary?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
+    private var trimmedAppointmentTiming: String? {
+        let value = preview.appointmentTiming?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value.isEmpty ? nil : value
+    }
+
+    private var normalizedCategories: [String] {
+        preview.categories
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
+    private var formattedBalance: String? {
+        guard let amount = preview.balanceDueAmount else { return nil }
+        return CurrencyDisplayFormatter.format(amount: amount, currency: preview.balanceDueCurrency)
+    }
+
+    var body: some View {
+        Section("Note") {
+            LabeledContent("Created") {
+                Text(AppDateFormatter.display(preview.createdAtUTC))
+                    .multilineTextAlignment(.trailing)
+            }
+            LabeledContent("Edited") {
+                Text(AppDateFormatter.display(preview.editedAtUTC))
+                    .multilineTextAlignment(.trailing)
+            }
+
+            if let summary = trimmedSummary {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Summary")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(summary)
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
+            if let formattedBalance {
+                LabeledContent("Balance Due") {
+                    Text(formattedBalance)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+
+            if !normalizedCategories.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Categories")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(normalizedCategories.joined(separator: ", "))
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
+            if let appointmentTiming = trimmedAppointmentTiming {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Appointment Timing")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(appointmentTiming)
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 4)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Content")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(preview.content.isEmpty ? "(Empty)" : preview.content)
+                    .textSelection(.enabled)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+}
+
+private struct ProcessedFollowupsPreviewList: View {
+    let followups: [ProcessedNotePreviewData.Followup]
+
+    var body: some View {
+        if followups.isEmpty {
+            Text("No followups for this note.")
+                .foregroundStyle(.secondary)
+        } else {
+            ForEach(followups) { followup in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(followup.type.preview())
+                        .fontWeight(.semibold)
+                    Text(followup.descriptionText.preview())
+                }
+                .padding(.vertical, 2)
             }
         }
     }
