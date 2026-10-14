@@ -13,7 +13,7 @@ private enum TextLimits {
 
 @Model
 final class NoteEntity {
-    @Attribute(.unique) var id: UUID
+    @Attribute(.unique) var id: String
     var value: String
     var summary: String?
     var balanceDueAmount: Decimal?
@@ -24,7 +24,7 @@ final class NoteEntity {
     var editedAtUTC: Date
 
     init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
         value: String,
         summary: String? = nil,
         balanceDueAmount: Decimal? = nil,
@@ -48,19 +48,19 @@ final class NoteEntity {
 
 @Model
 final class FollowupEntity {
-    @Attribute(.unique) var id: UUID
+    @Attribute(.unique) var id: String
     var descriptionText: String
     var type: String
-    var noteID: UUID
+    var noteID: String
     var createdAtUTC: Date
     var editedAtUTC: Date
     var isCompleted: Bool
 
     init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
         descriptionText: String,
         type: String,
-        noteID: UUID,
+        noteID: String,
         createdAtUTC: Date = Date(),
         editedAtUTC: Date = Date(),
         isCompleted: Bool = false
@@ -129,7 +129,7 @@ private extension String {
     }
 }
 
-private struct ProposedFollowup: Identifiable, Hashable {
+struct ProposedFollowup: Identifiable, Hashable {
     let id: UUID
     let type: String
     let descriptionText: String
@@ -141,7 +141,7 @@ private struct ProposedFollowup: Identifiable, Hashable {
     }
 }
 
-private struct ProcessedNoteResult {
+struct ProcessedNoteResult {
     let summary: String?
     let balanceDueAmount: Decimal?
     let balanceDueCurrency: String?
@@ -705,12 +705,14 @@ struct ContentView: View {
 
 private struct NotesTabView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
     @Query(sort: \NoteEntity.createdAtUTC, order: .reverse) private var notes: [NoteEntity]
     @Query private var allFollowups: [FollowupEntity]
 
     @State private var showingCreateNote = false
     @State private var showingSettings = false
     @State private var notePendingDelete: NoteEntity?
+    @State private var operationError: String?
 
     var body: some View {
         NavigationStack {
@@ -745,6 +747,11 @@ private struct NotesTabView: View {
                 }
             }
             .navigationTitle("Notes")
+            .refreshable {
+                if session.mode.isServer {
+                    _ = await session.refreshUserData(modelContext: modelContext)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -776,7 +783,9 @@ private struct NotesTabView: View {
             })) {
                 Button("Delete", role: .destructive) {
                     guard let note = notePendingDelete else { return }
-                    deleteNoteWithFollowups(note)
+                    Task { @MainActor in
+                        await deleteNoteWithFollowups(note)
+                    }
                     notePendingDelete = nil
                 }
                 Button("Cancel", role: .cancel) {
@@ -785,10 +794,34 @@ private struct NotesTabView: View {
             } message: {
                 Text("This also deletes all followups associated with this note.")
             }
+            .alert("Sync Error", isPresented: Binding(
+                get: { operationError != nil || session.syncError != nil },
+                set: { newValue in
+                    if !newValue {
+                        operationError = nil
+                        session.clearSyncError()
+                    }
+                })
+            ) {
+                Button("OK", role: .cancel) {
+                    operationError = nil
+                    session.clearSyncError()
+                }
+            } message: {
+                Text(operationError ?? session.syncError ?? "Request failed.")
+            }
         }
     }
 
-    private func deleteNoteWithFollowups(_ note: NoteEntity) {
+    private func deleteNoteWithFollowups(_ note: NoteEntity) async {
+        if session.mode.isServer {
+            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
+            if !success {
+                operationError = session.syncError ?? "Could not delete note."
+            }
+            return
+        }
+
         let related = allFollowups.filter { $0.noteID == note.id }
         for followup in related {
             modelContext.delete(followup)
@@ -800,10 +833,12 @@ private struct NotesTabView: View {
 
 private struct FollowupsTabView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
     @State private var hideCompleted = false
     @State private var followupPendingDelete: FollowupEntity?
+    @State private var operationError: String?
 
     private var displayedFollowups: [FollowupEntity] {
         hideCompleted ? followups.filter { !$0.isCompleted } : followups
@@ -846,6 +881,11 @@ private struct FollowupsTabView: View {
                 }
             }
             .navigationTitle("Followups")
+            .refreshable {
+                if session.mode.isServer {
+                    _ = await session.refreshUserData(modelContext: modelContext)
+                }
+            }
             .alert("Delete Followup?", isPresented: Binding(get: {
                 followupPendingDelete != nil
             }, set: { newValue in
@@ -855,20 +895,52 @@ private struct FollowupsTabView: View {
             })) {
                 Button("Delete", role: .destructive) {
                     guard let followup = followupPendingDelete else { return }
-                    modelContext.delete(followup)
-                    try? modelContext.save()
+                    Task { @MainActor in
+                        await deleteFollowup(followup)
+                    }
                     followupPendingDelete = nil
                 }
                 Button("Cancel", role: .cancel) {
                     followupPendingDelete = nil
                 }
             }
+            .alert("Sync Error", isPresented: Binding(
+                get: { operationError != nil || session.syncError != nil },
+                set: { newValue in
+                    if !newValue {
+                        operationError = nil
+                        session.clearSyncError()
+                    }
+                })
+            ) {
+                Button("OK", role: .cancel) {
+                    operationError = nil
+                    session.clearSyncError()
+                }
+            } message: {
+                Text(operationError ?? session.syncError ?? "Request failed.")
+            }
         }
+    }
+
+    private func deleteFollowup(_ followup: FollowupEntity) async {
+        if session.mode.isServer {
+            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
+            if !success {
+                operationError = session.syncError ?? "Could not delete followup."
+            }
+            return
+        }
+
+        modelContext.delete(followup)
+        try? modelContext.save()
     }
 }
 
 private struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
 
     @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
     @AppStorage(AppSettingsKeys.thirdPartyBaseURL) private var storedThirdPartyBaseURL = ""
@@ -880,6 +952,7 @@ private struct SettingsView: View {
     @State private var apiKeyInput = ""
     @State private var settingsMessage: String?
     @State private var settingsError: String?
+    @State private var confirmingLogout = false
 
     private var selectedProvider: AIProviderMethod {
         AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
@@ -984,6 +1057,14 @@ private struct SettingsView: View {
                         }
                     }
                 }
+
+                if session.mode.isServer && session.isAuthenticated {
+                    Section("Account") {
+                        Button("Log Out", role: .destructive) {
+                            confirmingLogout = true
+                        }
+                    }
+                }
             }
             .navigationTitle("Settings")
             .toolbar {
@@ -1000,6 +1081,17 @@ private struct SettingsView: View {
                     thirdPartyBaseURLInput = effectiveThirdPartyConfig.baseURL
                     thirdPartyModelIDInput = effectiveThirdPartyConfig.modelID
                 }
+            }
+            .alert("Log Out?", isPresented: $confirmingLogout) {
+                Button("Log Out", role: .destructive) {
+                    Task { @MainActor in
+                        await session.logoutAndClearLocalData(modelContext: modelContext)
+                        dismiss()
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This removes local notes and followups from this device.")
             }
         }
     }
@@ -1035,6 +1127,7 @@ private struct SettingsView: View {
 private struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
 
     @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
     @AppStorage(AppSettingsKeys.thirdPartyBaseURL) private var thirdPartyBaseURL = ""
@@ -1054,6 +1147,7 @@ private struct NoteDetailView: View {
     @State private var pendingProcessedResult: ProcessedNoteResult?
     @State private var pendingProcessedEditedAtUTC: Date?
     @State private var showingProcessApproval = false
+    @State private var isSavingProcessedNote = false
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
@@ -1121,12 +1215,9 @@ private struct NoteDetailView: View {
         }
         .alert("Delete Note?", isPresented: $notePendingDelete) {
             Button("Delete", role: .destructive) {
-                for followup in associatedFollowups {
-                    modelContext.delete(followup)
+                Task { @MainActor in
+                    await deleteCurrentNote()
                 }
-                modelContext.delete(note)
-                try? modelContext.save()
-                dismiss()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -1136,6 +1227,7 @@ private struct NoteDetailView: View {
             if let pendingPreviewData {
                 ProcessedNoteApprovalPreview(
                     preview: pendingPreviewData,
+                    isSaving: isSavingProcessedNote,
                     onSave: applyPendingProcessedChanges,
                     onCancel: discardPendingProcessedChanges
                 )
@@ -1145,6 +1237,20 @@ private struct NoteDetailView: View {
         }
         .onAppear {
             aiAvailable = NoteFollowupAIService.isAppleAvailable()
+        }
+        .alert("Sync Error", isPresented: Binding(
+            get: { session.syncError != nil },
+            set: { newValue in
+                if !newValue {
+                    session.clearSyncError()
+                }
+            })
+        ) {
+            Button("OK", role: .cancel) {
+                session.clearSyncError()
+            }
+        } message: {
+            Text(session.syncError ?? "Request failed.")
         }
     }
 
@@ -1171,7 +1277,7 @@ private struct NoteDetailView: View {
         aiHasProcessed = false
         proposedFollowups = []
 
-        Task {
+        Task { @MainActor in
             do {
                 let processed = try await NoteFollowupAIService.processNote(
                     from: note.value,
@@ -1198,17 +1304,37 @@ private struct NoteDetailView: View {
 
     private func applyPendingProcessedChanges() {
         guard let processed = pendingProcessedResult else { return }
-        let editedAtUTC = pendingProcessedEditedAtUTC ?? Date()
+        isSavingProcessedNote = true
 
-        applyProcessedNoteResult(processed, editedAtUTC: editedAtUTC)
-        replaceFollowups(with: processed.followups)
-        proposedFollowups = processed.followups
-        aiHasProcessed = true
-        try? modelContext.save()
+        Task { @MainActor in
+            if session.mode.isServer {
+                let success = await session.saveProcessedNote(note: note, result: processed, modelContext: modelContext)
+                await MainActor.run {
+                    if success {
+                        proposedFollowups = processed.followups
+                        aiHasProcessed = true
+                        pendingProcessedResult = nil
+                        pendingProcessedEditedAtUTC = nil
+                        showingProcessApproval = false
+                    }
+                    isSavingProcessedNote = false
+                }
+                return
+            }
 
-        pendingProcessedResult = nil
-        pendingProcessedEditedAtUTC = nil
-        showingProcessApproval = false
+            let editedAtUTC = pendingProcessedEditedAtUTC ?? Date()
+            await MainActor.run {
+                applyProcessedNoteResult(processed, editedAtUTC: editedAtUTC)
+                replaceFollowups(with: processed.followups)
+                proposedFollowups = processed.followups
+                aiHasProcessed = true
+                try? modelContext.save()
+                pendingProcessedResult = nil
+                pendingProcessedEditedAtUTC = nil
+                showingProcessApproval = false
+                isSavingProcessedNote = false
+            }
+        }
     }
 
     private func discardPendingProcessedChanges() {
@@ -1244,6 +1370,23 @@ private struct NoteDetailView: View {
         note.categories = result.categories
         note.appointmentTiming = result.appointmentTiming
         note.editedAtUTC = editedAtUTC
+    }
+
+    private func deleteCurrentNote() async {
+        if session.mode.isServer {
+            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
+            if success {
+                dismiss()
+            }
+            return
+        }
+
+        for followup in associatedFollowups {
+            modelContext.delete(followup)
+        }
+        modelContext.delete(note)
+        try? modelContext.save()
+        dismiss()
     }
 }
 
@@ -1402,6 +1545,7 @@ private struct AIProcessingControls: View {
 
 private struct ProcessedNoteApprovalPreview: View {
     let preview: ProcessedNotePreviewData
+    let isSaving: Bool
     let onSave: () -> Void
     let onCancel: () -> Void
 
@@ -1420,12 +1564,14 @@ private struct ProcessedNoteApprovalPreview: View {
                     Button("Cancel") {
                         onCancel()
                     }
+                    .disabled(isSaving)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         onSave()
                     }
                     .fontWeight(.semibold)
+                    .disabled(isSaving)
                 }
             }
         }
@@ -1543,6 +1689,7 @@ private struct ProcessedFollowupsPreviewList: View {
 private struct FollowupDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
 
     let followup: FollowupEntity
 
@@ -1630,28 +1777,56 @@ private struct FollowupDetailView: View {
         }
         .alert("Delete Followup?", isPresented: $followupPendingDelete) {
             Button("Delete", role: .destructive) {
-                modelContext.delete(followup)
-                try? modelContext.save()
-                dismiss()
+                Task { @MainActor in
+                    await deleteFollowup()
+                }
             }
             Button("Cancel", role: .cancel) {}
         }
     }
 
     private func setCompleted(to completed: Bool) {
+        if session.mode.isServer {
+            Task { @MainActor in
+                _ = await session.setFollowupCompletion(
+                    followupID: followup.id,
+                    completed: completed,
+                    modelContext: modelContext
+                )
+            }
+            return
+        }
+
         followup.isCompleted = completed
         followup.editedAtUTC = Date()
         try? modelContext.save()
+    }
+
+    private func deleteFollowup() async {
+        if session.mode.isServer {
+            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
+            if success {
+                dismiss()
+            }
+            return
+        }
+
+        modelContext.delete(followup)
+        try? modelContext.save()
+        dismiss()
     }
 }
 
 private struct NoteEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
 
     let note: NoteEntity?
 
     @State private var value: String
+    @State private var isSaving = false
+    @State private var saveError: String?
 
     init(note: NoteEntity? = nil) {
         self.note = note
@@ -1692,13 +1867,50 @@ private struct NoteEditorSheet: View {
                     Button("Save") {
                         save()
                     }
-                    .disabled(isTooLong)
+                    .disabled(isTooLong || isSaving)
                 }
+            }
+            .alert("Save Error", isPresented: Binding(get: {
+                saveError != nil
+            }, set: { newValue in
+                if !newValue { saveError = nil }
+            })) {
+                Button("OK", role: .cancel) {
+                    saveError = nil
+                }
+            } message: {
+                Text(saveError ?? "Could not save note.")
             }
         }
     }
 
     private func save() {
+        if isSaving { return }
+        isSaving = true
+        saveError = nil
+
+        if session.mode.isServer {
+            let noteValue = value
+            Task { @MainActor in
+                let success: Bool
+                if let note {
+                    success = await session.updateNote(noteID: note.id, value: noteValue, modelContext: modelContext)
+                } else {
+                    success = await session.createNote(value: noteValue, modelContext: modelContext)
+                }
+
+                await MainActor.run {
+                    isSaving = false
+                    if success {
+                        dismiss()
+                    } else {
+                        saveError = session.syncError ?? "Could not save note."
+                    }
+                }
+            }
+            return
+        }
+
         let now = Date()
         if let note {
             note.value = value
@@ -1709,6 +1921,7 @@ private struct NoteEditorSheet: View {
         }
 
         try? modelContext.save()
+        isSaving = false
         dismiss()
     }
 }
@@ -1716,15 +1929,18 @@ private struct NoteEditorSheet: View {
 private struct FollowupEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var session: AppSessionViewModel
 
-    let noteID: UUID
+    let noteID: String
     let existingFollowup: FollowupEntity?
 
     @State private var typeText: String
     @State private var descriptionText: String
+    @State private var isSaving = false
+    @State private var saveError: String?
 
-    init(noteID: UUID? = nil, existingFollowup: FollowupEntity? = nil) {
-        let resolvedNoteID = noteID ?? existingFollowup?.noteID ?? UUID()
+    init(noteID: String? = nil, existingFollowup: FollowupEntity? = nil) {
+        let resolvedNoteID = noteID ?? existingFollowup?.noteID ?? UUID().uuidString
         self.noteID = resolvedNoteID
         self.existingFollowup = existingFollowup
         _typeText = State(initialValue: existingFollowup?.type ?? "")
@@ -1792,15 +2008,63 @@ private struct FollowupEditorSheet: View {
                     Button("Save") {
                         save()
                     }
-                    .disabled(isDescriptionTooLong || isTypeTooLong || isTypeEmpty)
+                    .disabled(isDescriptionTooLong || isTypeTooLong || isTypeEmpty || isSaving)
                 }
+            }
+            .alert("Save Error", isPresented: Binding(get: {
+                saveError != nil
+            }, set: { newValue in
+                if !newValue { saveError = nil }
+            })) {
+                Button("OK", role: .cancel) {
+                    saveError = nil
+                }
+            } message: {
+                Text(saveError ?? "Could not save followup.")
             }
         }
     }
 
     private func save() {
+        if isSaving { return }
+        isSaving = true
+        saveError = nil
+
         let now = Date()
         let trimmedType = typeText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if session.mode.isServer {
+            let description = descriptionText
+            Task { @MainActor in
+                let success: Bool
+                if let existingFollowup {
+                    success = await session.updateFollowupText(
+                        followup: existingFollowup,
+                        type: trimmedType,
+                        descriptionText: description,
+                        modelContext: modelContext
+                    )
+                } else {
+                    success = await session.createFollowup(
+                        noteID: noteID,
+                        type: trimmedType,
+                        descriptionText: description,
+                        modelContext: modelContext
+                    )
+                }
+
+                await MainActor.run {
+                    isSaving = false
+                    if success {
+                        dismiss()
+                    } else {
+                        saveError = session.syncError ?? "Could not save followup."
+                    }
+                }
+            }
+            return
+        }
+
         if let existingFollowup {
             existingFollowup.type = trimmedType
             existingFollowup.descriptionText = descriptionText
@@ -1817,6 +2081,7 @@ private struct FollowupEditorSheet: View {
         }
 
         try? modelContext.save()
+        isSaving = false
         dismiss()
     }
 }
@@ -1824,4 +2089,5 @@ private struct FollowupEditorSheet: View {
 #Preview {
     ContentView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
+        .environmentObject(AppSessionViewModel())
 }

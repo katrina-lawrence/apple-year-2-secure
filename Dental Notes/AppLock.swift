@@ -45,7 +45,9 @@ final class AppLockViewModel: ObservableObject {
         ) { [weak self] success, error in
             Task { [weak self, success, error] in
                 guard let self else { return }
-                await self.handleAuthenticationResult(success: success, error: error)
+                await MainActor.run {
+                    self.handleAuthenticationResult(success: success, error: error)
+                }
             }
         }
     }
@@ -72,13 +74,15 @@ final class AppLockViewModel: ObservableObject {
 }
 
 struct AppLockGateView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var session: AppSessionViewModel
     @StateObject private var appLock = AppLockViewModel()
 
     var body: some View {
         Group {
             if appLock.isUnlocked {
-                ContentView()
+                UnlockedRootView()
             } else {
                 LockScreenView(
                     isAuthenticating: appLock.isAuthenticating,
@@ -90,14 +94,34 @@ struct AppLockGateView: View {
         .onAppear {
             appLock.authenticateIfNeeded()
         }
+        .task {
+            await session.bootstrapIfNeeded(modelContext: modelContext)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
                 appLock.authenticateIfNeeded()
+                Task { @MainActor in
+                    await session.bootstrapIfNeeded(modelContext: modelContext)
+                }
             case .inactive, .background:
                 appLock.lock()
             @unknown default:
                 appLock.lock()
+            }
+        }
+    }
+}
+
+private struct UnlockedRootView: View {
+    @EnvironmentObject private var session: AppSessionViewModel
+
+    var body: some View {
+        Group {
+            if session.mode.isServer && !session.isAuthenticated {
+                ServerAuthenticationView()
+            } else {
+                ContentView()
             }
         }
     }
@@ -156,4 +180,5 @@ private struct LockScreenView: View {
 #Preview {
     AppLockGateView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
+        .environmentObject(AppSessionViewModel())
 }

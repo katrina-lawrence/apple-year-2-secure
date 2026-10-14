@@ -28,3 +28,6 @@ playground.xcworkspace
 
 # Local third-party API config (contains secrets)
 Dental Notes/ThirdPartyAIConfig.plist
+
+# Local backend server config
+Dental Notes/BackendConfig.plist

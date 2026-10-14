@@ -3,6 +3,8 @@ import SwiftUI
 
 @main
 struct Dental_NotesApp: App {
+    @StateObject private var appSession = AppSessionViewModel()
+
     private let sharedModelContainer: ModelContainer = {
         do {
             return try ModelContainer(for: NoteEntity.self, FollowupEntity.self)
@@ -19,6 +21,7 @@ struct Dental_NotesApp: App {
     var body: some Scene {
         WindowGroup {
             AppLockGateView()
+                .environmentObject(appSession)
         }
         .modelContainer(sharedModelContainer)
     }

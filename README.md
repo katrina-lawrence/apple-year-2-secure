@@ -12,3 +12,15 @@ Security notes:
 - `Dental Notes/ThirdPartyAIConfig.plist` is gitignored and should stay local-only.
 - `Dental Notes/ThirdPartyAIConfig.example.plist` is safe to commit because it contains placeholders only.
 - Do not commit real secrets.
+
+## Backend Server Mode Configuration
+
+To run the app in server mode:
+
+1. Copy `Dental Notes/BackendConfig.example.plist` to `Dental Notes/BackendConfig.plist`.
+2. Set `baseURL` to your backend URL (HTTP and HTTPS are supported).
+3. Build with the `SERVER_MODE` Swift compilation condition enabled.
+
+Notes:
+- In builds without `SERVER_MODE`, the app runs in local-only mode.
+- `Dental Notes/BackendConfig.plist` is gitignored.
