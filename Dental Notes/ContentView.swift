@@ -54,7 +54,7 @@ final class FollowupEntity {
     var noteID: UUID
     var createdAtUTC: Date
     var editedAtUTC: Date
-    var completedAtUTC: Date?
+    var isCompleted: Bool
 
     init(
         id: UUID = UUID(),
@@ -63,7 +63,7 @@ final class FollowupEntity {
         noteID: UUID,
         createdAtUTC: Date = Date(),
         editedAtUTC: Date = Date(),
-        completedAtUTC: Date? = nil
+        isCompleted: Bool = false
     ) {
         self.id = id
         self.descriptionText = descriptionText
@@ -71,7 +71,7 @@ final class FollowupEntity {
         self.noteID = noteID
         self.createdAtUTC = createdAtUTC
         self.editedAtUTC = editedAtUTC
-        self.completedAtUTC = completedAtUTC
+        self.isCompleted = isCompleted
     }
 }
 
@@ -806,7 +806,7 @@ private struct FollowupsTabView: View {
     @State private var followupPendingDelete: FollowupEntity?
 
     private var displayedFollowups: [FollowupEntity] {
-        hideCompleted ? followups.filter { $0.completedAtUTC == nil } : followups
+        hideCompleted ? followups.filter { !$0.isCompleted } : followups
     }
 
     var body: some View {
@@ -829,10 +829,10 @@ private struct FollowupsTabView: View {
                                 Text(followup.type.preview())
                                     .fontWeight(.semibold)
                                 Text(followup.descriptionText.preview())
-                                    .foregroundStyle(followup.completedAtUTC == nil ? .primary : .secondary)
-                                    .strikethrough(followup.completedAtUTC != nil)
+                                    .foregroundStyle(followup.isCompleted ? .secondary : .primary)
+                                    .strikethrough(followup.isCompleted)
                             }
-                            .opacity(followup.completedAtUTC == nil ? 1 : 0.65)
+                            .opacity(followup.isCompleted ? 0.65 : 1)
                             .padding(.vertical, 2)
                         }
                         .swipeActions(edge: .trailing) {
@@ -1350,10 +1350,10 @@ private struct ExistingFollowupsList: View {
                         Text(followup.type.preview())
                             .fontWeight(.semibold)
                         Text(followup.descriptionText.preview())
-                            .foregroundStyle(followup.completedAtUTC == nil ? .primary : .secondary)
-                            .strikethrough(followup.completedAtUTC != nil)
+                            .foregroundStyle(followup.isCompleted ? .secondary : .primary)
+                            .strikethrough(followup.isCompleted)
                     }
-                    .opacity(followup.completedAtUTC == nil ? 1 : 0.65)
+                    .opacity(followup.isCompleted ? 0.65 : 1)
                 }
             }
         }
@@ -1570,11 +1570,7 @@ private struct FollowupDetailView: View {
                     Text(AppDateFormatter.display(followup.editedAtUTC))
                 }
                 LabeledContent("Completed") {
-                    if let completedAtUTC = followup.completedAtUTC {
-                        Text(AppDateFormatter.display(completedAtUTC))
-                    } else {
-                        Text("Not completed")
-                    }
+                    Text(followup.isCompleted ? "Yes" : "No")
                 }
 
                 if let type = trimmedType {
@@ -1594,11 +1590,11 @@ private struct FollowupDetailView: View {
                 .padding(.vertical, 4)
 
                 Button {
-                    setCompleted(to: followup.completedAtUTC == nil)
+                    setCompleted(to: !followup.isCompleted)
                 } label: {
                     Label(
-                        followup.completedAtUTC == nil ? "Mark Completed" : "Mark Incomplete",
-                        systemImage: followup.completedAtUTC == nil ? "checkmark.circle" : "xmark.circle"
+                        followup.isCompleted ? "Mark Incomplete" : "Mark Completed",
+                        systemImage: followup.isCompleted ? "xmark.circle" : "checkmark.circle"
                     )
                 }
             }
@@ -1643,7 +1639,7 @@ private struct FollowupDetailView: View {
     }
 
     private func setCompleted(to completed: Bool) {
-        followup.completedAtUTC = completed ? Date() : nil
+        followup.isCompleted = completed
         followup.editedAtUTC = Date()
         try? modelContext.save()
     }
