@@ -1027,14 +1027,12 @@ private struct NoteDetailView: View {
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var allFollowups: [FollowupEntity]
 
     @State private var showingEditNote = false
-    @State private var showingCreateFollowup = false
     @State private var notePendingDelete = false
     @State private var aiAvailable = false
     @State private var isProcessingWithAI = false
     @State private var aiProcessError: String?
     @State private var aiHasProcessed = false
     @State private var proposedFollowups: [ProposedFollowup] = []
-    @State private var pendingDuplicateConfirmation: ProposedFollowup?
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
@@ -1055,17 +1053,6 @@ private struct NoteDetailView: View {
         case .thirdParty:
             return thirdPartyConfig.isValid
         }
-    }
-
-    private var duplicateAlertBinding: Binding<Bool> {
-        Binding(
-            get: { pendingDuplicateConfirmation != nil },
-            set: { isPresented in
-                if !isPresented {
-                    pendingDuplicateConfirmation = nil
-                }
-            }
-        )
     }
 
     var body: some View {
@@ -1089,9 +1076,6 @@ private struct NoteDetailView: View {
         .sheet(isPresented: $showingEditNote) {
             NoteEditorSheet(note: note)
         }
-        .sheet(isPresented: $showingCreateFollowup) {
-            FollowupEditorSheet(noteID: note.id)
-        }
         .alert("Delete Note?", isPresented: $notePendingDelete) {
             Button("Delete", role: .destructive) {
                 for followup in associatedFollowups {
@@ -1105,21 +1089,6 @@ private struct NoteDetailView: View {
         } message: {
             Text("This also deletes all followups associated with this note.")
         }
-        .alert(
-            "Create Similar Followup?",
-            isPresented: duplicateAlertBinding,
-            presenting: pendingDuplicateConfirmation
-        ) { proposal in
-            Button("Create", role: .destructive) {
-                insertFollowupFromProposal(proposal)
-                pendingDuplicateConfirmation = nil
-            }
-            Button("Cancel", role: .cancel) {
-                pendingDuplicateConfirmation = nil
-            }
-        } message: {_ in 
-            Text("A similar followup already exists for this note. Create this one anyway?")
-        }
         .onAppear {
             aiAvailable = NoteFollowupAIService.isAppleAvailable()
         }
@@ -1129,20 +1098,13 @@ private struct NoteDetailView: View {
         Section("Followups") {
             ExistingFollowupsList(followups: associatedFollowups)
 
-            Button {
-                showingCreateFollowup = true
-            } label: {
-                Label("Add Followup", systemImage: "plus")
-            }
-
             AIProcessingControls(
                 canProcess: canProcessWithCurrentProvider,
                 isProcessingWithAI: isProcessingWithAI,
                 aiProcessError: aiProcessError,
                 aiHasProcessed: aiHasProcessed,
                 proposedFollowups: proposedFollowups,
-                onProcess: processWithAI,
-                onCreateProposal: createFollowupFromProposal
+                onProcess: processWithAI
             )
         }
     }
@@ -1163,7 +1125,9 @@ private struct NoteDetailView: View {
                 )
                 await MainActor.run {
                     applyProcessedNoteResult(processed)
+                    replaceFollowups(with: processed.followups)
                     proposedFollowups = processed.followups
+                    try? modelContext.save()
                     aiHasProcessed = true
                     isProcessingWithAI = false
                 }
@@ -1178,59 +1142,22 @@ private struct NoteDetailView: View {
         }
     }
 
-    private func createFollowupFromProposal(_ proposal: ProposedFollowup) {
-        if hasSimilarFollowup(for: proposal) {
-            pendingDuplicateConfirmation = proposal
-            return
+    private func replaceFollowups(with followups: [ProposedFollowup]) {
+        for followup in associatedFollowups {
+            modelContext.delete(followup)
         }
-        insertFollowupFromProposal(proposal)
-    }
 
-    private func insertFollowupFromProposal(_ proposal: ProposedFollowup) {
         let now = Date()
-        let followup = FollowupEntity(
-            descriptionText: proposal.descriptionText,
-            type: proposal.type,
-            noteID: note.id,
-            createdAtUTC: now,
-            editedAtUTC: now
-        )
-        modelContext.insert(followup)
-        try? modelContext.save()
-        proposedFollowups.removeAll { $0.id == proposal.id }
-    }
-
-    private func hasSimilarFollowup(for proposal: ProposedFollowup) -> Bool {
-        let target = normalizedText(proposal.descriptionText)
-        guard !target.isEmpty else { return false }
-
-        return associatedFollowups.contains { followup in
-            let candidate = normalizedText(followup.descriptionText)
-            guard !candidate.isEmpty else { return false }
-
-            if target == candidate || target.contains(candidate) || candidate.contains(target) {
-                return true
-            }
-
-            let targetTokens = Set(target.split(separator: " ").map(String.init))
-            let candidateTokens = Set(candidate.split(separator: " ").map(String.init))
-            guard !targetTokens.isEmpty, !candidateTokens.isEmpty else { return false }
-
-            let overlap = targetTokens.intersection(candidateTokens).count
-            let denominator = min(targetTokens.count, candidateTokens.count)
-            guard denominator > 0 else { return false }
-
-            let overlapRatio = Double(overlap) / Double(denominator)
-            return overlapRatio >= 0.7
+        for proposal in followups {
+            let followup = FollowupEntity(
+                descriptionText: proposal.descriptionText,
+                type: proposal.type,
+                noteID: note.id,
+                createdAtUTC: now,
+                editedAtUTC: now
+            )
+            modelContext.insert(followup)
         }
-    }
-
-    private func normalizedText(_ text: String) -> String {
-        let lowered = text.lowercased()
-        let scalars = lowered.unicodeScalars.map { scalar -> Character in
-            CharacterSet.alphanumerics.contains(scalar) ? Character(scalar) : " "
-        }
-        return String(scalars).replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func applyProcessedNoteResult(_ result: ProcessedNoteResult) {
@@ -1240,7 +1167,6 @@ private struct NoteDetailView: View {
         note.categories = result.categories
         note.appointmentTiming = result.appointmentTiming
         note.editedAtUTC = Date()
-        try? modelContext.save()
     }
 }
 
@@ -1364,14 +1290,13 @@ private struct AIProcessingControls: View {
     let aiHasProcessed: Bool
     let proposedFollowups: [ProposedFollowup]
     let onProcess: () -> Void
-    let onCreateProposal: (ProposedFollowup) -> Void
 
     var body: some View {
         if canProcess {
             Button {
                 onProcess()
             } label: {
-                Label("Process", systemImage: "wand.and.stars")
+                Label("Process Note", systemImage: "wand.and.stars")
             }
             .disabled(isProcessingWithAI)
 
@@ -1394,39 +1319,7 @@ private struct AIProcessingControls: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
-            ForEach(proposedFollowups) { proposal in
-                AIFollowupProposalRow(proposal: proposal, onCreate: onCreateProposal)
-            }
         }
-    }
-}
-
-private struct AIFollowupProposalRow: View {
-    let proposal: ProposedFollowup
-    let onCreate: (ProposedFollowup) -> Void
-
-    private var trimmedType: String? {
-        let value = proposal.type.trimmingCharacters(in: .whitespacesAndNewlines)
-        return value.isEmpty ? nil : value
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(proposal.descriptionText)
-            if let trimmedType {
-                Text(trimmedType)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Button("Create") {
-                onCreate(proposal)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.small)
-        }
-        .padding(.vertical, 4)
     }
 }
 
