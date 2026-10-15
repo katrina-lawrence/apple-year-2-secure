@@ -301,8 +301,8 @@ private struct ServerNote: Decodable {
     let balanceDueCurrency: String?
     let categories: [String]?
     let appointmentTiming: String?
-    let createdAtUTC: Date
-    let editedAtUTC: Date
+    let createdAtUTC: Date?
+    let editedAtUTC: Date?
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: AnyCodingKey.self)
@@ -325,8 +325,8 @@ private struct ServerNote: Decodable {
         self.balanceDueCurrency = container.decodeFlexibleString(forKeyNames: ["balanceDueCurrency", "balance_due_currency"])
         self.categories = container.decodeFlexibleStringArray(forKeyNames: ["categories"])
         self.appointmentTiming = container.decodeFlexibleString(forKeyNames: ["appointmentTiming", "appointment_timing"])
-        self.createdAtUTC = DateParsers.parseISO8601(createdString) ?? Date()
-        self.editedAtUTC = DateParsers.parseISO8601(editedString) ?? self.createdAtUTC
+        self.createdAtUTC = DateParsers.parseISO8601(createdString)
+        self.editedAtUTC = DateParsers.parseISO8601(editedString)
     }
 }
 
@@ -335,8 +335,8 @@ private struct ServerFollowup: Decodable {
     let descriptionText: String
     let type: String
     let noteID: String?
-    let createdAtUTC: Date
-    let editedAtUTC: Date
+    let createdAtUTC: Date?
+    let editedAtUTC: Date?
     let completed: Bool
 
     init(from decoder: Decoder) throws {
@@ -354,8 +354,8 @@ private struct ServerFollowup: Decodable {
         self.descriptionText = descriptionText
         self.type = type
         self.noteID = container.decodeFlexibleString(forKeyNames: ["noteID", "note_id", "noteId"])
-        self.createdAtUTC = DateParsers.parseISO8601(createdString) ?? Date()
-        self.editedAtUTC = DateParsers.parseISO8601(editedString) ?? self.createdAtUTC
+        self.createdAtUTC = DateParsers.parseISO8601(createdString)
+        self.editedAtUTC = DateParsers.parseISO8601(editedString)
         self.completed = container.decodeFlexibleBool(forKeyNames: ["completed", "isCompleted", "is_completed"]) ?? false
     }
 }
@@ -373,9 +373,28 @@ private enum DateParsers {
         return formatter
     }()
 
+    private static let withoutTimezoneWithFractional: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        return formatter
+    }()
+
+    private static let withoutTimezone: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return formatter
+    }()
+
     static func parseISO8601(_ string: String?) -> Date? {
         guard let string, !string.isEmpty else { return nil }
-        return withFractional.date(from: string) ?? withoutFractional.date(from: string)
+        return withFractional.date(from: string)
+            ?? withoutFractional.date(from: string)
+            ?? withoutTimezoneWithFractional.date(from: string)
+            ?? withoutTimezone.date(from: string)
     }
 }
 
@@ -764,9 +783,15 @@ final class AppSessionViewModel: ObservableObject {
                 existing.balanceDueCurrency = remote.balanceDueCurrency
                 existing.categories = remote.categories
                 existing.appointmentTiming = remote.appointmentTiming
-                existing.createdAtUTC = remote.createdAtUTC
-                existing.editedAtUTC = remote.editedAtUTC
+                if let createdAtUTC = remote.createdAtUTC {
+                    existing.createdAtUTC = createdAtUTC
+                }
+                if let editedAtUTC = remote.editedAtUTC {
+                    existing.editedAtUTC = editedAtUTC
+                }
             } else {
+                let createdAtUTC = remote.createdAtUTC ?? Date()
+                let editedAtUTC = remote.editedAtUTC ?? createdAtUTC
                 let created = NoteEntity(
                     id: remote.id,
                     value: remote.value,
@@ -775,8 +800,8 @@ final class AppSessionViewModel: ObservableObject {
                     balanceDueCurrency: remote.balanceDueCurrency,
                     categories: remote.categories,
                     appointmentTiming: remote.appointmentTiming,
-                    createdAtUTC: remote.createdAtUTC,
-                    editedAtUTC: remote.editedAtUTC
+                    createdAtUTC: createdAtUTC,
+                    editedAtUTC: editedAtUTC
                 )
                 modelContext.insert(created)
             }
@@ -792,17 +817,23 @@ final class AppSessionViewModel: ObservableObject {
                 existing.descriptionText = remote.descriptionText
                 existing.type = remote.type
                 existing.noteID = remote.noteID
-                existing.createdAtUTC = remote.createdAtUTC
-                existing.editedAtUTC = remote.editedAtUTC
+                if let createdAtUTC = remote.createdAtUTC {
+                    existing.createdAtUTC = createdAtUTC
+                }
+                if let editedAtUTC = remote.editedAtUTC {
+                    existing.editedAtUTC = editedAtUTC
+                }
                 existing.isCompleted = remote.completed
             } else {
+                let createdAtUTC = remote.createdAtUTC ?? Date()
+                let editedAtUTC = remote.editedAtUTC ?? createdAtUTC
                 let created = FollowupEntity(
                     id: remote.id,
                     descriptionText: remote.descriptionText,
                     type: remote.type,
                     noteID: remote.noteID,
-                    createdAtUTC: remote.createdAtUTC,
-                    editedAtUTC: remote.editedAtUTC,
+                    createdAtUTC: createdAtUTC,
+                    editedAtUTC: editedAtUTC,
                     isCompleted: remote.completed
                 )
                 modelContext.insert(created)
