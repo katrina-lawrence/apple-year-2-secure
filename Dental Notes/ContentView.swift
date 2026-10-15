@@ -218,8 +218,30 @@ private enum AppSettingsStore {
     private static let thirdPartyConfigResourceName = "ThirdPartyAIConfig"
     private static let thirdPartyConfigExtension = "plist"
 
+    static func isAppleIntelligenceAvailable() -> Bool {
+        NoteFollowupAIService.isAppleAvailable()
+    }
+
+    static func availableProviders() -> [AIProviderMethod] {
+        if isAppleIntelligenceAvailable() {
+            return [.appleIntelligence, .thirdParty]
+        }
+        return [.thirdParty]
+    }
+
+    static func defaultProvider() -> AIProviderMethod {
+        if isAppleIntelligenceAvailable() {
+            return .appleIntelligence
+        }
+        return .thirdParty
+    }
+
     static func currentProvider(rawValue: String) -> AIProviderMethod {
-        AIProviderMethod(rawValue: rawValue) ?? .appleIntelligence
+        let candidate = AIProviderMethod(rawValue: rawValue) ?? defaultProvider()
+        if availableProviders().contains(candidate) {
+            return candidate
+        }
+        return defaultProvider()
     }
 
     static func thirdPartyConfig() -> ThirdPartyAIConfig {
@@ -883,7 +905,7 @@ private struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var session: AppSessionViewModel
 
-    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
+    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AppSettingsStore.defaultProvider().rawValue
     @State private var confirmingLogout = false
 
     private var selectedProvider: AIProviderMethod {
@@ -900,7 +922,7 @@ private struct SettingsView: View {
                             providerMethodRawValue = newValue.rawValue
                         })
                     ) {
-                        ForEach(AIProviderMethod.allCases) { method in
+                        ForEach(AppSettingsStore.availableProviders()) { method in
                             Text(method.title).tag(method)
                         }
                     }
@@ -923,6 +945,12 @@ private struct SettingsView: View {
                     }
                 }
             }
+            .onAppear {
+                let normalizedProviderRawValue = selectedProvider.rawValue
+                if providerMethodRawValue != normalizedProviderRawValue {
+                    providerMethodRawValue = normalizedProviderRawValue
+                }
+            }
             .alert("Log Out?", isPresented: $confirmingLogout) {
                 Button("Log Out", role: .destructive) {
                     Task { @MainActor in
@@ -943,7 +971,7 @@ private struct NoteDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var session: AppSessionViewModel
 
-    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AIProviderMethod.appleIntelligence.rawValue
+    @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AppSettingsStore.defaultProvider().rawValue
 
     let note: NoteEntity
 
