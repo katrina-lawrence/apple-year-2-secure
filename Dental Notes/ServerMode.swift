@@ -334,7 +334,7 @@ private struct ServerFollowup: Decodable {
     let id: String
     let descriptionText: String
     let type: String
-    let noteID: String
+    let noteID: String?
     let createdAtUTC: Date
     let editedAtUTC: Date
     let completed: Bool
@@ -343,8 +343,7 @@ private struct ServerFollowup: Decodable {
         let container = try decoder.container(keyedBy: AnyCodingKey.self)
         guard let id = container.decodeFlexibleString(forKeyNames: ["id", "followup_id", "followupId"]),
               let descriptionText = container.decodeFlexibleString(forKeyNames: ["descriptionText", "description_text"]),
-              let type = container.decodeFlexibleString(forKeyNames: ["type"]),
-              let noteID = container.decodeFlexibleString(forKeyNames: ["noteID", "note_id", "noteId"]) else {
+              let type = container.decodeFlexibleString(forKeyNames: ["type"]) else {
             throw BackendError.decodingFailed
         }
 
@@ -354,7 +353,7 @@ private struct ServerFollowup: Decodable {
         self.id = id
         self.descriptionText = descriptionText
         self.type = type
-        self.noteID = noteID
+        self.noteID = container.decodeFlexibleString(forKeyNames: ["noteID", "note_id", "noteId"])
         self.createdAtUTC = DateParsers.parseISO8601(createdString) ?? Date()
         self.editedAtUTC = DateParsers.parseISO8601(editedString) ?? self.createdAtUTC
         self.completed = container.decodeFlexibleBool(forKeyNames: ["completed", "isCompleted", "is_completed"]) ?? false
@@ -400,6 +399,12 @@ private struct NoteUpdatePayload: Encodable {
 private struct FollowupCreatePayload: Encodable {
     let descriptionText: String
     let type: String
+    let noteID: String?
+}
+
+private struct FollowupUpdatePayload: Encodable {
+    let descriptionText: String?
+    let type: String?
 }
 
 private struct FollowupCompletionPayload: Encodable {
@@ -623,10 +628,10 @@ final class AppSessionViewModel: ObservableObject {
         }
     }
 
-    func createFollowup(noteID: String, type: String, descriptionText: String, modelContext: ModelContext) async -> Bool {
+    func createFollowup(noteID: String?, type: String, descriptionText: String, modelContext: ModelContext) async -> Bool {
         do {
-            let payload = FollowupCreatePayload(descriptionText: descriptionText, type: type)
-            let _: EmptyResponse = try await sendRequest(path: "/notes/\(noteID)/followups", method: "POST", body: payload, requiresAuthentication: true)
+            let payload = FollowupCreatePayload(descriptionText: descriptionText, type: type, noteID: noteID)
+            let _: EmptyResponse = try await sendRequest(path: "/followups", method: "POST", body: payload, requiresAuthentication: true)
             return await refreshUserData(modelContext: modelContext)
         } catch {
             syncError = message(for: error)
@@ -685,35 +690,9 @@ final class AppSessionViewModel: ObservableObject {
         descriptionText: String,
         modelContext: ModelContext
     ) async -> Bool {
-        let associatedNoteID = followup.noteID
-        let noteDescriptor = FetchDescriptor<NoteEntity>(predicate: #Predicate { $0.id == associatedNoteID })
-        guard let note = try? modelContext.fetch(noteDescriptor).first else {
-            syncError = "Associated note not found."
-            return false
-        }
-
-        let followupDescriptor = FetchDescriptor<FollowupEntity>(predicate: #Predicate { $0.noteID == associatedNoteID })
-        let noteFollowups = (try? modelContext.fetch(followupDescriptor)) ?? []
-
-        let payloadFollowups: [SyncNoteFollowupPayload] = noteFollowups.map { item in
-            if item.id == followup.id {
-                return SyncNoteFollowupPayload(descriptionText: descriptionText, type: type)
-            }
-            return SyncNoteFollowupPayload(descriptionText: item.descriptionText, type: item.type)
-        }
-
-        let payload = SyncNotePatchPayload(
-            value: note.value,
-            summary: note.summary,
-            balanceDueAmount: note.balanceDueAmount,
-            balanceDueCurrency: note.balanceDueCurrency,
-            categories: note.categories ?? [],
-            appointmentTiming: note.appointmentTiming,
-            followups: payloadFollowups
-        )
-
         do {
-            let _: EmptyResponse = try await sendRequest(path: "/sync/note/\(note.id)", method: "POST", body: payload, requiresAuthentication: true)
+            let payload = FollowupUpdatePayload(descriptionText: descriptionText, type: type)
+            let _: EmptyResponse = try await sendRequest(path: "/followups/\(followup.id)", method: "PATCH", body: payload, requiresAuthentication: true)
             return await refreshUserData(modelContext: modelContext)
         } catch {
             syncError = message(for: error)

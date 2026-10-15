@@ -50,7 +50,7 @@ final class FollowupEntity {
     @Attribute(.unique) var id: String
     var descriptionText: String
     var type: String
-    var noteID: String
+    var noteID: String?
     var createdAtUTC: Date
     var editedAtUTC: Date
     var isCompleted: Bool
@@ -59,7 +59,7 @@ final class FollowupEntity {
         id: String = UUID().uuidString,
         descriptionText: String,
         type: String,
-        noteID: String,
+        noteID: String?,
         createdAtUTC: Date = Date(),
         editedAtUTC: Date = Date(),
         isCompleted: Bool = false
@@ -801,6 +801,7 @@ private struct FollowupsTabView: View {
 
     @State private var hideCompleted = false
     @State private var showingSettings = false
+    @State private var showingCreateFollowup = false
     @State private var followupPendingDelete: FollowupEntity?
     @State private var operationError: String?
 
@@ -817,7 +818,7 @@ private struct FollowupsTabView: View {
                     ContentUnavailableView(
                         "No Followups",
                         systemImage: "calendar",
-                        description: Text(hideCompleted ? "No incomplete followups." : "Add a followup from a note.")
+                        description: Text(hideCompleted ? "No incomplete followups." : "Tap + to add a followup.")
                     )
                 } else {
                     ForEach(displayedFollowups) { followup in
@@ -858,6 +859,16 @@ private struct FollowupsTabView: View {
                         Image(systemName: "gearshape")
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingCreateFollowup = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingCreateFollowup) {
+                FollowupEditorSheet(mode: .createCustom(noteID: nil))
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
@@ -991,6 +1002,7 @@ private struct NoteDetailView: View {
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var allFollowups: [FollowupEntity]
 
     @State private var showingEditNote = false
+    @State private var showingCreateFollowup = false
     @State private var notePendingDelete = false
     @State private var aiAvailable = false
     @State private var isProcessingWithAI = false
@@ -1066,6 +1078,9 @@ private struct NoteDetailView: View {
         .sheet(isPresented: $showingEditNote) {
             NoteEditorSheet(note: note)
         }
+        .sheet(isPresented: $showingCreateFollowup) {
+            FollowupEditorSheet(mode: .createCustom(noteID: note.id))
+        }
         .alert("Delete Note?", isPresented: $notePendingDelete) {
             Button("Delete", role: .destructive) {
                 Task { @MainActor in
@@ -1109,6 +1124,12 @@ private struct NoteDetailView: View {
 
     private var followupsSection: some View {
         Section("Followups") {
+            Button {
+                showingCreateFollowup = true
+            } label: {
+                Label("Add Manual Followup", systemImage: "plus.circle")
+            }
+
             ExistingFollowupsList(followups: associatedFollowups)
 
             AIProcessingControls(
@@ -1552,7 +1573,8 @@ private struct FollowupDetailView: View {
     @State private var followupPendingDelete = false
 
     private var associatedNote: NoteEntity? {
-        notes.first { $0.id == followup.noteID }
+        guard let noteID = followup.noteID else { return nil }
+        return notes.first { $0.id == noteID }
     }
 
     private var trimmedType: String? {
@@ -1606,6 +1628,9 @@ private struct FollowupDetailView: View {
                     } label: {
                         Text(note.value.preview())
                     }
+                } else if followup.noteID == nil {
+                    Text("No associated note")
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("Note not found")
                         .foregroundStyle(.secondary)
@@ -1626,7 +1651,7 @@ private struct FollowupDetailView: View {
             }
         }
         .sheet(isPresented: $showingEditFollowup) {
-            FollowupEditorSheet(existingFollowup: followup)
+            FollowupEditorSheet(mode: .edit(followup))
         }
         .alert("Delete Followup?", isPresented: $followupPendingDelete) {
             Button("Delete", role: .destructive) {
@@ -1780,24 +1805,50 @@ private struct NoteEditorSheet: View {
 }
 
 private struct FollowupEditorSheet: View {
+    enum Mode {
+        case createCustom(noteID: String?)
+        case edit(FollowupEntity)
+    }
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var session: AppSessionViewModel
 
-    let noteID: String
-    let existingFollowup: FollowupEntity?
+    let mode: Mode
 
     @State private var typeText: String
     @State private var descriptionText: String
     @State private var isSaving = false
     @State private var saveError: String?
 
-    init(noteID: String? = nil, existingFollowup: FollowupEntity? = nil) {
-        let resolvedNoteID = noteID ?? existingFollowup?.noteID ?? UUID().uuidString
-        self.noteID = resolvedNoteID
-        self.existingFollowup = existingFollowup
-        _typeText = State(initialValue: existingFollowup?.type ?? "")
-        _descriptionText = State(initialValue: existingFollowup?.descriptionText ?? "")
+    init(mode: Mode) {
+        self.mode = mode
+        switch mode {
+        case .createCustom:
+            _typeText = State(initialValue: "Custom")
+            _descriptionText = State(initialValue: "")
+        case .edit(let existingFollowup):
+            _typeText = State(initialValue: existingFollowup.type)
+            _descriptionText = State(initialValue: existingFollowup.descriptionText)
+        }
+    }
+
+    private var existingFollowup: FollowupEntity? {
+        guard case .edit(let followup) = mode else { return nil }
+        return followup
+    }
+
+    private var noteID: String? {
+        switch mode {
+        case .createCustom(let noteID):
+            return noteID
+        case .edit(let followup):
+            return followup.noteID
+        }
+    }
+
+    private var isTypeEditable: Bool {
+        existingFollowup != nil
     }
 
     private var isDescriptionTooLong: Bool {
@@ -1812,25 +1863,35 @@ private struct FollowupEditorSheet: View {
         typeText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    private var isSaveDisabled: Bool {
+        if isSaving || isDescriptionTooLong { return true }
+        if isTypeEditable {
+            return isTypeTooLong || isTypeEmpty
+        }
+        return false
+    }
+
     var body: some View {
         NavigationStack {
             Form {
-                Section("Type") {
-                    TextField("Type", text: $typeText)
-                    HStack {
-                        Spacer()
-                        Text("\(typeText.count)/\(TextLimits.maxLength)")
-                            .font(.caption)
-                            .foregroundStyle((isTypeTooLong || isTypeEmpty) ? .red : .secondary)
-                    }
-                    if isTypeEmpty {
-                        Text("Type is required.")
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                    } else if isTypeTooLong {
-                        Text("Type must be 2048 characters or fewer.")
-                            .font(.caption)
-                            .foregroundStyle(.red)
+                if isTypeEditable {
+                    Section("Type") {
+                        TextField("Type", text: $typeText)
+                        HStack {
+                            Spacer()
+                            Text("\(typeText.count)/\(TextLimits.maxLength)")
+                                .font(.caption)
+                                .foregroundStyle((isTypeTooLong || isTypeEmpty) ? .red : .secondary)
+                        }
+                        if isTypeEmpty {
+                            Text("Type is required.")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        } else if isTypeTooLong {
+                            Text("Type must be 2048 characters or fewer.")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
 
@@ -1861,7 +1922,7 @@ private struct FollowupEditorSheet: View {
                     Button("Save") {
                         save()
                     }
-                    .disabled(isDescriptionTooLong || isTypeTooLong || isTypeEmpty || isSaving)
+                    .disabled(isSaveDisabled)
                 }
             }
             .alert("Save Error", isPresented: Binding(get: {
@@ -1884,7 +1945,7 @@ private struct FollowupEditorSheet: View {
         saveError = nil
 
         let now = Date()
-        let trimmedType = typeText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedType = isTypeEditable ? typeText.trimmingCharacters(in: .whitespacesAndNewlines) : "Custom"
 
         if session.mode.isServer {
             let description = descriptionText
