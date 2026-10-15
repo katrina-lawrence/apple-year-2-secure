@@ -800,6 +800,7 @@ private struct FollowupsTabView: View {
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
     @State private var hideCompleted = false
+    @State private var showingSettings = false
     @State private var followupPendingDelete: FollowupEntity?
     @State private var operationError: String?
 
@@ -848,6 +849,18 @@ private struct FollowupsTabView: View {
                 if session.mode.isServer {
                     _ = await session.refreshUserData(modelContext: modelContext)
                 }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .alert("Delete Followup?", isPresented: Binding(get: {
                 followupPendingDelete != nil
