@@ -8,6 +8,8 @@ private enum FollowupIntentConstants {
 private enum FollowupIntentError: LocalizedError {
     case emptyDescription
     case serverCreationFailed(String?)
+    case serverSyncFailed(String?)
+    case followupFetchFailed
     case saveFailed
 
     var errorDescription: String? {
@@ -16,6 +18,10 @@ private enum FollowupIntentError: LocalizedError {
             return "Followup description is required."
         case .serverCreationFailed(let message):
             return message ?? "Could not create followup."
+        case .serverSyncFailed(let message):
+            return message ?? "Could not refresh followups."
+        case .followupFetchFailed:
+            return "Could not read followups."
         case .saveFailed:
             return "Could not save followup."
         }
@@ -45,6 +51,17 @@ private enum FollowupIntentModelContextFactory {
             let container = try ModelContainer(for: schema, configurations: configuration)
             return FollowupIntentDataStore(container: container, modelContext: container.mainContext)
         }
+    }
+}
+
+private enum FollowupIntentQueries {
+    static func nextIncompleteFollowup(in modelContext: ModelContext) throws -> FollowupEntity? {
+        var descriptor = FetchDescriptor<FollowupEntity>(
+            predicate: #Predicate<FollowupEntity> { !$0.isCompleted },
+            sortBy: [SortDescriptor(\.createdAtUTC, order: .forward)]
+        )
+        descriptor.fetchLimit = 1
+        return try modelContext.fetch(descriptor).first
     }
 }
 
@@ -106,6 +123,42 @@ struct CreateDentalFollowupIntent: AppIntent {
     }
 }
 
+struct GetNextIncompleteFollowupIntent: AppIntent {
+    static let title: LocalizedStringResource = "Get Next Incomplete Followup"
+    static let description = IntentDescription("Get the oldest incomplete followup.")
+    static let openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
+        let dataStore = try FollowupIntentModelContextFactory.makeStore()
+        let modelContext = dataStore.modelContext
+
+        if AppRuntimeMode.current.isServer {
+            let session = AppSessionViewModel()
+            let success = await session.refreshUserData(modelContext: modelContext)
+            guard success else {
+                throw FollowupIntentError.serverSyncFailed(session.syncError)
+            }
+        }
+
+        let nextFollowup: FollowupEntity?
+        do {
+            nextFollowup = try FollowupIntentQueries.nextIncompleteFollowup(in: modelContext)
+        } catch {
+            throw FollowupIntentError.followupFetchFailed
+        }
+
+        _ = dataStore.container
+
+        guard let nextFollowup else {
+            return .result(value: "", dialog: "You have no incomplete followups.")
+        }
+
+        let value = nextFollowup.descriptionText
+        return .result(value: value, dialog: IntentDialog(stringLiteral: value))
+    }
+}
+
 struct DentalNotesAppShortcutsProvider: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
@@ -118,6 +171,17 @@ struct DentalNotesAppShortcutsProvider: AppShortcutsProvider {
             ],
             shortTitle: "Create Followup",
             systemImageName: "calendar.badge.plus"
+        )
+        AppShortcut(
+            intent: GetNextIncompleteFollowupIntent(),
+            phrases: [
+                "What is my next followup in \(.applicationName)",
+                "Get my next followup in \(.applicationName)",
+                "What is my next dental followup in \(.applicationName)",
+                "Get next incomplete followup in \(.applicationName)"
+            ],
+            shortTitle: "Next Followup",
+            systemImageName: "calendar"
         )
     }
 }
