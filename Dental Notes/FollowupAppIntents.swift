@@ -9,6 +9,7 @@ private enum FollowupIntentError: LocalizedError {
     case emptyDescription
     case serverCreationFailed(String?)
     case serverSyncFailed(String?)
+    case serverCompletionFailed(String?)
     case followupFetchFailed
     case saveFailed
 
@@ -20,6 +21,8 @@ private enum FollowupIntentError: LocalizedError {
             return message ?? "Could not create followup."
         case .serverSyncFailed(let message):
             return message ?? "Could not refresh followups."
+        case .serverCompletionFailed(let message):
+            return message ?? "Could not complete followup."
         case .followupFetchFailed:
             return "Could not read followups."
         case .saveFailed:
@@ -90,19 +93,17 @@ struct CreateDentalFollowupIntent: AppIntent {
         let dataStore = try FollowupIntentModelContextFactory.makeStore()
         let modelContext = dataStore.modelContext
         let now = Date()
-        let targetFollowupID: String
 
         if AppRuntimeMode.current.isServer {
             let session = AppSessionViewModel()
-            guard let followupID = await session.createFollowupAndReturnID(
+            guard await session.createFollowupAndReturnID(
                 noteID: nil,
                 type: FollowupIntentConstants.customType,
                 descriptionText: trimmedDescription,
                 modelContext: modelContext
-            ) else {
+            ) != nil else {
                 throw FollowupIntentError.serverCreationFailed(session.syncError)
             }
-            targetFollowupID = followupID
         } else {
             let followup = FollowupEntity(
                 descriptionText: trimmedDescription,
@@ -117,18 +118,18 @@ struct CreateDentalFollowupIntent: AppIntent {
             } catch {
                 throw FollowupIntentError.saveFailed
             }
-            targetFollowupID = followup.id
         }
 
-        AppIntentRouteStore.storeFollowupRoute(followupID: targetFollowupID)
         _ = dataStore.container
-        return .result(dialog: "Followup created.")
+        return .result(
+            dialog: "Followup created."
+        )
     }
 }
 
 struct GetNextIncompleteFollowupIntent: AppIntent {
-    static let title: LocalizedStringResource = "Get Next Incomplete Followup"
-    static let description = IntentDescription("Get the oldest incomplete followup.")
+    static let title: LocalizedStringResource = "Show Next Followup"
+    static let description = IntentDescription("Get the oldest remaining followup.")
     static let openAppWhenRun = false
 
     @MainActor
@@ -154,18 +155,85 @@ struct GetNextIncompleteFollowupIntent: AppIntent {
         _ = dataStore.container
 
         guard let nextFollowup else {
-            AppIntentRouteStore.storeFollowupsRoute()
-            return .result(value: "", dialog: "You have no incomplete followups.")
+            return .result(
+                value: "",
+                dialog: "You have no incomplete followups."
+            )
         }
 
         let value = nextFollowup.descriptionText
-        AppIntentRouteStore.storeFollowupRoute(followupID: nextFollowup.id)
-        return .result(value: value, dialog: IntentDialog(stringLiteral: value))
+        return .result(
+            value: value,
+            dialog: IntentDialog(stringLiteral: value)
+        )
+    }
+}
+
+struct CompleteNextFollowupIntent: AppIntent {
+    static let title: LocalizedStringResource = "Mark Next Followup Done"
+    static let description = IntentDescription("Mark the oldest incomplete followup as complete.")
+    static let openAppWhenRun = false
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
+        let dataStore = try FollowupIntentModelContextFactory.makeStore()
+        let modelContext = dataStore.modelContext
+
+        if AppRuntimeMode.current.isServer {
+            let session = AppSessionViewModel()
+            let success = await session.refreshUserData(modelContext: modelContext)
+            guard success else {
+                throw FollowupIntentError.serverSyncFailed(session.syncError)
+            }
+        }
+
+        let nextFollowup: FollowupEntity?
+        do {
+            nextFollowup = try FollowupIntentQueries.nextIncompleteFollowup(in: modelContext)
+        } catch {
+            throw FollowupIntentError.followupFetchFailed
+        }
+
+        guard let nextFollowup else {
+            _ = dataStore.container
+            return .result(
+                value: "",
+                dialog: "You have no incomplete followups."
+            )
+        }
+
+        if AppRuntimeMode.current.isServer {
+            let session = AppSessionViewModel()
+            let success = await session.setFollowupCompletion(
+                followupID: nextFollowup.id,
+                completed: true,
+                modelContext: modelContext
+            )
+            guard success else {
+                throw FollowupIntentError.serverCompletionFailed(session.syncError)
+            }
+        } else {
+            nextFollowup.isCompleted = true
+            nextFollowup.editedAtUTC = Date()
+            do {
+                try modelContext.save()
+            } catch {
+                throw FollowupIntentError.saveFailed
+            }
+        }
+
+        let value = "Complete: \(nextFollowup.descriptionText)"
+        _ = dataStore.container
+        return .result(
+            value: value,
+            dialog: IntentDialog(stringLiteral: value)
+        )
     }
 }
 
 struct DentalNotesAppShortcutsProvider: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
+        // Keep query/read phrases separate from completion verbs to improve Siri intent disambiguation.
         AppShortcut(
             intent: CreateDentalFollowupIntent(),
             phrases: [
@@ -178,14 +246,19 @@ struct DentalNotesAppShortcutsProvider: AppShortcutsProvider {
             systemImageName: "calendar.badge.plus"
         )
         AppShortcut(
+            intent: CompleteNextFollowupIntent(),
+            phrases: [
+                "\(.applicationName) Complete"
+            ],
+            shortTitle: "Mark Done",
+            systemImageName: "checkmark.circle"
+        )
+        AppShortcut(
             intent: GetNextIncompleteFollowupIntent(),
             phrases: [
-                "What is my next followup in \(.applicationName)",
-                "Get my next followup in \(.applicationName)",
-                "What is my next dental followup in \(.applicationName)",
-                "Get next incomplete followup in \(.applicationName)"
+                "\(.applicationName) Display next"
             ],
-            shortTitle: "Next Followup",
+            shortTitle: "Display Next",
             systemImageName: "calendar"
         )
     }

@@ -93,7 +93,6 @@ struct AppLockGateView: View {
             }
         }
         .onAppear {
-            navigationCoordinator.restorePendingRouteIfNeeded()
             appLock.authenticateIfNeeded()
         }
         .task {
@@ -102,7 +101,6 @@ struct AppLockGateView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
-                navigationCoordinator.restorePendingRouteIfNeeded()
                 appLock.authenticateIfNeeded()
                 Task { @MainActor in
                     await session.bootstrapIfNeeded(modelContext: modelContext)
@@ -127,9 +125,6 @@ private struct UnlockedRootView: View {
             } else {
                 ContentView()
             }
-        }
-        .onAppear {
-            navigationCoordinator.restorePendingRouteIfNeeded()
         }
     }
 }
