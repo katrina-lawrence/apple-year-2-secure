@@ -26,3 +26,4 @@ To run the app in server mode:
 Notes:
 - In builds without `SERVER_MODE`, the app runs in local-only mode.
 - `Dental Notes/BackendConfig.plist` is gitignored.
+- In builds with `SERVER_MODE`, notes and followups are stored in an in-memory SwiftData store only (no persistent on-device SwiftData files).

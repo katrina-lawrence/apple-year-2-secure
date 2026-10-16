@@ -500,6 +500,14 @@ final class AppSessionViewModel: ObservableObject {
     private var accessToken: String?
     private var refreshToken: String?
     private var hasBootstrapped = false
+    private let serverSession: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.httpShouldSetCookies = false
+        return URLSession(configuration: configuration)
+    }()
 
     init() {
         configureForMode()
@@ -906,7 +914,7 @@ final class AppSessionViewModel: ObservableObject {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await serverSession.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             throw BackendError.invalidResponse
         }
