@@ -113,7 +113,8 @@ struct DentalNotesAppShortcutsProvider: AppShortcutsProvider {
             phrases: [
                 "Create a dental followup in \(.applicationName)",
                 "Add a dental followup in \(.applicationName)",
-                "Create dental followup in \(.applicationName)"
+                "Create dental followup in \(.applicationName)",
+                "Add dental followup in \(.applicationName)"
             ],
             shortTitle: "Create Followup",
             systemImageName: "calendar.badge.plus"
