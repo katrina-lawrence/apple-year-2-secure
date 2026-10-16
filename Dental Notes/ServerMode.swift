@@ -421,6 +421,18 @@ private struct FollowupCreatePayload: Encodable {
     let noteID: String?
 }
 
+private struct FollowupCreateResponse: Decodable {
+    let id: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        guard let id = container.decodeFlexibleString(forKeyNames: ["id", "followup_id", "followupId"]) else {
+            throw BackendError.decodingFailed
+        }
+        self.id = id
+    }
+}
+
 private struct FollowupUpdatePayload: Encodable {
     let descriptionText: String?
     let type: String?
@@ -656,13 +668,34 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     func createFollowup(noteID: String?, type: String, descriptionText: String, modelContext: ModelContext) async -> Bool {
+        guard let _ = await createFollowupAndReturnID(
+            noteID: noteID,
+            type: type,
+            descriptionText: descriptionText,
+            modelContext: modelContext
+        ) else {
+            return false
+        }
+        return true
+    }
+
+    func createFollowupAndReturnID(
+        noteID: String?,
+        type: String,
+        descriptionText: String,
+        modelContext: ModelContext
+    ) async -> String? {
         do {
             let payload = FollowupCreatePayload(descriptionText: descriptionText, type: type, noteID: noteID)
-            let _: EmptyResponse = try await sendRequest(path: "/followups", method: "POST", body: payload, requiresAuthentication: true)
-            return await refreshUserData(modelContext: modelContext)
+            let response: FollowupCreateResponse = try await sendRequest(path: "/followups", method: "POST", body: payload, requiresAuthentication: true)
+            let refreshed = await refreshUserData(modelContext: modelContext)
+            guard refreshed else {
+                return nil
+            }
+            return response.id
         } catch {
             syncError = message(for: error)
-            return false
+            return nil
         }
     }
 

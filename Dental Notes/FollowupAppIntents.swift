@@ -90,18 +90,19 @@ struct CreateDentalFollowupIntent: AppIntent {
         let dataStore = try FollowupIntentModelContextFactory.makeStore()
         let modelContext = dataStore.modelContext
         let now = Date()
+        let targetFollowupID: String
 
         if AppRuntimeMode.current.isServer {
             let session = AppSessionViewModel()
-            let success = await session.createFollowup(
+            guard let followupID = await session.createFollowupAndReturnID(
                 noteID: nil,
                 type: FollowupIntentConstants.customType,
                 descriptionText: trimmedDescription,
                 modelContext: modelContext
-            )
-            guard success else {
+            ) else {
                 throw FollowupIntentError.serverCreationFailed(session.syncError)
             }
+            targetFollowupID = followupID
         } else {
             let followup = FollowupEntity(
                 descriptionText: trimmedDescription,
@@ -116,8 +117,10 @@ struct CreateDentalFollowupIntent: AppIntent {
             } catch {
                 throw FollowupIntentError.saveFailed
             }
+            targetFollowupID = followup.id
         }
 
+        AppIntentRouteStore.storeFollowupRoute(followupID: targetFollowupID)
         _ = dataStore.container
         return .result(dialog: "Followup created.")
     }
@@ -151,10 +154,12 @@ struct GetNextIncompleteFollowupIntent: AppIntent {
         _ = dataStore.container
 
         guard let nextFollowup else {
+            AppIntentRouteStore.storeFollowupsRoute()
             return .result(value: "", dialog: "You have no incomplete followups.")
         }
 
         let value = nextFollowup.descriptionText
+        AppIntentRouteStore.storeFollowupRoute(followupID: nextFollowup.id)
         return .result(value: value, dialog: IntentDialog(stringLiteral: value))
     }
 }

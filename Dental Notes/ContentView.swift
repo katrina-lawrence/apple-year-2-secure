@@ -651,17 +651,21 @@ private enum NoteFollowupAIService {
 #endif
 
 struct ContentView: View {
+    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
+
     var body: some View {
-        TabView {
+        TabView(selection: $navigationCoordinator.selectedTab) {
             NotesTabView()
                 .tabItem {
                     Label("Notes", systemImage: "note.text")
                 }
+                .tag(AppTab.notes)
 
             FollowupsTabView()
                 .tabItem {
                     Label("Followups", systemImage: "calendar")
                 }
+                .tag(AppTab.followups)
         }
     }
 }
@@ -797,6 +801,7 @@ private struct NotesTabView: View {
 private struct FollowupsTabView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var session: AppSessionViewModel
+    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
     @State private var hideCompleted = false
@@ -804,13 +809,15 @@ private struct FollowupsTabView: View {
     @State private var showingCreateFollowup = false
     @State private var followupPendingDelete: FollowupEntity?
     @State private var operationError: String?
+    @State private var navigationPath: [String] = []
+    @State private var routeSyncAttemptedForFollowupID: String?
 
     private var displayedFollowups: [FollowupEntity] {
         hideCompleted ? followups.filter { !$0.isCompleted } : followups
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             List {
                 Toggle("Hide Completed", isOn: $hideCompleted)
 
@@ -822,9 +829,7 @@ private struct FollowupsTabView: View {
                     )
                 } else {
                     ForEach(displayedFollowups) { followup in
-                        NavigationLink {
-                            FollowupDetailView(followup: followup)
-                        } label: {
+                        NavigationLink(value: followup.id) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(followup.type.preview())
                                     .fontWeight(.semibold)
@@ -845,11 +850,31 @@ private struct FollowupsTabView: View {
                     }
                 }
             }
+            .navigationDestination(for: String.self) { followupID in
+                if let followup = followups.first(where: { $0.id == followupID }) {
+                    FollowupDetailView(followup: followup)
+                } else {
+                    ContentUnavailableView(
+                        "Followup Not Found",
+                        systemImage: "calendar.badge.exclamationmark",
+                        description: Text("This followup is no longer available.")
+                    )
+                }
+            }
             .navigationTitle("Followups")
             .refreshable {
                 if session.mode.isServer {
                     _ = await session.refreshUserData(modelContext: modelContext)
                 }
+            }
+            .onAppear {
+                handlePendingFollowupRoute()
+            }
+            .onChange(of: navigationCoordinator.pendingFollowupID) { _, _ in
+                handlePendingFollowupRoute()
+            }
+            .onChange(of: followups.map(\.id)) { _, _ in
+                handlePendingFollowupRoute()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -907,6 +932,35 @@ private struct FollowupsTabView: View {
             } message: {
                 Text(operationError ?? session.syncError ?? "Request failed.")
             }
+        }
+    }
+
+    private func handlePendingFollowupRoute() {
+        guard let pendingFollowupID = navigationCoordinator.pendingFollowupID else { return }
+
+        if followups.contains(where: { $0.id == pendingFollowupID }) {
+            navigationPath = [pendingFollowupID]
+            routeSyncAttemptedForFollowupID = nil
+            navigationCoordinator.consumePendingFollowupRoute()
+            return
+        }
+
+        guard session.mode.isServer else {
+            routeSyncAttemptedForFollowupID = nil
+            navigationCoordinator.consumePendingFollowupRoute()
+            return
+        }
+
+        if routeSyncAttemptedForFollowupID == pendingFollowupID {
+            routeSyncAttemptedForFollowupID = nil
+            navigationCoordinator.consumePendingFollowupRoute()
+            return
+        }
+
+        routeSyncAttemptedForFollowupID = pendingFollowupID
+        Task { @MainActor in
+            _ = await session.refreshUserData(modelContext: modelContext)
+            handlePendingFollowupRoute()
         }
     }
 
@@ -2004,4 +2058,5 @@ private struct FollowupEditorSheet: View {
     ContentView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
         .environmentObject(AppSessionViewModel())
+        .environmentObject(AppNavigationCoordinator())
 }

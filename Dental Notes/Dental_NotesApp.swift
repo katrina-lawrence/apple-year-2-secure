@@ -5,6 +5,7 @@ import SwiftUI
 @main
 struct Dental_NotesApp: App {
     @StateObject private var appSession = AppSessionViewModel()
+    @StateObject private var navigationCoordinator = AppNavigationCoordinator()
 
     init() {
         DentalNotesAppShortcutsProvider.updateAppShortcutParameters()
@@ -40,6 +41,11 @@ struct Dental_NotesApp: App {
         WindowGroup {
             AppLockGateView()
                 .environmentObject(appSession)
+                .environmentObject(navigationCoordinator)
+                .onOpenURL { url in
+                    guard let route = AppDeepLinks.route(from: url) else { return }
+                    navigationCoordinator.open(route: route)
+                }
         }
         .modelContainer(sharedModelContainer)
     }

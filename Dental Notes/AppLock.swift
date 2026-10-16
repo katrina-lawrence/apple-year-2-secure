@@ -77,6 +77,7 @@ struct AppLockGateView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var session: AppSessionViewModel
+    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
     @StateObject private var appLock = AppLockViewModel()
 
     var body: some View {
@@ -92,6 +93,7 @@ struct AppLockGateView: View {
             }
         }
         .onAppear {
+            navigationCoordinator.restorePendingRouteIfNeeded()
             appLock.authenticateIfNeeded()
         }
         .task {
@@ -100,6 +102,7 @@ struct AppLockGateView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
+                navigationCoordinator.restorePendingRouteIfNeeded()
                 appLock.authenticateIfNeeded()
                 Task { @MainActor in
                     await session.bootstrapIfNeeded(modelContext: modelContext)
@@ -115,6 +118,7 @@ struct AppLockGateView: View {
 
 private struct UnlockedRootView: View {
     @EnvironmentObject private var session: AppSessionViewModel
+    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
 
     var body: some View {
         Group {
@@ -123,6 +127,9 @@ private struct UnlockedRootView: View {
             } else {
                 ContentView()
             }
+        }
+        .onAppear {
+            navigationCoordinator.restorePendingRouteIfNeeded()
         }
     }
 }
@@ -181,4 +188,5 @@ private struct LockScreenView: View {
     AppLockGateView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
         .environmentObject(AppSessionViewModel())
+        .environmentObject(AppNavigationCoordinator())
 }
