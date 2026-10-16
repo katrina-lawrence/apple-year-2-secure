@@ -1,9 +1,14 @@
+import AppIntents
 import SwiftData
 import SwiftUI
 
 @main
 struct Dental_NotesApp: App {
     @StateObject private var appSession = AppSessionViewModel()
+
+    init() {
+        DentalNotesAppShortcutsProvider.updateAppShortcutParameters()
+    }
 
     private let sharedModelContainer: ModelContainer = {
         switch AppRuntimeMode.current {
@@ -39,7 +44,7 @@ struct Dental_NotesApp: App {
         .modelContainer(sharedModelContainer)
     }
 
-    private static func purgeLocalSwiftDataStoreFiles() {
+    static func purgeLocalSwiftDataStoreFiles() {
         let fileManager = FileManager.default
         guard let applicationSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             return
