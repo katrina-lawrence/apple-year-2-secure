@@ -1085,6 +1085,9 @@ private struct NoteDetailView: View {
         case .appleIntelligence:
             return aiAvailable
         case .thirdParty:
+            if session.mode.isServer {
+                return true
+            }
             return thirdPartyConfig.isValid
         }
     }
@@ -1207,12 +1210,27 @@ private struct NoteDetailView: View {
 
         Task { @MainActor in
             do {
-                let processed = try await NoteFollowupAIService.processNote(
-                    from: note.value,
-                    referenceDate: note.createdAtUTC,
-                    provider: selectedProvider,
-                    thirdPartyConfig: selectedProvider == .thirdParty ? thirdPartyConfig : nil
-                )
+                let processed: ProcessedNoteResult
+                switch selectedProvider {
+                case .appleIntelligence:
+                    processed = try await NoteFollowupAIService.processNote(
+                        from: note.value,
+                        referenceDate: note.createdAtUTC,
+                        provider: .appleIntelligence,
+                        thirdPartyConfig: nil
+                    )
+                case .thirdParty:
+                    if session.mode.isServer {
+                        processed = try await session.processNote(noteID: note.id)
+                    } else {
+                        processed = try await NoteFollowupAIService.processNote(
+                            from: note.value,
+                            referenceDate: note.createdAtUTC,
+                            provider: .thirdParty,
+                            thirdPartyConfig: thirdPartyConfig
+                        )
+                    }
+                }
                 await MainActor.run {
                     pendingProcessedResult = processed
                     pendingProcessedEditedAtUTC = Date()

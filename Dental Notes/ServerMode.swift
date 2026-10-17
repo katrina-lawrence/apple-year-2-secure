@@ -447,6 +447,72 @@ private struct SyncNoteFollowupPayload: Encodable {
     let type: String
 }
 
+private struct NoteProcessPayload: Encodable {
+    let noteID: String
+}
+
+private struct ProcessNoteActionResponse: Decodable {
+    let type: String?
+    let description: String?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        self.type = container.decodeFlexibleString(forKeyNames: ["type"])
+        self.description = container.decodeFlexibleString(forKeyNames: ["description", "descriptionText", "description_text"])
+    }
+}
+
+private struct ProcessNoteBalanceDueResponse: Decodable {
+    let amount: Double?
+    let currency: String?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        self.amount = container.decodeFlexibleDouble(forKeyNames: ["amount"])
+        self.currency = container.decodeFlexibleString(forKeyNames: ["currency"])
+    }
+}
+
+private struct ProcessNoteResponse: Decodable {
+    let summary: String?
+    let categories: [String]
+    let balanceDue: ProcessNoteBalanceDueResponse?
+    let actions: [ProcessNoteActionResponse]
+    let appointmentTiming: String?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        self.summary = container.decodeFlexibleString(forKeyNames: ["summary"])
+        self.categories = container.decodeFlexibleStringArray(forKeyNames: ["categories"]) ?? []
+
+        let balanceDueSnakeKey = AnyCodingKey("balance_due")
+        let balanceDueCamelKey = AnyCodingKey("balanceDue")
+        let decodedBalanceDueSnake: ProcessNoteBalanceDueResponse?
+        do {
+            decodedBalanceDueSnake = try container.decodeIfPresent(ProcessNoteBalanceDueResponse.self, forKey: balanceDueSnakeKey)
+        } catch {
+            decodedBalanceDueSnake = nil
+        }
+        let decodedBalanceDueCamel: ProcessNoteBalanceDueResponse?
+        do {
+            decodedBalanceDueCamel = try container.decodeIfPresent(ProcessNoteBalanceDueResponse.self, forKey: balanceDueCamelKey)
+        } catch {
+            decodedBalanceDueCamel = nil
+        }
+        self.balanceDue = decodedBalanceDueSnake ?? decodedBalanceDueCamel
+
+        let actionsKey = AnyCodingKey("actions")
+        let decodedActions: [ProcessNoteActionResponse]?
+        do {
+            decodedActions = try container.decodeIfPresent([ProcessNoteActionResponse].self, forKey: actionsKey)
+        } catch {
+            decodedActions = nil
+        }
+        self.actions = decodedActions ?? []
+        self.appointmentTiming = container.decodeFlexibleString(forKeyNames: ["appointment_timing", "appointmentTiming"])
+    }
+}
+
 private struct SyncNotePatchPayload: Encodable {
     let value: String
     let summary: String?
@@ -744,6 +810,50 @@ final class AppSessionViewModel: ObservableObject {
         }
     }
 
+    func processNote(noteID: String) async throws -> ProcessedNoteResult {
+        let payload = NoteProcessPayload(noteID: noteID)
+        let response: ProcessNoteResponse = try await sendRequest(
+            path: "/notes/process",
+            method: "POST",
+            body: payload,
+            requiresAuthentication: true
+        )
+
+        let followups: [ProposedFollowup] = response.actions.prefix(8).compactMap { action in
+            guard let rawType = action.type, let rawDescription = action.description else { return nil }
+            let type = rawType.trimmingCharacters(in: .whitespacesAndNewlines)
+            let description = rawDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !type.isEmpty, !description.isEmpty else { return nil }
+            return ProposedFollowup(type: type, descriptionText: description)
+        }
+
+        let summary = trimmedOrNil(response.summary)
+
+        let amount: Decimal?
+        if let rawAmount = response.balanceDue?.amount {
+            amount = NSDecimalNumber(value: rawAmount).decimalValue
+        } else {
+            amount = nil
+        }
+
+        let currency = amount == nil ? nil : normalizedCurrency(response.balanceDue?.currency)
+
+        var seenCategories = Set<String>()
+        let categories = response.categories
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .filter { seenCategories.insert($0.lowercased()).inserted }
+
+        return ProcessedNoteResult(
+            summary: summary,
+            balanceDueAmount: amount,
+            balanceDueCurrency: currency,
+            categories: categories,
+            appointmentTiming: trimmedOrNil(response.appointmentTiming),
+            followups: followups
+        )
+    }
+
     func updateFollowupText(
         followup: FollowupEntity,
         type: String,
@@ -1011,6 +1121,16 @@ final class AppSessionViewModel: ObservableObject {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format")
         }
         return decoder
+    }
+
+    private func trimmedOrNil(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private func normalizedCurrency(_ value: String?) -> String? {
+        guard let trimmed = trimmedOrNil(value) else { return nil }
+        return trimmed.uppercased()
     }
 }
 
