@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F0A1D1A13B7C100100A00001 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = F0A1D1A03B7C100100A00001 /* SwiftSoup */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		BFE31C363077076F009DB6FD /* My Dental Companion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Dental Companion.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0A1D1A13B7C100100A00001 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "Dental Notes";
 			packageProductDependencies = (
+				F0A1D1A03B7C100100A00001 /* SwiftSoup */,
 			);
 			productName = "My Dental Companion";
 			productReference = BFE31C363077076F009DB6FD /* My Dental Companion.app */;
@@ -98,6 +104,9 @@
 			productRefGroup = BFE31C373077076F009DB6FD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			targets = (
 				BFE31C353077076F009DB6FD /* Dental Notes */,
 			);
@@ -123,6 +132,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCBuildConfiguration section */
 		BFA02DCA30801F0C0004DD13 /* Debug Local */ = {
@@ -562,6 +582,14 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F0A1D1A03B7C100100A00001 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BFE31C2E3077076F009DB6FD /* Project object */;
 }

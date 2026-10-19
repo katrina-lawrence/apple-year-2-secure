@@ -1415,8 +1415,12 @@ private struct NoteMetadataSection: View {
                 Text("Content")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(note.value.isEmpty ? "(Empty)" : note.value)
-                    .textSelection(.enabled)
+                if note.value.isEmpty {
+                    Text("(Empty)")
+                } else {
+                    SanitizedHTMLView(html: note.value)
+                        .frame(minHeight: 140)
+                }
             }
             .padding(.vertical, 4)
         }
@@ -1678,8 +1682,12 @@ private struct FollowupDetailView: View {
                     Text("Description")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(followup.descriptionText.isEmpty ? "(Empty)" : followup.descriptionText)
-                        .textSelection(.enabled)
+                    if followup.descriptionText.isEmpty {
+                        Text("(Empty)")
+                    } else {
+                        SanitizedHTMLView(html: followup.descriptionText)
+                            .frame(minHeight: 140)
+                    }
                 }
                 .padding(.vertical, 4)
 
