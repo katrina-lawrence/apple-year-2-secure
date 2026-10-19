@@ -1376,8 +1376,8 @@ private struct NoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(summary)
-                        .textSelection(.enabled)
+                    SanitizedHTMLView(html: summary)
+                        .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)
             }
@@ -1569,8 +1569,8 @@ private struct ProcessedNoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(summary)
-                        .textSelection(.enabled)
+                    SanitizedHTMLView(html: summary)
+                        .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)
             }
