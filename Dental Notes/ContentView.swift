@@ -192,17 +192,8 @@ private struct ThirdPartyAIConfig {
     var modelID: String
     var apiKey: String?
 
-    private var baseURLIsHTTPS: Bool {
-        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmed),
-              let scheme = url.scheme?.lowercased() else {
-            return false
-        }
-        return scheme == "https"
-    }
-
     var isValid: Bool {
-        baseURLIsHTTPS &&
+        !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !modelID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
@@ -588,11 +579,7 @@ private enum NoteFollowupAIService {
 
     private static func anthropicMessagesURL(from baseURL: String) -> URL? {
         let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard var url = URL(string: trimmed),
-              let scheme = url.scheme?.lowercased(),
-              scheme == "https" else {
-            return nil
-        }
+        guard var url = URL(string: trimmed) else { return nil }
 
         if url.path.hasSuffix("/messages") {
             return url

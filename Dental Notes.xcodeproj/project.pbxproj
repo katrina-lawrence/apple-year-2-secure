@@ -100,13 +100,13 @@
 			);
 			mainGroup = BFE31C2D3077076F009DB6FD;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BFE31C373077076F009DB6FD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			targets = (
 				BFE31C353077076F009DB6FD /* Dental Notes */,
 			);
@@ -132,6 +132,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCBuildConfiguration section */
 		BFA02DCA30801F0C0004DD13 /* Debug Local */ = {
@@ -214,7 +225,7 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = NO;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,7 +329,7 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = NO;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -479,7 +490,7 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = NO;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -521,7 +532,7 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = NO;
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -571,17 +582,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		F0A1D19F3B7C100100A00001 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.5;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		F0A1D1A03B7C100100A00001 /* SwiftSoup */ = {

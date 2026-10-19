@@ -3,7 +3,6 @@ import Security
 import SwiftData
 import SwiftUI
 import Combine
-import CryptoKit
 
 enum AppRuntimeMode {
     case local
@@ -24,7 +23,6 @@ enum AppRuntimeMode {
 
 private struct BackendConfigFile: Decodable {
     let baseURL: String?
-    let spkiPins: [String]?
 
     enum CodingKeys: String, CodingKey {
         case baseURL
@@ -32,14 +30,11 @@ private struct BackendConfigFile: Decodable {
         case serverURL
         case serverUrl
         case endpoint
-        case spkiPins
-        case spki_pins
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         baseURL = container.decodeFirstNonEmptyString(for: [.baseURL, .baseUrl, .serverURL, .serverUrl, .endpoint])
-        spkiPins = container.decodeFirstNonEmptyStringArray(for: [.spkiPins, .spki_pins])
     }
 }
 
@@ -55,30 +50,13 @@ private extension KeyedDecodingContainer {
         }
         return nil
     }
-
-    func decodeFirstNonEmptyStringArray(for keys: [Key]) -> [String]? {
-        for key in keys {
-            if let values = (try? decodeIfPresent([String].self, forKey: key)) ?? nil {
-                let normalized = values.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-                if !normalized.isEmpty {
-                    return normalized
-                }
-            }
-        }
-        return nil
-    }
-}
-
-fileprivate struct BackendServerConfiguration {
-    let baseURL: URL
-    let spkiPins: [String]
 }
 
 enum BackendConfigStore {
     private static let resourceName = "BackendConfig"
     private static let resourceExtension = "plist"
 
-    fileprivate static func serverConfiguration() -> BackendServerConfiguration? {
+    static func serverBaseURL() -> URL? {
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else {
             return nil
         }
@@ -91,209 +69,10 @@ enum BackendConfigStore {
         guard let baseURLText = file.baseURL,
               let parsed = URL(string: baseURLText),
               let scheme = parsed.scheme?.lowercased(),
-              scheme == "https" else {
+              scheme == "http" || scheme == "https" else {
             return nil
         }
-        guard let pins = file.spkiPins, pins.count >= 1 else {
-            return nil
-        }
-        return BackendServerConfiguration(baseURL: parsed, spkiPins: pins)
-    }
-}
-
-private enum TLSError: LocalizedError {
-    case missingCAResource
-    case invalidCACertificate
-    case invalidSPKIPins
-
-    var errorDescription: String? {
-        switch self {
-        case .missingCAResource:
-            return "Missing bundled CA certificate (ca.crt)."
-        case .invalidCACertificate:
-            return "Bundled CA certificate (ca.crt) is invalid."
-        case .invalidSPKIPins:
-            return "Invalid SPKI pins in BackendConfig.plist."
-        }
-    }
-}
-
-private final class TLSPinningDelegate: NSObject, URLSessionDelegate {
-    private let anchorCertificate: SecCertificate
-    private let allowedPins: Set<String>
-
-    init(spkiPins: [String]) throws {
-        let normalizedPins = Set(spkiPins.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })
-        guard normalizedPins.count >= 1 else {
-            throw TLSError.invalidSPKIPins
-        }
-        guard normalizedPins.allSatisfy({ Data(base64Encoded: $0) != nil }) else {
-            throw TLSError.invalidSPKIPins
-        }
-
-        self.allowedPins = normalizedPins
-        self.anchorCertificate = try Self.loadAnchorCertificate()
-        super.init()
-    }
-
-    func urlSession(
-        _ session: URLSession,
-        didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-    ) {
-        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-              let trust = challenge.protectionSpace.serverTrust else {
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-
-        do {
-            guard try evaluate(trust: trust) else {
-                completionHandler(.cancelAuthenticationChallenge, nil)
-                return
-            }
-            completionHandler(.useCredential, URLCredential(trust: trust))
-        } catch {
-            completionHandler(.cancelAuthenticationChallenge, nil)
-        }
-    }
-
-    private func evaluate(trust: SecTrust) throws -> Bool {
-        let policy = SecPolicyCreateBasicX509()
-        SecTrustSetPolicies(trust, policy)
-        SecTrustSetAnchorCertificates(trust, [anchorCertificate] as CFArray)
-        SecTrustSetAnchorCertificatesOnly(trust, true)
-
-        guard SecTrustEvaluateWithError(trust, nil) else {
-            return false
-        }
-
-        guard let certificateChain = SecTrustCopyCertificateChain(trust) as? [SecCertificate],
-              let leafCertificate = certificateChain.first else {
-            return false
-        }
-        let spkiHashBase64 = try Self.spkiSHA256Base64(from: leafCertificate)
-        return allowedPins.contains(spkiHashBase64)
-    }
-
-    private static func loadAnchorCertificate() throws -> SecCertificate {
-        guard let url = Bundle.main.url(forResource: "ca", withExtension: "crt") else {
-            throw TLSError.missingCAResource
-        }
-        let rawData = try Data(contentsOf: url)
-        let certificateData = try decodeCertificateData(from: rawData)
-        guard let certificate = SecCertificateCreateWithData(nil, certificateData as CFData) else {
-            throw TLSError.invalidCACertificate
-        }
-        return certificate
-    }
-
-    private static func decodeCertificateData(from data: Data) throws -> Data {
-        guard let text = String(data: data, encoding: .utf8),
-              text.contains("BEGIN CERTIFICATE") else {
-            return data
-        }
-
-        let beginMarker = "-----BEGIN CERTIFICATE-----"
-        let endMarker = "-----END CERTIFICATE-----"
-        guard let beginRange = text.range(of: beginMarker),
-              let endRange = text.range(of: endMarker, range: beginRange.upperBound..<text.endIndex) else {
-            throw TLSError.invalidCACertificate
-        }
-
-        let body = text[beginRange.upperBound..<endRange.lowerBound]
-        let base64 = body.replacingOccurrences(of: "\\s+", with: "", options: .regularExpression)
-        guard let decoded = Data(base64Encoded: base64) else {
-            throw TLSError.invalidCACertificate
-        }
-        return decoded
-    }
-
-    private static func spkiSHA256Base64(from certificate: SecCertificate) throws -> String {
-        guard let key = SecCertificateCopyKey(certificate) else {
-            throw TLSError.invalidCACertificate
-        }
-        let spki = try subjectPublicKeyInfoData(from: key)
-        let digest = SHA256.hash(data: spki)
-        return Data(digest).base64EncodedString()
-    }
-
-    private static func subjectPublicKeyInfoData(from key: SecKey) throws -> Data {
-        var error: Unmanaged<CFError>?
-        guard let rawKeyData = SecKeyCopyExternalRepresentation(key, &error) as Data? else {
-            throw (error?.takeRetainedValue() as Error?) ?? TLSError.invalidCACertificate
-        }
-
-        guard let attributes = SecKeyCopyAttributes(key) as? [CFString: Any],
-              let keyType = attributes[kSecAttrKeyType] as? String else {
-            throw TLSError.invalidCACertificate
-        }
-        let keySizeBits = (attributes[kSecAttrKeySizeInBits] as? NSNumber)?.intValue ?? 0
-
-        let algorithmIdentifier: Data
-        if keyType == (kSecAttrKeyTypeRSA as String) {
-            algorithmIdentifier = derSequence(derOID([0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01]) + derNull())
-        } else if keyType == (kSecAttrKeyTypeECSECPrimeRandom as String) {
-            let curveOID: [UInt8]
-            switch keySizeBits {
-            case 256:
-                curveOID = [0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07]
-            case 384:
-                curveOID = [0x2B, 0x81, 0x04, 0x00, 0x22]
-            case 521:
-                curveOID = [0x2B, 0x81, 0x04, 0x00, 0x23]
-            default:
-                throw TLSError.invalidCACertificate
-            }
-            algorithmIdentifier = derSequence(
-                derOID([0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01]) +
-                derOID(curveOID)
-            )
-        } else {
-            throw TLSError.invalidCACertificate
-        }
-
-        return derSequence(algorithmIdentifier + derBitString(rawKeyData))
-    }
-
-    private static func derSequence(_ payload: Data) -> Data {
-        derTag(0x30, payload)
-    }
-
-    private static func derNull() -> Data {
-        Data([0x05, 0x00])
-    }
-
-    private static func derOID(_ bytes: [UInt8]) -> Data {
-        derTag(0x06, Data(bytes))
-    }
-
-    private static func derBitString(_ payload: Data) -> Data {
-        var body = Data([0x00])
-        body.append(payload)
-        return derTag(0x03, body)
-    }
-
-    private static func derTag(_ tag: UInt8, _ payload: Data) -> Data {
-        var data = Data([tag])
-        data.append(derLength(payload.count))
-        data.append(payload)
-        return data
-    }
-
-    private static func derLength(_ length: Int) -> Data {
-        if length < 0x80 {
-            return Data([UInt8(length)])
-        }
-        var value = length
-        var octets: [UInt8] = []
-        while value > 0 {
-            octets.insert(UInt8(value & 0xFF), at: 0)
-            value >>= 8
-        }
-        var result = Data([0x80 | UInt8(octets.count)])
-        result.append(contentsOf: octets)
-        return result
+        return parsed
     }
 }
 
@@ -459,7 +238,6 @@ private extension KeyedDecodingContainer where Key == AnyCodingKey {
 private enum BackendError: LocalizedError {
     case modeDisabled
     case invalidServerConfiguration
-    case invalidTLSConfiguration
     case unauthenticated
     case invalidResponse
     case httpStatus(Int)
@@ -470,9 +248,7 @@ private enum BackendError: LocalizedError {
         case .modeDisabled:
             return "Server mode is disabled for this build."
         case .invalidServerConfiguration:
-            return "Invalid or missing server configuration. Ensure BackendConfig.plist has an https baseURL and at least one SPKI pin."
-        case .invalidTLSConfiguration:
-            return "TLS configuration failed. Ensure ca.crt is bundled and SPKI pins are valid."
+            return "Invalid or missing server configuration."
         case .unauthenticated:
             return "Please log in to continue."
         case .invalidResponse:
@@ -802,8 +578,14 @@ final class AppSessionViewModel: ObservableObject {
     private var accessToken: String?
     private var refreshToken: String?
     private var hasBootstrapped = false
-    private var serverSession: URLSession?
-    private var tlsDelegate: TLSPinningDelegate?
+    private let serverSession: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.httpShouldSetCookies = false
+        return URLSession(configuration: configuration)
+    }()
 
     init() {
         configureForMode()
@@ -1095,33 +877,13 @@ final class AppSessionViewModel: ObservableObject {
             return
         }
 
-        authError = nil
-        let serverConfiguration = BackendConfigStore.serverConfiguration()
-        backendBaseURL = serverConfiguration?.baseURL
+        backendBaseURL = BackendConfigStore.serverBaseURL()
         accessToken = AuthTokenKeychainStore.readAccessToken()
         refreshToken = AuthTokenKeychainStore.readRefreshToken()
-        isAuthenticated = false
-        serverSession = nil
-        tlsDelegate = nil
+        isAuthenticated = backendBaseURL != nil && accessToken != nil && refreshToken != nil
 
-        guard let serverConfiguration else {
-            authError = "Add Dental Notes/BackendConfig.plist with an https baseURL and at least one SPKI pin."
-            return
-        }
-
-        do {
-            let delegate = try TLSPinningDelegate(spkiPins: serverConfiguration.spkiPins)
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-            configuration.urlCache = nil
-            configuration.httpCookieStorage = nil
-            configuration.httpShouldSetCookies = false
-
-            tlsDelegate = delegate
-            serverSession = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
-            isAuthenticated = accessToken != nil && refreshToken != nil
-        } catch {
-            authError = message(for: error)
+        if backendBaseURL == nil {
+            authError = "Add Dental Notes/BackendConfig.plist with a valid http:// or https:// base URL."
         }
     }
 
@@ -1240,10 +1002,6 @@ final class AppSessionViewModel: ObservableObject {
         if let backendError = error as? BackendError {
             return backendError.localizedDescription
         }
-        if let localizedError = error as? LocalizedError,
-           let description = localizedError.errorDescription {
-            return description
-        }
         if let urlError = error as? URLError {
             return urlError.localizedDescription
         }
@@ -1278,7 +1036,6 @@ final class AppSessionViewModel: ObservableObject {
     ) async throws -> Data {
         guard mode.isServer else { throw BackendError.modeDisabled }
         guard let baseURL = backendBaseURL else { throw BackendError.invalidServerConfiguration }
-        guard let serverSession else { throw BackendError.invalidTLSConfiguration }
 
         let normalizedPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
         let url = baseURL.appending(path: normalizedPath)
