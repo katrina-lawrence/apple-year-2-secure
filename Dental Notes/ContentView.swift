@@ -149,6 +149,35 @@ struct ProcessedNoteResult {
     let followups: [ProposedFollowup]
 }
 
+struct NoteCategoryScore: Identifiable, Hashable {
+    let category: String
+    let score: Double
+
+    var id: String { category }
+}
+
+struct NoteClassificationResult: Identifiable {
+    let id = UUID()
+    let scores: [NoteCategoryScore]
+
+    var sortedScores: [NoteCategoryScore] {
+        scores.sorted { lhs, rhs in
+            if lhs.score == rhs.score {
+                return lhs.category < rhs.category
+            }
+            return lhs.score > rhs.score
+        }
+    }
+
+    var topCategoryScore: NoteCategoryScore? {
+        sortedScores.first
+    }
+
+    var otherCategoryScores: [NoteCategoryScore] {
+        Array(sortedScores.dropFirst())
+    }
+}
+
 private struct ProcessedNotePreviewData {
     struct Followup: Identifiable {
         let id: UUID
@@ -1067,6 +1096,7 @@ private struct NoteDetailView: View {
     @State private var pendingProcessedEditedAtUTC: Date?
     @State private var showingProcessApproval = false
     @State private var isSavingProcessedNote = false
+    @State private var pendingClassificationResult: NoteClassificationResult?
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
@@ -1160,6 +1190,12 @@ private struct NoteDetailView: View {
                 EmptyView()
             }
         }
+        .fullScreenCover(item: $pendingClassificationResult) { result in
+            ClassificationResultView(
+                result: result,
+                onDone: dismissClassificationResult
+            )
+        }
         .onAppear {
             aiAvailable = NoteFollowupAIService.isAppleAvailable()
         }
@@ -1195,7 +1231,8 @@ private struct NoteDetailView: View {
                 aiProcessError: aiProcessError,
                 aiHasProcessed: aiHasProcessed,
                 proposedFollowups: proposedFollowups,
-                onProcess: processWithAI
+                onProcess: processWithAI,
+                onClassify: classifyNote
             )
         }
     }
@@ -1289,6 +1326,28 @@ private struct NoteDetailView: View {
         showingProcessApproval = false
         aiHasProcessed = false
         proposedFollowups = []
+    }
+
+    private func classifyNote() {
+        pendingClassificationResult = generateClassificationStub(for: note.value)
+    }
+
+    private func dismissClassificationResult() {
+        pendingClassificationResult = nil
+    }
+
+    private func generateClassificationStub(for noteText: String) -> NoteClassificationResult {
+        // Temporary stub for future on-device Apple Intelligence classification from the note text.
+        _ = noteText
+        return NoteClassificationResult(
+            scores: [
+                NoteCategoryScore(category: "Follow-up", score: 0.92),
+                NoteCategoryScore(category: "Appointment", score: 0.04),
+                NoteCategoryScore(category: "Treatment", score: 0.02),
+                NoteCategoryScore(category: "Insurance", score: 0.01),
+                NoteCategoryScore(category: "Billing", score: 0.01)
+            ]
+        )
     }
 
     private func replaceFollowups(with followups: [ProposedFollowup]) {
@@ -1460,6 +1519,7 @@ private struct AIProcessingControls: View {
     let aiHasProcessed: Bool
     let proposedFollowups: [ProposedFollowup]
     let onProcess: () -> Void
+    let onClassify: () -> Void
 
     var body: some View {
         if canProcess {
@@ -1490,6 +1550,95 @@ private struct AIProcessingControls: View {
                     .foregroundStyle(.secondary)
             }
         }
+
+        Button {
+            onClassify()
+        } label: {
+            Label("Classify Note", systemImage: "chart.bar.doc.horizontal")
+        }
+    }
+}
+
+private struct ClassificationResultView: View {
+    let result: NoteClassificationResult
+    let onDone: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    if let topScore = result.topCategoryScore {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Predicted Category")
+                                .font(.title3)
+                                .fontWeight(.semibold)
+
+                            HStack {
+                                Text(topScore.category)
+                                    .font(.headline)
+                                Spacer()
+                                Text(scoreText(topScore.score))
+                                    .font(.subheadline.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            ProgressView(value: topScore.score, total: 1.0)
+
+                            Text("Illustrative prediction. A high model score does not guarantee correctness.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
+                Section("Other category scores") {
+                    ForEach(result.otherCategoryScores) { categoryScore in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(categoryScore.category)
+                                .font(.subheadline)
+
+                            HStack(spacing: 10) {
+                                ProgressView(value: categoryScore.score, total: 1.0)
+                                Text(scoreText(categoryScore.score))
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 36, alignment: .trailing)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+
+                Section {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "shield.checkmark")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 2)
+                        Text("Classification runs locally. No hosted AI API call is required.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            .navigationTitle("Classification Result")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        onDone()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .interactiveDismissDisabled()
+    }
+
+    private func scoreText(_ score: Double) -> String {
+        String(format: "%.2f", score)
     }
 }
 
