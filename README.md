@@ -20,11 +20,19 @@ Security notes:
 To run the app in server mode:
 
 1. Copy `Dental Notes/BackendConfig.example.plist` to `Dental Notes/BackendConfig.plist`.
-2. Set `baseURL` to your backend URL (HTTP and HTTPS are supported).
-3. Build with the `SERVER_MODE` Swift compilation condition enabled.
+2. Set `baseURL` to your backend HTTPS URL (`https://...`).
+3. Set `spkiPins` with at least one base64 SHA-256 SPKI pin (a second pin is optional for future rotation).
+4. Put your private CA certificate at `Dental Notes/ca.crt`.
+5. Build with the `SERVER_MODE` Swift compilation condition enabled.
 
 Notes:
 - In builds without `SERVER_MODE`, the app runs in local-only mode.
 - `Dental Notes/BackendConfig.plist` is gitignored.
 - In builds with `SERVER_MODE`, notes and followups are stored in an in-memory SwiftData store only (no persistent on-device SwiftData files).
 - In builds with `SERVER_MODE`, selecting `Third-party provider` routes note processing to backend `POST /notes/process` using the note ID. The app does not use `ThirdPartyAIConfig.plist` for that path.
+- ATS arbitrary loads are disabled; network endpoints must use HTTPS.
+- Private-network backends are supported when the server cert chains to bundled `ca.crt` and SPKI pinning matches.
+- With a single pin, certificate/key rotation requires app config update before server key cutover.
+- Backend TLS is fail-closed: requests are rejected unless both checks pass:
+  - Trust chain validates against bundled `ca.crt` only.
+  - Server leaf public key SPKI hash matches one of the configured `spkiPins`.
