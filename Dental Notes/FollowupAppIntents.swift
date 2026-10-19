@@ -72,6 +72,9 @@ struct CreateDentalFollowupIntent: AppIntent {
     static let title: LocalizedStringResource = "Create Dental Followup"
     static let description = IntentDescription("Create a followup that is not attached to a note.")
     static let openAppWhenRun = false
+    static var authenticationPolicy: IntentAuthenticationPolicy {
+        .requiresAuthentication
+    }
 
     @Parameter(
         title: "Followup Description",
@@ -131,6 +134,9 @@ struct GetNextIncompleteFollowupIntent: AppIntent {
     static let title: LocalizedStringResource = "Show Next Followup"
     static let description = IntentDescription("Get the oldest remaining followup.")
     static let openAppWhenRun = false
+    static var authenticationPolicy: IntentAuthenticationPolicy {
+        .requiresAuthentication
+    }
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
@@ -173,6 +179,9 @@ struct CompleteNextFollowupIntent: AppIntent {
     static let title: LocalizedStringResource = "Mark Next Followup Done"
     static let description = IntentDescription("Mark the oldest incomplete followup as complete.")
     static let openAppWhenRun = false
+    static var authenticationPolicy: IntentAuthenticationPolicy {
+        .requiresAuthentication
+    }
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
