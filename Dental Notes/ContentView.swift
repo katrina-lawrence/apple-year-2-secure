@@ -1,6 +1,9 @@
 import Foundation
 import SwiftData
 import SwiftUI
+#if canImport(FoundationModels)
+import FoundationModels
+#endif
 
 private enum TextLimits {
     static let maxLength = 2048
@@ -241,6 +244,28 @@ private enum AppSettingsStore {
     }
 }
 
+#if canImport(FoundationModels)
+@Generable
+private struct AIActionDraft {
+    var type: String
+    var description: String
+}
+
+@Generable
+private struct AIBalanceDueDraft {
+    var amount: Double?
+    var currency: String?
+}
+
+@Generable
+private struct AIProcessedNoteDraft {
+    var summary: String
+    var categories: [String]
+    var balance_due: AIBalanceDueDraft?
+    var actions: [AIActionDraft]
+    var appointment_timing: String?
+}
+#else
 private struct AIActionDraft {
     var type: String
     var description: String
@@ -258,10 +283,73 @@ private struct AIProcessedNoteDraft {
     var actions: [AIActionDraft]
     var appointment_timing: String?
 }
+#endif
+
+private enum AIServiceError: Error {
+    case unsupportedProvider
+    case missingPromptResource(String)
+    case unreadablePromptResource(String)
+    case emptyPromptResource(String)
+    case unresolvedPromptPlaceholders
+}
+
+private struct AIPromptTemplates {
+    let system: String
+    let user: String
+}
+
+private enum AIPromptTemplateLoader {
+    private static let systemTemplateName = "PromptSystem"
+    private static let userTemplateName = "PromptUser"
+    private static let placeholderReferenceISO = "{{referenceISO}}"
+    private static let placeholderNoteText = "{{noteText}}"
+
+    static func render(noteText: String, referenceDate: Date) throws -> AIPromptTemplates {
+        let system = try loadTemplate(named: systemTemplateName)
+        let userTemplate = try loadTemplate(named: userTemplateName)
+
+        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
+        let user = userTemplate
+            .replacingOccurrences(of: placeholderReferenceISO, with: referenceISO)
+            .replacingOccurrences(of: placeholderNoteText, with: noteText)
+
+        if user.contains("{{") || user.contains("}}") {
+            throw AIServiceError.unresolvedPromptPlaceholders
+        }
+
+        return AIPromptTemplates(system: system, user: user)
+    }
+
+    private static func loadTemplate(named resourceName: String) throws -> String {
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "md") else {
+            throw AIServiceError.missingPromptResource(resourceName)
+        }
+        guard let content = try? String(contentsOf: url, encoding: .utf8) else {
+            throw AIServiceError.unreadablePromptResource(resourceName)
+        }
+
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            throw AIServiceError.emptyPromptResource(resourceName)
+        }
+        return trimmed
+    }
+}
 
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
-        true
+        #if canImport(FoundationModels)
+        switch SystemLanguageModel.default.availability {
+        case .available:
+            return true
+        case .unavailable:
+            return false
+        @unknown default:
+            return false
+        }
+        #else
+        return false
+        #endif
     }
 
     static func processNote(
@@ -320,21 +408,27 @@ private enum NoteFollowupAIService {
     }
 
     private static func processNoteWithApple(noteText: String, referenceDate: Date) async throws -> AIProcessedNoteDraft {
-        // TODO(Learner):
-        // 1) Define @Generable draft structs for Apple Intelligence output (actions, balance_due, processed note).
-        // 2) Build prompts from noteText + referenceDate (reuse the prompt template loader).
-        // 3) Invoke the on-device Apple Intelligence model and decode into AIProcessedNoteDraft.
-        // 4) Return the parsed draft so normalizeProcessedResult can map it to ProcessedNoteResult.
-        // 5) Preserve safe behavior for empty notes and model/parsing failures.
+        #if canImport(FoundationModels)
+        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedNote.isEmpty else {
+            return AIProcessedNoteDraft(
+                summary: "",
+                categories: [],
+                balance_due: nil,
+                actions: [],
+                appointment_timing: nil
+            )
+        }
+
+        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
+        let session = LanguageModelSession(instructions: prompts.system)
+        let response = try await session.respond(to: prompts.user, generating: AIProcessedNoteDraft.self)
+        return response.content
+        #else
         let _ = noteText
         let _ = referenceDate
-        return AIProcessedNoteDraft(
-            summary: "This feature has not been implemented.",
-            categories: [],
-            balance_due: nil,
-            actions: [],
-            appointment_timing: nil
-        )
+        throw AIServiceError.unsupportedProvider
+        #endif
     }
 
     private static func trimmedOrNil(_ value: String?) -> String? {
