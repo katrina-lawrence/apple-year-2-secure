@@ -316,59 +316,10 @@ private struct AIProcessedNoteDraft {
 }
 
 private enum AIServiceError: Error {
-    case invalidConfiguration
-    case invalidURL
-    case invalidResponse
-    case badHTTPStatus(Int)
-    case decodingFailed
     case missingPromptResource(String)
     case unreadablePromptResource(String)
     case emptyPromptResource(String)
     case unresolvedPromptPlaceholders
-}
-
-private struct ThirdPartyAnthropicMessagesRequest: Encodable {
-    struct Message: Encodable {
-        struct ContentBlock: Encodable {
-            let type: String
-            let text: String
-        }
-
-        let role: String
-        let content: [ContentBlock]
-    }
-
-    let model: String
-    let max_tokens: Int
-    let system: String
-    let messages: [Message]
-}
-
-private struct ThirdPartyAnthropicMessagesResponse: Decodable {
-    struct ContentBlock: Decodable {
-        let type: String
-        let text: String?
-    }
-
-    let content: [ContentBlock]
-}
-
-private struct ThirdPartyAIActionDraft: Decodable {
-    let type: String?
-    let description: String?
-}
-
-private struct ThirdPartyAIProcessedNoteDraft: Decodable {
-    let summary: String?
-    let balance_due: ThirdPartyAIBalanceDueDraft?
-    let categories: [String]?
-    let actions: [ThirdPartyAIActionDraft]?
-    let appointment_timing: String?
-}
-
-private struct ThirdPartyAIBalanceDueDraft: Decodable {
-    let amount: Double?
-    let currency: String?
 }
 
 private struct AIPromptTemplates {
@@ -442,10 +393,11 @@ private enum NoteFollowupAIService {
         case .appleIntelligence:
             draft = try await processNoteWithApple(noteText: trimmedNote, referenceDate: referenceDate)
         case .thirdParty:
-            guard let config = thirdPartyConfig, config.isValid else {
-                throw AIServiceError.invalidConfiguration
-            }
-            draft = try await processNoteWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
+            draft = try await processNoteWithThirdParty(
+                noteText: trimmedNote,
+                referenceDate: referenceDate,
+                config: thirdPartyConfig
+            )
         }
 
         return normalizeProcessedResult(from: draft)
@@ -506,123 +458,26 @@ private enum NoteFollowupAIService {
     private static func processNoteWithThirdParty(
         noteText: String,
         referenceDate: Date,
-        config: ThirdPartyAIConfig
+        config: ThirdPartyAIConfig?
     ) async throws -> AIProcessedNoteDraft {
-        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else {
-            return AIProcessedNoteDraft(
-                summary: "",
-                categories: [],
-                balance_due: nil,
-                actions: [],
-                appointment_timing: nil
-            )
-        }
-
-        guard let endpoint = anthropicMessagesURL(from: config.baseURL) else {
-            throw AIServiceError.invalidURL
-        }
-
-        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
-
-        let requestBody = ThirdPartyAnthropicMessagesRequest(
-            model: config.modelID,
-            max_tokens: 1200,
-            system: prompts.system,
-            messages: [
-                .init(
-                    role: "user",
-                    content: [
-                        .init(type: "text", text: prompts.user)
-                    ]
-                )
-            ]
-        )
-
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 180
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
-        if let apiKey = config.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines), !apiKey.isEmpty {
-            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        }
-        request.httpBody = try JSONEncoder().encode(requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw AIServiceError.invalidResponse
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AIServiceError.badHTTPStatus(http.statusCode)
-        }
-
-        let decoded = try JSONDecoder().decode(ThirdPartyAnthropicMessagesResponse.self, from: data)
-        let content = decoded.content
-            .filter { $0.type == "text" }
-            .compactMap(\.text)
-            .joined(separator: "\n")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !content.isEmpty else {
-            throw AIServiceError.invalidResponse
-        }
-
-        let cleaned = cleanedJSONText(from: content)
-        guard let contentData = cleaned.data(using: .utf8),
-              let thirdPartyDraftList = try? JSONDecoder().decode(ThirdPartyAIProcessedNoteDraft.self, from: contentData) else {
-            throw AIServiceError.decodingFailed
-        }
-
+        // TODO(Learner):
+        // 1) Validate config fields required by your chosen provider (endpoint/model/key).
+        // 2) Render prompts from noteText + referenceDate using AIPromptTemplateLoader.
+        // 3) Build a provider request/response adapter that maps output to AIProcessedNoteDraft.
+        // 4) Handle failures safely (timeouts, bad status, malformed JSON) with clear fallbacks.
+        //
+        // Stubbed local implementation for learner exercise:
+        // no direct third-party API call is made from the client app.
+        let _ = noteText
+        let _ = referenceDate
+        let _ = config
         return AIProcessedNoteDraft(
-            summary: thirdPartyDraftList.summary ?? "",
-            categories: thirdPartyDraftList.categories ?? [],
-            balance_due: thirdPartyDraftList.balance_due.map {
-                AIBalanceDueDraft(amount: $0.amount, currency: $0.currency)
-            },
-            actions: (thirdPartyDraftList.actions ?? []).compactMap { action in
-                guard let type = action.type, let description = action.description else { return nil }
-                return AIActionDraft(
-                    type: type,
-                    description: description
-                )
-            },
-            appointment_timing: thirdPartyDraftList.appointment_timing
+            summary: "Tnis feature has not been implemented.",
+            categories: [],
+            balance_due: nil,
+            actions: [],
+            appointment_timing: nil
         )
-    }
-
-    private static func anthropicMessagesURL(from baseURL: String) -> URL? {
-        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard var url = URL(string: trimmed) else { return nil }
-
-        if url.path.hasSuffix("/messages") {
-            return url
-        }
-        if url.path.hasSuffix("/v1") {
-            url.append(path: "messages")
-            return url
-        }
-        if url.path.isEmpty || url.path == "/" {
-            url.append(path: "v1/messages")
-            return url
-        }
-
-        url.append(path: "messages")
-        return url
-    }
-
-    private static func cleanedJSONText(from raw: String) -> String {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix("```") else { return trimmed }
-
-        var lines = trimmed.components(separatedBy: .newlines)
-        if !lines.isEmpty {
-            lines.removeFirst()
-        }
-        if let last = lines.last,
-           last.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("```") {
-            lines.removeLast()
-        }
-        return lines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func trimmedOrNil(_ value: String?) -> String? {
@@ -1072,10 +927,7 @@ private struct NoteDetailView: View {
         case .appleIntelligence:
             return aiAvailable
         case .thirdParty:
-            if session.mode.isServer {
-                return true
-            }
-            return thirdPartyConfig.isValid
+            return true
         }
     }
 
