@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftData
 import SwiftUI
 
@@ -5,6 +6,10 @@ import SwiftUI
 struct Dental_NotesApp: App {
     @StateObject private var appSession = AppSessionViewModel()
     @StateObject private var navigationCoordinator = AppNavigationCoordinator()
+
+    init() {
+        DentalNotesAppShortcutsProvider.updateAppShortcutParameters()
+    }
 
     private let sharedModelContainer: ModelContainer = {
         Dental_NotesApp.purgeLocalSwiftDataStoreFiles()
