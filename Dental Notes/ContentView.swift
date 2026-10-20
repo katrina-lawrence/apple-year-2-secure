@@ -513,14 +513,12 @@ struct ContentView: View {
 
 private struct NotesTabView: View {
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
     @Query(sort: \NoteEntity.createdAtUTC, order: .reverse) private var notes: [NoteEntity]
     @Query private var allFollowups: [FollowupEntity]
 
     @State private var showingCreateNote = false
     @State private var showingSettings = false
     @State private var notePendingDelete: NoteEntity?
-    @State private var operationError: String?
 
     var body: some View {
         NavigationStack {
@@ -555,11 +553,6 @@ private struct NotesTabView: View {
                 }
             }
             .navigationTitle("Notes")
-            .refreshable {
-                if session.mode.isServer {
-                    _ = await session.refreshUserData(modelContext: modelContext)
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -602,34 +595,10 @@ private struct NotesTabView: View {
             } message: {
                 Text("This also deletes all followups associated with this note.")
             }
-            .alert("Sync Error", isPresented: Binding(
-                get: { operationError != nil || session.syncError != nil },
-                set: { newValue in
-                    if !newValue {
-                        operationError = nil
-                        session.clearSyncError()
-                    }
-                })
-            ) {
-                Button("OK", role: .cancel) {
-                    operationError = nil
-                    session.clearSyncError()
-                }
-            } message: {
-                Text(operationError ?? session.syncError ?? "Request failed.")
-            }
         }
     }
 
     private func deleteNoteWithFollowups(_ note: NoteEntity) async {
-        if session.mode.isServer {
-            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
-            if !success {
-                operationError = session.syncError ?? "Could not delete note."
-            }
-            return
-        }
-
         let related = allFollowups.filter { $0.noteID == note.id }
         for followup in related {
             modelContext.delete(followup)
@@ -641,7 +610,6 @@ private struct NotesTabView: View {
 
 private struct FollowupsTabView: View {
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
     @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
     @Query(sort: \FollowupEntity.createdAtUTC, order: .reverse) private var followups: [FollowupEntity]
 
@@ -649,9 +617,7 @@ private struct FollowupsTabView: View {
     @State private var showingSettings = false
     @State private var showingCreateFollowup = false
     @State private var followupPendingDelete: FollowupEntity?
-    @State private var operationError: String?
     @State private var navigationPath: [String] = []
-    @State private var routeSyncAttemptedForFollowupID: String?
 
     private var displayedFollowups: [FollowupEntity] {
         hideCompleted ? followups.filter { !$0.isCompleted } : followups
@@ -703,11 +669,6 @@ private struct FollowupsTabView: View {
                 }
             }
             .navigationTitle("Followups")
-            .refreshable {
-                if session.mode.isServer {
-                    _ = await session.refreshUserData(modelContext: modelContext)
-                }
-            }
             .onAppear {
                 handlePendingFollowupRoute()
             }
@@ -757,22 +718,6 @@ private struct FollowupsTabView: View {
                     followupPendingDelete = nil
                 }
             }
-            .alert("Sync Error", isPresented: Binding(
-                get: { operationError != nil || session.syncError != nil },
-                set: { newValue in
-                    if !newValue {
-                        operationError = nil
-                        session.clearSyncError()
-                    }
-                })
-            ) {
-                Button("OK", role: .cancel) {
-                    operationError = nil
-                    session.clearSyncError()
-                }
-            } message: {
-                Text(operationError ?? session.syncError ?? "Request failed.")
-            }
         }
     }
 
@@ -781,39 +726,14 @@ private struct FollowupsTabView: View {
 
         if followups.contains(where: { $0.id == pendingFollowupID }) {
             navigationPath = [pendingFollowupID]
-            routeSyncAttemptedForFollowupID = nil
             navigationCoordinator.consumePendingFollowupRoute()
             return
         }
 
-        guard session.mode.isServer else {
-            routeSyncAttemptedForFollowupID = nil
-            navigationCoordinator.consumePendingFollowupRoute()
-            return
-        }
-
-        if routeSyncAttemptedForFollowupID == pendingFollowupID {
-            routeSyncAttemptedForFollowupID = nil
-            navigationCoordinator.consumePendingFollowupRoute()
-            return
-        }
-
-        routeSyncAttemptedForFollowupID = pendingFollowupID
-        Task { @MainActor in
-            _ = await session.refreshUserData(modelContext: modelContext)
-            handlePendingFollowupRoute()
-        }
+        navigationCoordinator.consumePendingFollowupRoute()
     }
 
     private func deleteFollowup(_ followup: FollowupEntity) async {
-        if session.mode.isServer {
-            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
-            if !success {
-                operationError = session.syncError ?? "Could not delete followup."
-            }
-            return
-        }
-
         modelContext.delete(followup)
         try? modelContext.save()
     }
@@ -821,11 +741,8 @@ private struct FollowupsTabView: View {
 
 private struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
 
     @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AppSettingsStore.defaultProvider().rawValue
-    @State private var confirmingLogout = false
 
     private var selectedProvider: AIProviderMethod {
         AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
@@ -847,14 +764,6 @@ private struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                 }
-
-                if session.mode.isServer && session.isAuthenticated {
-                    Section("Account") {
-                        Button("Log Out", role: .destructive) {
-                            confirmingLogout = true
-                        }
-                    }
-                }
             }
             .navigationTitle("Settings")
             .toolbar {
@@ -870,17 +779,6 @@ private struct SettingsView: View {
                     providerMethodRawValue = normalizedProviderRawValue
                 }
             }
-            .alert("Log Out?", isPresented: $confirmingLogout) {
-                Button("Log Out", role: .destructive) {
-                    Task { @MainActor in
-                        await session.logoutAndClearLocalData(modelContext: modelContext)
-                        dismiss()
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This removes local notes and followups from this device.")
-            }
         }
     }
 }
@@ -888,7 +786,6 @@ private struct SettingsView: View {
 private struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
 
     @AppStorage(AppSettingsKeys.aiProviderMethod) private var providerMethodRawValue = AppSettingsStore.defaultProvider().rawValue
 
@@ -1008,20 +905,6 @@ private struct NoteDetailView: View {
         .onAppear {
             aiAvailable = NoteFollowupAIService.isAppleAvailable()
         }
-        .alert("Sync Error", isPresented: Binding(
-            get: { session.syncError != nil },
-            set: { newValue in
-                if !newValue {
-                    session.clearSyncError()
-                }
-            })
-        ) {
-            Button("OK", role: .cancel) {
-                session.clearSyncError()
-            }
-        } message: {
-            Text(session.syncError ?? "Request failed.")
-        }
     }
 
     private var followupsSection: some View {
@@ -1066,16 +949,12 @@ private struct NoteDetailView: View {
                         thirdPartyConfig: nil
                     )
                 case .thirdParty:
-                    if session.mode.isServer {
-                        processed = try await session.processNote(noteID: note.id)
-                    } else {
-                        processed = try await NoteFollowupAIService.processNote(
-                            from: note.value,
-                            referenceDate: note.createdAtUTC,
-                            provider: .thirdParty,
-                            thirdPartyConfig: thirdPartyConfig
-                        )
-                    }
+                    processed = try await NoteFollowupAIService.processNote(
+                        from: note.value,
+                        referenceDate: note.createdAtUTC,
+                        provider: .thirdParty,
+                        thirdPartyConfig: thirdPartyConfig
+                    )
                 }
                 await MainActor.run {
                     pendingProcessedResult = processed
@@ -1099,21 +978,6 @@ private struct NoteDetailView: View {
         isSavingProcessedNote = true
 
         Task { @MainActor in
-            if session.mode.isServer {
-                let success = await session.saveProcessedNote(note: note, result: processed, modelContext: modelContext)
-                await MainActor.run {
-                    if success {
-                        proposedFollowups = processed.followups
-                        aiHasProcessed = true
-                        pendingProcessedResult = nil
-                        pendingProcessedEditedAtUTC = nil
-                        showingProcessApproval = false
-                    }
-                    isSavingProcessedNote = false
-                }
-                return
-            }
-
             let editedAtUTC = pendingProcessedEditedAtUTC ?? Date()
             await MainActor.run {
                 applyProcessedNoteResult(processed, editedAtUTC: editedAtUTC)
@@ -1187,14 +1051,6 @@ private struct NoteDetailView: View {
     }
 
     private func deleteCurrentNote() async {
-        if session.mode.isServer {
-            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
-            if success {
-                dismiss()
-            }
-            return
-        }
-
         for followup in associatedFollowups {
             modelContext.delete(followup)
         }
@@ -1597,7 +1453,6 @@ private struct ProcessedFollowupsPreviewList: View {
 private struct FollowupDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
 
     let followup: FollowupEntity
 
@@ -1702,31 +1557,12 @@ private struct FollowupDetailView: View {
     }
 
     private func setCompleted(to completed: Bool) {
-        if session.mode.isServer {
-            Task { @MainActor in
-                _ = await session.setFollowupCompletion(
-                    followupID: followup.id,
-                    completed: completed,
-                    modelContext: modelContext
-                )
-            }
-            return
-        }
-
         followup.isCompleted = completed
         followup.editedAtUTC = Date()
         try? modelContext.save()
     }
 
     private func deleteFollowup() async {
-        if session.mode.isServer {
-            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
-            if success {
-                dismiss()
-            }
-            return
-        }
-
         modelContext.delete(followup)
         try? modelContext.save()
         dismiss()
@@ -1736,7 +1572,6 @@ private struct FollowupDetailView: View {
 private struct NoteEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
 
     let note: NoteEntity?
 
@@ -1805,28 +1640,6 @@ private struct NoteEditorSheet: View {
         isSaving = true
         saveError = nil
 
-        if session.mode.isServer {
-            let noteValue = value
-            Task { @MainActor in
-                let success: Bool
-                if let note {
-                    success = await session.updateNote(noteID: note.id, value: noteValue, modelContext: modelContext)
-                } else {
-                    success = await session.createNote(value: noteValue, modelContext: modelContext)
-                }
-
-                await MainActor.run {
-                    isSaving = false
-                    if success {
-                        dismiss()
-                    } else {
-                        saveError = session.syncError ?? "Could not save note."
-                    }
-                }
-            }
-            return
-        }
-
         let now = Date()
         if let note {
             note.value = value
@@ -1850,7 +1663,6 @@ private struct FollowupEditorSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var session: AppSessionViewModel
 
     let mode: Mode
 
@@ -1985,38 +1797,6 @@ private struct FollowupEditorSheet: View {
         let now = Date()
         let trimmedType = isTypeEditable ? typeText.trimmingCharacters(in: .whitespacesAndNewlines) : "Custom"
 
-        if session.mode.isServer {
-            let description = descriptionText
-            Task { @MainActor in
-                let success: Bool
-                if let existingFollowup {
-                    success = await session.updateFollowupText(
-                        followup: existingFollowup,
-                        type: trimmedType,
-                        descriptionText: description,
-                        modelContext: modelContext
-                    )
-                } else {
-                    success = await session.createFollowup(
-                        noteID: noteID,
-                        type: trimmedType,
-                        descriptionText: description,
-                        modelContext: modelContext
-                    )
-                }
-
-                await MainActor.run {
-                    isSaving = false
-                    if success {
-                        dismiss()
-                    } else {
-                        saveError = session.syncError ?? "Could not save followup."
-                    }
-                }
-            }
-            return
-        }
-
         if let existingFollowup {
             existingFollowup.type = trimmedType
             existingFollowup.descriptionText = descriptionText
@@ -2041,6 +1821,5 @@ private struct FollowupEditorSheet: View {
 #Preview {
     ContentView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
-        .environmentObject(AppSessionViewModel())
         .environmentObject(AppNavigationCoordinator())
 }

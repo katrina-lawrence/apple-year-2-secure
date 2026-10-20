@@ -1,7 +1,7 @@
 import LocalAuthentication
 import Combine
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @MainActor
 final class AppLockViewModel: ObservableObject {
@@ -74,10 +74,7 @@ final class AppLockViewModel: ObservableObject {
 }
 
 struct AppLockGateView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
-    @EnvironmentObject private var session: AppSessionViewModel
-    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
     @StateObject private var appLock = AppLockViewModel()
 
     var body: some View {
@@ -95,16 +92,10 @@ struct AppLockGateView: View {
         .onAppear {
             appLock.authenticateIfNeeded()
         }
-        .task {
-            await session.bootstrapIfNeeded(modelContext: modelContext)
-        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
                 appLock.authenticateIfNeeded()
-                Task { @MainActor in
-                    await session.bootstrapIfNeeded(modelContext: modelContext)
-                }
             case .inactive, .background:
                 appLock.lock()
             @unknown default:
@@ -115,17 +106,8 @@ struct AppLockGateView: View {
 }
 
 private struct UnlockedRootView: View {
-    @EnvironmentObject private var session: AppSessionViewModel
-    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
-
     var body: some View {
-        Group {
-            if session.mode.isServer && !session.isAuthenticated {
-                ServerAuthenticationView()
-            } else {
-                ContentView()
-            }
-        }
+        ContentView()
     }
 }
 
@@ -182,6 +164,5 @@ private struct LockScreenView: View {
 #Preview {
     AppLockGateView()
         .modelContainer(for: [NoteEntity.self, FollowupEntity.self], inMemory: true)
-        .environmentObject(AppSessionViewModel())
         .environmentObject(AppNavigationCoordinator())
 }
