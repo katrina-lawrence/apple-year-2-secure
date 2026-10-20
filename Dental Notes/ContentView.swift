@@ -1,9 +1,6 @@
 import Foundation
 import SwiftData
 import SwiftUI
-#if canImport(FoundationModels)
-import FoundationModels
-#endif
 
 private enum TextLimits {
     static let maxLength = 2048
@@ -300,20 +297,16 @@ private enum AppSettingsStore {
     }
 }
 
-#if canImport(FoundationModels)
-@Generable
 private struct AIActionDraft {
     var type: String
     var description: String
 }
 
-@Generable
 private struct AIBalanceDueDraft {
     var amount: Double?
     var currency: String?
 }
 
-@Generable
 private struct AIProcessedNoteDraft {
     var summary: String
     var categories: [String]
@@ -323,7 +316,6 @@ private struct AIProcessedNoteDraft {
 }
 
 private enum AIServiceError: Error {
-    case unsupportedProvider
     case invalidConfiguration
     case invalidURL
     case invalidResponse
@@ -424,14 +416,7 @@ private enum AIPromptTemplateLoader {
 
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
-        switch SystemLanguageModel.default.availability {
-        case .available:
-            return true
-        case .unavailable:
-            return false
-        @unknown default:
-            return false
-        }
+        true
     }
 
     static func processNote(
@@ -501,22 +486,21 @@ private enum NoteFollowupAIService {
     }
 
     private static func processNoteWithApple(noteText: String, referenceDate: Date) async throws -> AIProcessedNoteDraft {
-        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else {
-            return AIProcessedNoteDraft(
-                summary: "",
-                categories: [],
-                balance_due: nil,
-                actions: [],
-                appointment_timing: nil
-            )
-        }
-
-        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
-        let session = LanguageModelSession(instructions: prompts.system)
-
-        let response = try await session.respond(to: prompts.user, generating: AIProcessedNoteDraft.self)
-        return response.content
+        // TODO(Learner):
+        // 1) Define @Generable draft structs for Apple Intelligence output (actions, balance_due, processed note).
+        // 2) Build prompts from noteText + referenceDate (reuse the prompt template loader).
+        // 3) Invoke the on-device Apple Intelligence model and decode into AIProcessedNoteDraft.
+        // 4) Return the parsed draft so normalizeProcessedResult can map it to ProcessedNoteResult.
+        // 5) Preserve safe behavior for empty notes and model/parsing failures.
+        let _ = noteText
+        let _ = referenceDate
+        return AIProcessedNoteDraft(
+            summary: "This feature has not been implemented.",
+            categories: [],
+            balance_due: nil,
+            actions: [],
+            appointment_timing: nil
+        )
     }
 
     private static func processNoteWithThirdParty(
@@ -651,33 +635,6 @@ private enum NoteFollowupAIService {
         return trimmed.uppercased()
     }
 }
-#else
-private enum AIServiceError: Error {
-    case unsupportedProvider
-    case invalidConfiguration
-}
-
-private enum NoteFollowupAIService {
-    static func isAppleAvailable() -> Bool { false }
-
-    static func processNote(
-        from noteText: String,
-        referenceDate: Date,
-        provider: AIProviderMethod,
-        thirdPartyConfig: ThirdPartyAIConfig?
-    ) async throws -> ProcessedNoteResult {
-        let _ = noteText
-        let _ = referenceDate
-        let _ = thirdPartyConfig
-        switch provider {
-        case .appleIntelligence:
-            throw AIServiceError.unsupportedProvider
-        case .thirdParty:
-            throw AIServiceError.unsupportedProvider
-        }
-    }
-}
-#endif
 
 struct ContentView: View {
     @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
