@@ -225,7 +225,6 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -329,7 +328,6 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -490,7 +488,6 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -532,7 +529,6 @@
 				INFOPLIST_KEY_APP_GROUP_ID = "$(APP_GROUP_ID)";
 				INFOPLIST_KEY_CFBundleDisplayName = "My Dental Companion";
 				INFOPLIST_KEY_CFBundleURLTypes = "{\n    CFBundleTypeRole = Editor;\n    CFBundleURLName = \"com.vincentdragnea.DentalNotes\";\n    CFBundleURLSchemes =     (\n        mydentalcompanion\n    );\n}";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
