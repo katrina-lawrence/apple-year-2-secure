@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>endpoint</key>
-	<string>https://api.example.com</string>
+	<string>https://api.example.com/v1/messages</string>
 	<key>model</key>
 	<string>example-model-id</string>
 	<key>apiKey</key>
