@@ -1294,7 +1294,7 @@ private struct NoteDetailView: View {
     }
 
     private func generateClassificationStub(for noteText: String) -> NoteClassificationResult {
-        // Temporary stub for future on-device Apple Intelligence classification from the note text.
+        // TODO(Learner): Replace this stub with real note classification using the noteText input and return model-generated category scores.
         _ = noteText
         return NoteClassificationResult(
             scores: [
