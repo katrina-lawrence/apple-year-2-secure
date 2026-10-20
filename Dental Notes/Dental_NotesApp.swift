@@ -7,28 +7,13 @@ struct Dental_NotesApp: App {
     @StateObject private var navigationCoordinator = AppNavigationCoordinator()
 
     private let sharedModelContainer: ModelContainer = {
-        switch AppRuntimeMode.current {
-        case .server:
-            // SERVER_MODE keeps PHI in memory only.
-            Dental_NotesApp.purgeLocalSwiftDataStoreFiles()
-            do {
-                let schema = Schema([NoteEntity.self, FollowupEntity.self])
-                let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                return try ModelContainer(for: schema, configurations: configuration)
-            } catch {
-                fatalError("Could not initialize in-memory model container: \(error)")
-            }
-        case .local:
-            do {
-                return try ModelContainer(for: NoteEntity.self, FollowupEntity.self)
-            } catch {
-                Dental_NotesApp.purgeLocalSwiftDataStoreFiles()
-                do {
-                    return try ModelContainer(for: NoteEntity.self, FollowupEntity.self)
-                } catch {
-                    fatalError("Could not initialize model container after store reset: \(error)")
-                }
-            }
+        Dental_NotesApp.purgeLocalSwiftDataStoreFiles()
+        do {
+            let schema = Schema([NoteEntity.self, FollowupEntity.self])
+            let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try ModelContainer(for: schema, configurations: configuration)
+        } catch {
+            fatalError("Could not initialize in-memory model container: \(error)")
         }
     }()
 

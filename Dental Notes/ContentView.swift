@@ -213,37 +213,7 @@ private enum AppSettingsKeys {
     static let aiProviderMethod = "ai_provider_method"
 }
 
-private struct ThirdPartyAIConfig {
-    var baseURL: String
-    var modelID: String
-    var apiKey: String?
-
-    var isValid: Bool {
-        !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !modelID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-}
-
-private struct ThirdPartyAIConfigFile: Decodable {
-    let endpoint: String?
-    let model: String?
-    let apiKey: String?
-
-    private func nonEmptyTrimmed(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    var trimmedEndpoint: String? { nonEmptyTrimmed(endpoint) }
-    var trimmedModel: String? { nonEmptyTrimmed(model) }
-    var trimmedAPIKey: String? { nonEmptyTrimmed(apiKey) }
-}
-
 private enum AppSettingsStore {
-    private static let thirdPartyConfigResourceName = "ThirdPartyAIConfig"
-    private static let thirdPartyConfigExtension = "plist"
-
     static func isAppleIntelligenceAvailable() -> Bool {
         NoteFollowupAIService.isAppleAvailable()
     }
@@ -269,32 +239,6 @@ private enum AppSettingsStore {
         }
         return defaultProvider()
     }
-
-    static func thirdPartyConfig() -> ThirdPartyAIConfig {
-        let fileConfig = bundledThirdPartyConfig()
-        let fileEndpoint = fileConfig?.trimmedEndpoint
-        let fileModel = fileConfig?.trimmedModel
-        let fileAPIKey = fileConfig?.trimmedAPIKey
-
-        return ThirdPartyAIConfig(
-            baseURL: fileEndpoint ?? "",
-            modelID: fileModel ?? "",
-            apiKey: fileAPIKey
-        )
-    }
-
-    private static func bundledThirdPartyConfig() -> ThirdPartyAIConfigFile? {
-        guard let url = Bundle.main.url(
-            forResource: thirdPartyConfigResourceName,
-            withExtension: thirdPartyConfigExtension
-        ) else {
-            return nil
-        }
-        guard let data = try? Data(contentsOf: url) else {
-            return nil
-        }
-        return try? PropertyListDecoder().decode(ThirdPartyAIConfigFile.self, from: data)
-    }
 }
 
 private struct AIActionDraft {
@@ -315,105 +259,6 @@ private struct AIProcessedNoteDraft {
     var appointment_timing: String?
 }
 
-private enum AIServiceError: Error {
-    case invalidConfiguration
-    case invalidURL
-    case invalidResponse
-    case badHTTPStatus(Int)
-    case decodingFailed
-    case missingPromptResource(String)
-    case unreadablePromptResource(String)
-    case emptyPromptResource(String)
-    case unresolvedPromptPlaceholders
-}
-
-private struct ThirdPartyAnthropicMessagesRequest: Encodable {
-    struct Message: Encodable {
-        struct ContentBlock: Encodable {
-            let type: String
-            let text: String
-        }
-
-        let role: String
-        let content: [ContentBlock]
-    }
-
-    let model: String
-    let max_tokens: Int
-    let system: String
-    let messages: [Message]
-}
-
-private struct ThirdPartyAnthropicMessagesResponse: Decodable {
-    struct ContentBlock: Decodable {
-        let type: String
-        let text: String?
-    }
-
-    let content: [ContentBlock]
-}
-
-private struct ThirdPartyAIActionDraft: Decodable {
-    let type: String?
-    let description: String?
-}
-
-private struct ThirdPartyAIProcessedNoteDraft: Decodable {
-    let summary: String?
-    let balance_due: ThirdPartyAIBalanceDueDraft?
-    let categories: [String]?
-    let actions: [ThirdPartyAIActionDraft]?
-    let appointment_timing: String?
-}
-
-private struct ThirdPartyAIBalanceDueDraft: Decodable {
-    let amount: Double?
-    let currency: String?
-}
-
-private struct AIPromptTemplates {
-    let system: String
-    let user: String
-}
-
-private enum AIPromptTemplateLoader {
-    private static let systemTemplateName = "PromptSystem"
-    private static let userTemplateName = "PromptUser"
-    private static let placeholderReferenceISO = "{{referenceISO}}"
-    private static let placeholderNoteText = "{{noteText}}"
-
-    static func render(noteText: String, referenceDate: Date) throws -> AIPromptTemplates {
-        let system = try loadTemplate(named: systemTemplateName)
-        let userTemplate = try loadTemplate(named: userTemplateName)
-
-        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
-        let user = userTemplate
-            .replacingOccurrences(of: placeholderReferenceISO, with: referenceISO)
-            .replacingOccurrences(of: placeholderNoteText, with: noteText)
-
-        if user.contains("{{") || user.contains("}}") {
-            throw AIServiceError.unresolvedPromptPlaceholders
-        }
-
-        return AIPromptTemplates(system: system, user: user)
-    }
-
-    private static func loadTemplate(named resourceName: String) throws -> String {
-        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "md") else {
-            throw AIServiceError.missingPromptResource(resourceName)
-        }
-        guard let content = try? String(contentsOf: url, encoding: .utf8) else {
-            throw AIServiceError.unreadablePromptResource(resourceName)
-        }
-
-        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            throw AIServiceError.emptyPromptResource(resourceName)
-        }
-        return trimmed
-    }
-}
-
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
         true
@@ -421,9 +266,7 @@ private enum NoteFollowupAIService {
 
     static func processNote(
         from noteText: String,
-        referenceDate: Date,
-        provider: AIProviderMethod,
-        thirdPartyConfig: ThirdPartyAIConfig?
+        referenceDate: Date
     ) async throws -> ProcessedNoteResult {
         let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedNote.isEmpty else {
@@ -437,16 +280,7 @@ private enum NoteFollowupAIService {
             )
         }
 
-        let draft: AIProcessedNoteDraft
-        switch provider {
-        case .appleIntelligence:
-            draft = try await processNoteWithApple(noteText: trimmedNote, referenceDate: referenceDate)
-        case .thirdParty:
-            guard let config = thirdPartyConfig, config.isValid else {
-                throw AIServiceError.invalidConfiguration
-            }
-            draft = try await processNoteWithThirdParty(noteText: trimmedNote, referenceDate: referenceDate, config: config)
-        }
+        let draft = try await processNoteWithApple(noteText: trimmedNote, referenceDate: referenceDate)
 
         return normalizeProcessedResult(from: draft)
     }
@@ -503,128 +337,6 @@ private enum NoteFollowupAIService {
         )
     }
 
-    private static func processNoteWithThirdParty(
-        noteText: String,
-        referenceDate: Date,
-        config: ThirdPartyAIConfig
-    ) async throws -> AIProcessedNoteDraft {
-        let trimmedNote = noteText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedNote.isEmpty else {
-            return AIProcessedNoteDraft(
-                summary: "",
-                categories: [],
-                balance_due: nil,
-                actions: [],
-                appointment_timing: nil
-            )
-        }
-
-        guard let endpoint = anthropicMessagesURL(from: config.baseURL) else {
-            throw AIServiceError.invalidURL
-        }
-
-        let prompts = try AIPromptTemplateLoader.render(noteText: trimmedNote, referenceDate: referenceDate)
-
-        let requestBody = ThirdPartyAnthropicMessagesRequest(
-            model: config.modelID,
-            max_tokens: 1200,
-            system: prompts.system,
-            messages: [
-                .init(
-                    role: "user",
-                    content: [
-                        .init(type: "text", text: prompts.user)
-                    ]
-                )
-            ]
-        )
-
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 180
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
-        if let apiKey = config.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines), !apiKey.isEmpty {
-            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
-        }
-        request.httpBody = try JSONEncoder().encode(requestBody)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw AIServiceError.invalidResponse
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AIServiceError.badHTTPStatus(http.statusCode)
-        }
-
-        let decoded = try JSONDecoder().decode(ThirdPartyAnthropicMessagesResponse.self, from: data)
-        let content = decoded.content
-            .filter { $0.type == "text" }
-            .compactMap(\.text)
-            .joined(separator: "\n")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !content.isEmpty else {
-            throw AIServiceError.invalidResponse
-        }
-
-        let cleaned = cleanedJSONText(from: content)
-        guard let contentData = cleaned.data(using: .utf8),
-              let thirdPartyDraftList = try? JSONDecoder().decode(ThirdPartyAIProcessedNoteDraft.self, from: contentData) else {
-            throw AIServiceError.decodingFailed
-        }
-
-        return AIProcessedNoteDraft(
-            summary: thirdPartyDraftList.summary ?? "",
-            categories: thirdPartyDraftList.categories ?? [],
-            balance_due: thirdPartyDraftList.balance_due.map {
-                AIBalanceDueDraft(amount: $0.amount, currency: $0.currency)
-            },
-            actions: (thirdPartyDraftList.actions ?? []).compactMap { action in
-                guard let type = action.type, let description = action.description else { return nil }
-                return AIActionDraft(
-                    type: type,
-                    description: description
-                )
-            },
-            appointment_timing: thirdPartyDraftList.appointment_timing
-        )
-    }
-
-    private static func anthropicMessagesURL(from baseURL: String) -> URL? {
-        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard var url = URL(string: trimmed) else { return nil }
-
-        if url.path.hasSuffix("/messages") {
-            return url
-        }
-        if url.path.hasSuffix("/v1") {
-            url.append(path: "messages")
-            return url
-        }
-        if url.path.isEmpty || url.path == "/" {
-            url.append(path: "v1/messages")
-            return url
-        }
-
-        url.append(path: "messages")
-        return url
-    }
-
-    private static func cleanedJSONText(from raw: String) -> String {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix("```") else { return trimmed }
-
-        var lines = trimmed.components(separatedBy: .newlines)
-        if !lines.isEmpty {
-            lines.removeFirst()
-        }
-        if let last = lines.last,
-           last.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("```") {
-            lines.removeLast()
-        }
-        return lines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
     private static func trimmedOrNil(_ value: String?) -> String? {
         let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return trimmed.isEmpty ? nil : trimmed
@@ -660,7 +372,6 @@ private struct NotesTabView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var session: AppSessionViewModel
     @Query(sort: \NoteEntity.createdAtUTC, order: .reverse) private var notes: [NoteEntity]
-    @Query private var allFollowups: [FollowupEntity]
 
     @State private var showingCreateNote = false
     @State private var showingSettings = false
@@ -701,9 +412,7 @@ private struct NotesTabView: View {
             }
             .navigationTitle("Notes")
             .refreshable {
-                if session.mode.isServer {
-                    _ = await session.refreshUserData(modelContext: modelContext)
-                }
+                _ = await session.refreshUserData(modelContext: modelContext)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -767,20 +476,10 @@ private struct NotesTabView: View {
     }
 
     private func deleteNoteWithFollowups(_ note: NoteEntity) async {
-        if session.mode.isServer {
-            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
-            if !success {
-                operationError = session.syncError ?? "Could not delete note."
-            }
-            return
+        let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
+        if !success {
+            operationError = session.syncError ?? "Could not delete note."
         }
-
-        let related = allFollowups.filter { $0.noteID == note.id }
-        for followup in related {
-            modelContext.delete(followup)
-        }
-        modelContext.delete(note)
-        try? modelContext.save()
     }
 }
 
@@ -849,9 +548,7 @@ private struct FollowupsTabView: View {
             }
             .navigationTitle("Followups")
             .refreshable {
-                if session.mode.isServer {
-                    _ = await session.refreshUserData(modelContext: modelContext)
-                }
+                _ = await session.refreshUserData(modelContext: modelContext)
             }
             .onAppear {
                 handlePendingFollowupRoute()
@@ -931,12 +628,6 @@ private struct FollowupsTabView: View {
             return
         }
 
-        guard session.mode.isServer else {
-            routeSyncAttemptedForFollowupID = nil
-            navigationCoordinator.consumePendingFollowupRoute()
-            return
-        }
-
         if routeSyncAttemptedForFollowupID == pendingFollowupID {
             routeSyncAttemptedForFollowupID = nil
             navigationCoordinator.consumePendingFollowupRoute()
@@ -951,16 +642,10 @@ private struct FollowupsTabView: View {
     }
 
     private func deleteFollowup(_ followup: FollowupEntity) async {
-        if session.mode.isServer {
-            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
-            if !success {
-                operationError = session.syncError ?? "Could not delete followup."
-            }
-            return
+        let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
+        if !success {
+            operationError = session.syncError ?? "Could not delete followup."
         }
-
-        modelContext.delete(followup)
-        try? modelContext.save()
     }
 }
 
@@ -993,7 +678,7 @@ private struct SettingsView: View {
                     .pickerStyle(.menu)
                 }
 
-                if session.mode.isServer && session.isAuthenticated {
+                if session.isAuthenticated {
                     Section("Account") {
                         Button("Log Out", role: .destructive) {
                             confirmingLogout = true
@@ -1024,7 +709,7 @@ private struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This removes local notes and followups from this device.")
+                Text("This removes notes and followups from this device.")
             }
         }
     }
@@ -1063,19 +748,12 @@ private struct NoteDetailView: View {
         AppSettingsStore.currentProvider(rawValue: providerMethodRawValue)
     }
 
-    private var thirdPartyConfig: ThirdPartyAIConfig {
-        AppSettingsStore.thirdPartyConfig()
-    }
-
     private var canProcessWithCurrentProvider: Bool {
         switch selectedProvider {
         case .appleIntelligence:
             return aiAvailable
         case .thirdParty:
-            if session.mode.isServer {
-                return true
-            }
-            return thirdPartyConfig.isValid
+            return true
         }
     }
 
@@ -1209,21 +887,10 @@ private struct NoteDetailView: View {
                 case .appleIntelligence:
                     processed = try await NoteFollowupAIService.processNote(
                         from: note.value,
-                        referenceDate: note.createdAtUTC,
-                        provider: .appleIntelligence,
-                        thirdPartyConfig: nil
+                        referenceDate: note.createdAtUTC
                     )
                 case .thirdParty:
-                    if session.mode.isServer {
-                        processed = try await session.processNote(noteID: note.id)
-                    } else {
-                        processed = try await NoteFollowupAIService.processNote(
-                            from: note.value,
-                            referenceDate: note.createdAtUTC,
-                            provider: .thirdParty,
-                            thirdPartyConfig: thirdPartyConfig
-                        )
-                    }
+                    processed = try await session.processNote(noteID: note.id)
                 }
                 await MainActor.run {
                     pendingProcessedResult = processed
@@ -1247,31 +914,15 @@ private struct NoteDetailView: View {
         isSavingProcessedNote = true
 
         Task { @MainActor in
-            if session.mode.isServer {
-                let success = await session.saveProcessedNote(note: note, result: processed, modelContext: modelContext)
-                await MainActor.run {
-                    if success {
-                        proposedFollowups = processed.followups
-                        aiHasProcessed = true
-                        pendingProcessedResult = nil
-                        pendingProcessedEditedAtUTC = nil
-                        showingProcessApproval = false
-                    }
-                    isSavingProcessedNote = false
-                }
-                return
-            }
-
-            let editedAtUTC = pendingProcessedEditedAtUTC ?? Date()
+            let success = await session.saveProcessedNote(note: note, result: processed, modelContext: modelContext)
             await MainActor.run {
-                applyProcessedNoteResult(processed, editedAtUTC: editedAtUTC)
-                replaceFollowups(with: processed.followups)
-                proposedFollowups = processed.followups
-                aiHasProcessed = true
-                try? modelContext.save()
-                pendingProcessedResult = nil
-                pendingProcessedEditedAtUTC = nil
-                showingProcessApproval = false
+                if success {
+                    proposedFollowups = processed.followups
+                    aiHasProcessed = true
+                    pendingProcessedResult = nil
+                    pendingProcessedEditedAtUTC = nil
+                    showingProcessApproval = false
+                }
                 isSavingProcessedNote = false
             }
         }
@@ -1307,48 +958,11 @@ private struct NoteDetailView: View {
         )
     }
 
-    private func replaceFollowups(with followups: [ProposedFollowup]) {
-        for followup in associatedFollowups {
-            modelContext.delete(followup)
-        }
-
-        let now = Date()
-        for proposal in followups {
-            let followup = FollowupEntity(
-                descriptionText: proposal.descriptionText,
-                type: proposal.type,
-                noteID: note.id,
-                createdAtUTC: now,
-                editedAtUTC: now
-            )
-            modelContext.insert(followup)
-        }
-    }
-
-    private func applyProcessedNoteResult(_ result: ProcessedNoteResult, editedAtUTC: Date) {
-        note.summary = result.summary
-        note.balanceDueAmount = result.balanceDueAmount
-        note.balanceDueCurrency = result.balanceDueCurrency
-        note.categories = result.categories
-        note.appointmentTiming = result.appointmentTiming
-        note.editedAtUTC = editedAtUTC
-    }
-
     private func deleteCurrentNote() async {
-        if session.mode.isServer {
-            let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
-            if success {
-                dismiss()
-            }
-            return
+        let success = await session.deleteNote(noteID: note.id, modelContext: modelContext)
+        if success {
+            dismiss()
         }
-
-        for followup in associatedFollowups {
-            modelContext.delete(followup)
-        }
-        modelContext.delete(note)
-        try? modelContext.save()
-        dismiss()
     }
 }
 
@@ -1850,34 +1464,20 @@ private struct FollowupDetailView: View {
     }
 
     private func setCompleted(to completed: Bool) {
-        if session.mode.isServer {
-            Task { @MainActor in
-                _ = await session.setFollowupCompletion(
-                    followupID: followup.id,
-                    completed: completed,
-                    modelContext: modelContext
-                )
-            }
-            return
+        Task { @MainActor in
+            _ = await session.setFollowupCompletion(
+                followupID: followup.id,
+                completed: completed,
+                modelContext: modelContext
+            )
         }
-
-        followup.isCompleted = completed
-        followup.editedAtUTC = Date()
-        try? modelContext.save()
     }
 
     private func deleteFollowup() async {
-        if session.mode.isServer {
-            let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
-            if success {
-                dismiss()
-            }
-            return
+        let success = await session.deleteFollowup(followupID: followup.id, modelContext: modelContext)
+        if success {
+            dismiss()
         }
-
-        modelContext.delete(followup)
-        try? modelContext.save()
-        dismiss()
     }
 }
 
@@ -1953,40 +1553,24 @@ private struct NoteEditorSheet: View {
         isSaving = true
         saveError = nil
 
-        if session.mode.isServer {
-            let noteValue = value
-            Task { @MainActor in
-                let success: Bool
-                if let note {
-                    success = await session.updateNote(noteID: note.id, value: noteValue, modelContext: modelContext)
-                } else {
-                    success = await session.createNote(value: noteValue, modelContext: modelContext)
-                }
+        let noteValue = value
+        Task { @MainActor in
+            let success: Bool
+            if let note {
+                success = await session.updateNote(noteID: note.id, value: noteValue, modelContext: modelContext)
+            } else {
+                success = await session.createNote(value: noteValue, modelContext: modelContext)
+            }
 
-                await MainActor.run {
-                    isSaving = false
-                    if success {
-                        dismiss()
-                    } else {
-                        saveError = session.syncError ?? "Could not save note."
-                    }
+            await MainActor.run {
+                isSaving = false
+                if success {
+                    dismiss()
+                } else {
+                    saveError = session.syncError ?? "Could not save note."
                 }
             }
-            return
         }
-
-        let now = Date()
-        if let note {
-            note.value = value
-            note.editedAtUTC = now
-        } else {
-            let created = NoteEntity(value: value, createdAtUTC: now, editedAtUTC: now)
-            modelContext.insert(created)
-        }
-
-        try? modelContext.save()
-        isSaving = false
-        dismiss()
     }
 }
 
@@ -2130,59 +1714,35 @@ private struct FollowupEditorSheet: View {
         isSaving = true
         saveError = nil
 
-        let now = Date()
         let trimmedType = isTypeEditable ? typeText.trimmingCharacters(in: .whitespacesAndNewlines) : "Custom"
+        let description = descriptionText
+        Task { @MainActor in
+            let success: Bool
+            if let existingFollowup {
+                success = await session.updateFollowupText(
+                    followup: existingFollowup,
+                    type: trimmedType,
+                    descriptionText: description,
+                    modelContext: modelContext
+                )
+            } else {
+                success = await session.createFollowup(
+                    noteID: noteID,
+                    type: trimmedType,
+                    descriptionText: description,
+                    modelContext: modelContext
+                )
+            }
 
-        if session.mode.isServer {
-            let description = descriptionText
-            Task { @MainActor in
-                let success: Bool
-                if let existingFollowup {
-                    success = await session.updateFollowupText(
-                        followup: existingFollowup,
-                        type: trimmedType,
-                        descriptionText: description,
-                        modelContext: modelContext
-                    )
+            await MainActor.run {
+                isSaving = false
+                if success {
+                    dismiss()
                 } else {
-                    success = await session.createFollowup(
-                        noteID: noteID,
-                        type: trimmedType,
-                        descriptionText: description,
-                        modelContext: modelContext
-                    )
-                }
-
-                await MainActor.run {
-                    isSaving = false
-                    if success {
-                        dismiss()
-                    } else {
-                        saveError = session.syncError ?? "Could not save followup."
-                    }
+                    saveError = session.syncError ?? "Could not save followup."
                 }
             }
-            return
         }
-
-        if let existingFollowup {
-            existingFollowup.type = trimmedType
-            existingFollowup.descriptionText = descriptionText
-            existingFollowup.editedAtUTC = now
-        } else {
-            let followup = FollowupEntity(
-                descriptionText: descriptionText,
-                type: trimmedType,
-                noteID: noteID,
-                createdAtUTC: now,
-                editedAtUTC: now
-            )
-            modelContext.insert(followup)
-        }
-
-        try? modelContext.save()
-        isSaving = false
-        dismiss()
     }
 }
 

@@ -116,11 +116,10 @@ struct AppLockGateView: View {
 
 private struct UnlockedRootView: View {
     @EnvironmentObject private var session: AppSessionViewModel
-    @EnvironmentObject private var navigationCoordinator: AppNavigationCoordinator
 
     var body: some View {
         Group {
-            if session.mode.isServer && !session.isAuthenticated {
+            if !session.isAuthenticated {
                 ServerAuthenticationView()
             } else {
                 ContentView()

@@ -4,23 +4,6 @@ import SwiftData
 import SwiftUI
 import Combine
 
-enum AppRuntimeMode {
-    case local
-    case server
-
-    static var current: AppRuntimeMode {
-        #if SERVER_MODE
-        .server
-        #else
-        .local
-        #endif
-    }
-
-    var isServer: Bool {
-        self == .server
-    }
-}
-
 private struct BackendConfigFile: Decodable {
     let baseURL: String?
 
@@ -236,7 +219,6 @@ private extension KeyedDecodingContainer where Key == AnyCodingKey {
 }
 
 private enum BackendError: LocalizedError {
-    case modeDisabled
     case invalidServerConfiguration
     case unauthenticated
     case invalidResponse
@@ -245,8 +227,6 @@ private enum BackendError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .modeDisabled:
-            return "Server mode is disabled for this build."
         case .invalidServerConfiguration:
             return "Invalid or missing server configuration."
         case .unauthenticated:
@@ -570,7 +550,6 @@ private struct SyncNotePatchPayload: Encodable {
 final class AppSessionViewModel: ObservableObject {
     @Published private(set) var isAuthenticated = false
     @Published private(set) var isSyncing = false
-    @Published private(set) var mode = AppRuntimeMode.current
     @Published private(set) var authError: String?
     @Published private(set) var syncError: String?
 
@@ -600,7 +579,7 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     func bootstrapIfNeeded(modelContext: ModelContext) async {
-        guard mode.isServer, !hasBootstrapped else { return }
+        guard !hasBootstrapped else { return }
         hasBootstrapped = true
 
         if isAuthenticated {
@@ -609,10 +588,6 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     func login(username: String, password: String, modelContext: ModelContext) async -> Bool {
-        guard mode.isServer else {
-            authError = BackendError.modeDisabled.localizedDescription
-            return false
-        }
         authError = nil
 
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -643,10 +618,6 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     func register(username: String, password: String, modelContext: ModelContext) async -> Bool {
-        guard mode.isServer else {
-            authError = BackendError.modeDisabled.localizedDescription
-            return false
-        }
         authError = nil
 
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -678,7 +649,6 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     func refreshUserData(modelContext: ModelContext) async -> Bool {
-        guard mode.isServer else { return true }
         guard isAuthenticated else { return false }
 
         isSyncing = true
@@ -871,12 +841,6 @@ final class AppSessionViewModel: ObservableObject {
     }
 
     private func configureForMode() {
-        mode = AppRuntimeMode.current
-        guard mode.isServer else {
-            isAuthenticated = true
-            return
-        }
-
         backendBaseURL = BackendConfigStore.serverBaseURL()
         accessToken = AuthTokenKeychainStore.readAccessToken()
         refreshToken = AuthTokenKeychainStore.readRefreshToken()
@@ -1034,7 +998,6 @@ final class AppSessionViewModel: ObservableObject {
         requiresAuthentication: Bool,
         hasRetriedAfterRefresh: Bool = false
     ) async throws -> Data {
-        guard mode.isServer else { throw BackendError.modeDisabled }
         guard let baseURL = backendBaseURL else { throw BackendError.invalidServerConfiguration }
 
         let normalizedPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
