@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftData
 import SwiftUI
 
@@ -16,6 +17,10 @@ struct Dental_NotesApp: App {
             fatalError("Could not initialize in-memory model container: \(error)")
         }
     }()
+
+    init() {
+        DentalFollowupShortcuts.updateAppShortcutParameters()
+    }
 
     var body: some Scene {
         WindowGroup {

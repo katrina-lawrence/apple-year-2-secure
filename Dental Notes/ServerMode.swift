@@ -1,5 +1,4 @@
 import Foundation
-import Security
 import SwiftData
 import SwiftUI
 import Combine
@@ -56,77 +55,6 @@ enum BackendConfigStore {
             return nil
         }
         return parsed
-    }
-}
-
-private enum AuthTokenKeychainStore {
-    private static let service = "com.vincentdragnea.DentalNotes.backend"
-    private static let accessAccount = "access_token"
-    private static let refreshAccount = "refresh_token"
-
-    static func readAccessToken() -> String? {
-        read(account: accessAccount)
-    }
-
-    static func readRefreshToken() -> String? {
-        read(account: refreshAccount)
-    }
-
-    static func save(accessToken: String, refreshToken: String) {
-        save(value: accessToken, account: accessAccount)
-        save(value: refreshToken, account: refreshAccount)
-    }
-
-    static func saveAccessToken(_ token: String) {
-        save(value: token, account: accessAccount)
-    }
-
-    static func clearAll() {
-        delete(account: accessAccount)
-        delete(account: refreshAccount)
-    }
-
-    private static func save(value: String, account: String) {
-        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, let data = trimmed.data(using: .utf8) else {
-            _ = delete(account: account)
-            return
-        }
-
-        _ = delete(account: account)
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecValueData as String: data
-        ]
-        _ = SecItemAdd(query as CFDictionary, nil)
-    }
-
-    @discardableResult
-    private static func delete(account: String) -> Bool {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account
-        ]
-        let status = SecItemDelete(query as CFDictionary)
-        return status == errSecSuccess || status == errSecItemNotFound
-    }
-
-    private static func read(account: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        guard status == errSecSuccess, let data = item as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
     }
 }
 
@@ -724,10 +652,8 @@ final class AppSessionViewModel: ObservableObject {
         do {
             let payload = FollowupCreatePayload(descriptionText: descriptionText, type: type, noteID: noteID)
             let response: FollowupCreateResponse = try await sendRequest(path: "/followups", method: "POST", body: payload, requiresAuthentication: true)
-            let refreshed = await refreshUserData(modelContext: modelContext)
-            guard refreshed else {
-                return nil
-            }
+            // Creation has committed. A later sync failure must not invite a duplicate retry.
+            _ = await refreshUserData(modelContext: modelContext)
             return response.id
         } catch {
             syncError = message(for: error)
@@ -842,8 +768,8 @@ final class AppSessionViewModel: ObservableObject {
 
     private func configureForMode() {
         backendBaseURL = BackendConfigStore.serverBaseURL()
-        accessToken = AuthTokenKeychainStore.readAccessToken()
-        refreshToken = AuthTokenKeychainStore.readRefreshToken()
+        accessToken = SessionTokenStore.shared.readAccessToken()
+        refreshToken = SessionTokenStore.shared.readRefreshToken()
         isAuthenticated = backendBaseURL != nil && accessToken != nil && refreshToken != nil
 
         if backendBaseURL == nil {
@@ -855,14 +781,14 @@ final class AppSessionViewModel: ObservableObject {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         isAuthenticated = true
-        AuthTokenKeychainStore.save(accessToken: accessToken, refreshToken: refreshToken)
+        SessionTokenStore.shared.save(accessToken: accessToken, refreshToken: refreshToken)
     }
 
     private func clearTokens() {
         accessToken = nil
         refreshToken = nil
         isAuthenticated = false
-        AuthTokenKeychainStore.clearAll()
+        SessionTokenStore.shared.clearAll()
     }
 
     private func clearAllLocalData(modelContext: ModelContext) {
@@ -1064,7 +990,7 @@ final class AppSessionViewModel: ObservableObject {
                 requiresAuthentication: false
             )
             accessToken = response.accessToken
-            AuthTokenKeychainStore.saveAccessToken(response.accessToken)
+            SessionTokenStore.shared.saveAccessToken(response.accessToken)
             isAuthenticated = true
             return true
         } catch {

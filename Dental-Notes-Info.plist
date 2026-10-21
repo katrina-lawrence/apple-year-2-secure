@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your private dental notes and follow-ups.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to the classroom backend running on your Mac.</string>
 	<key>APP_GROUP_ID</key>
 	<string>$(APP_GROUP_ID)</string>
 	<key>CFBundleURLTypes</key>

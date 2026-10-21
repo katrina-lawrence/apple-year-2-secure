@@ -125,27 +125,6 @@ private extension String {
     }
 }
 
-struct ProposedFollowup: Identifiable, Hashable {
-    let id: UUID
-    let type: String
-    let descriptionText: String
-
-    init(id: UUID = UUID(), type: String, descriptionText: String) {
-        self.id = id
-        self.type = type
-        self.descriptionText = descriptionText
-    }
-}
-
-struct ProcessedNoteResult {
-    let summary: String?
-    let balanceDueAmount: Decimal?
-    let balanceDueCurrency: String?
-    let categories: [String]
-    let appointmentTiming: String?
-    let followups: [ProposedFollowup]
-}
-
 struct NoteCategoryScore: Identifiable, Hashable {
     let category: String
     let score: Double
@@ -261,7 +240,8 @@ private struct AIProcessedNoteDraft {
 
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
-        true
+        // The on-device implementation is a later exercise.
+        false
     }
 
     static func processNote(
@@ -890,7 +870,12 @@ private struct NoteDetailView: View {
                         referenceDate: note.createdAtUTC
                     )
                 case .thirdParty:
-                    processed = try await session.processNote(noteID: note.id)
+                    // Day 2 starts with a provider key in the app.
+                    // Replace this request with the backend call in the security exercise.
+                    processed = try await HostedAIClient.processNote(
+                        from: note.value,
+                        referenceDate: note.createdAtUTC
+                    )
                 }
                 await MainActor.run {
                     pendingProcessedResult = processed
@@ -900,7 +885,7 @@ private struct NoteDetailView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiProcessError = "Could not generate followups right now."
+                    aiProcessError = error.localizedDescription
                     proposedFollowups = []
                     aiHasProcessed = true
                     isProcessingWithAI = false
