@@ -13,7 +13,7 @@ struct CreateDentalFollowupIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        // TODO: Trim and validate descriptionText (1 to 512 characters).
+        // TODO: Trim and validate descriptionText (1 to 2,048 characters).
         // TODO: Make a context with FollowupIntentSupport.makeContext().
         // TODO: Create an AppSessionViewModel and use the signed-in account.
         // TODO: Call createFollowupAndReturnID(noteID:type:descriptionText:modelContext:).

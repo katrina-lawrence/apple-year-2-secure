@@ -14,7 +14,7 @@ Start with the setup in [README.md](README.md). Use a test account and made-up d
 
 Complete `CreateDentalFollowupIntent.perform()`:
 
-1. Trim `descriptionText` and reject an empty description or more than 512 characters. This matches the current backend limit.
+1. Trim `descriptionText` and reject an empty description or more than 2,048 characters. This matches the app editor and backend limit.
 2. Use `FollowupIntentSupport.makeContext()` for the temporary SwiftData context and create an `AppSessionViewModel`. It loads the signed-in account's tokens.
 3. Call `createFollowupAndReturnID(noteID:type:descriptionText:modelContext:)`. Use `nil` for `noteID`, `"Custom"` for `type`, and the validated description.
 4. Handle a missing session or a failed creation. Return a success dialog only when the backend returns a created record ID.
