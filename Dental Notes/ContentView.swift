@@ -460,16 +460,22 @@ private enum NoteFollowupAIService {
         referenceDate: Date,
         config: ThirdPartyAIConfig?
     ) async throws -> AIProcessedNoteDraft {
+        // PromptSystem.md contains a dummy key for the Day 1 injection exercise.
+        // Keep the real provider key in local config, never in either prompt.
+        let prompts = try AIPromptTemplateLoader.render(
+            noteText: noteText,
+            referenceDate: referenceDate
+        )
+
         // TODO(Learner):
         // 1) Validate config fields required by your chosen provider (endpoint/model/key).
-        // 2) Render prompts from noteText + referenceDate using AIPromptTemplateLoader.
+        // 2) Send prompts.system as the system prompt and prompts.user as the user message.
         // 3) Build a provider request/response adapter that maps output to AIProcessedNoteDraft.
         // 4) Handle failures safely (timeouts, bad status, malformed JSON) with clear fallbacks.
         //
         // Stubbed local implementation for learner exercise:
         // no direct third-party API call is made from the client app.
-        let _ = noteText
-        let _ = referenceDate
+        let _ = prompts
         let _ = config
         return AIProcessedNoteDraft(
             summary: "Tnis feature has not been implemented.",

@@ -1,5 +1,9 @@
 # My Dental Companion
 
+See [README-Day-1.md](README-Day-1.md) for the hosted AI build activity and prompt-injection exercise.
+
+`Dental Notes/PromptSystem.md` deliberately contains a fake `ANTHROPIC_API_KEY` GUID for that exercise. It is not a working key and must never be replaced with a real credential. The starter loads the template; students complete the hosted provider call before testing it.
+
 ## Third-party AI Local Configuration
 
 In local-only builds, selecting `Third-party provider` now uses a deterministic in-app stub and does not call any external AI API directly.
