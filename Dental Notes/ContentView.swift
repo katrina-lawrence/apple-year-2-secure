@@ -993,6 +993,14 @@ private struct SettingsView: View {
                     .pickerStyle(.menu)
                 }
 
+                Section("Security Demos") {
+                    NavigationLink {
+                        ATSDemoView()
+                    } label: {
+                        Label("ATS Demo", systemImage: "lock.shield")
+                    }
+                }
+
                 if session.mode.isServer && session.isAuthenticated {
                     Section("Account") {
                         Button("Log Out", role: .destructive) {
