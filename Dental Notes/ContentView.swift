@@ -1479,7 +1479,7 @@ private struct NoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    GeneratedSummaryHTMLView(html: summary)
+                    GeneratedSummaryView(summary: summary)
                         .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)
@@ -1762,7 +1762,7 @@ private struct ProcessedNoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    GeneratedSummaryHTMLView(html: summary)
+                    GeneratedSummaryView(summary: summary)
                         .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)

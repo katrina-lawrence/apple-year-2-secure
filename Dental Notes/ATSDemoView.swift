@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 struct ATSDemoView: View {
-    private let endpoint = URL(string: "http://httpbingo.org/get")!
+    private let endpoint = URL(string: "https://httpbingo.org/get")!
 
     @State private var isLoading = false
     @State private var result: ATSRequestResult?
@@ -11,7 +11,7 @@ struct ATSDemoView: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Protocol", value: "HTTP")
+                LabeledContent("Protocol", value: "HTTPS")
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("URL")
@@ -28,7 +28,7 @@ struct ATSDemoView: View {
                     }
                 } label: {
                     HStack {
-                        Label("Send HTTP Request", systemImage: "paperplane.fill")
+                        Label("Send HTTPS Request", systemImage: "paperplane.fill")
                         Spacer()
                         if isLoading {
                             ProgressView()
@@ -37,9 +37,9 @@ struct ATSDemoView: View {
                 }
                 .disabled(isLoading)
             } header: {
-                Text("ATS Training Request")
+                Text("Secure Training Request")
             } footer: {
-                Text("This starter intentionally permits a public HTTP request. The request contains no notes, tokens or API keys.")
+                Text("This request uses HTTPS. ATS remains enabled and no broad transport exception is required.")
             }
 
             if let result {
