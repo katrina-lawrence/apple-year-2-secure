@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import SwiftData
 import SwiftUI
 
@@ -297,16 +298,19 @@ private enum AppSettingsStore {
     }
 }
 
+// TODO(Day 4 learner): Add @Generable to this type.
 private struct AIActionDraft {
     var type: String
     var description: String
 }
 
+// TODO(Day 4 learner): Add @Generable to this type.
 private struct AIBalanceDueDraft {
     var amount: Double?
     var currency: String?
 }
 
+// TODO(Day 4 learner): Add @Generable to this type.
 private struct AIProcessedNoteDraft {
     var summary: String
     var categories: [String]
@@ -316,6 +320,8 @@ private struct AIProcessedNoteDraft {
 }
 
 private enum AIServiceError: Error {
+    case appleIntelligenceNotImplemented
+    case appleIntelligenceUnavailable(String)
     case invalidConfiguration
     case invalidURL
     case invalidResponse
@@ -416,7 +422,57 @@ private enum AIPromptTemplateLoader {
 
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
-        true
+        appleUnavailableReason() == nil
+    }
+
+    static func appleUnavailableReason() -> String? {
+        switch SystemLanguageModel.default.availability {
+        case .available:
+            return nil
+        case .unavailable(let reason):
+            switch reason {
+            case .deviceNotEligible:
+                return "Apple Intelligence is not supported on this device."
+            case .appleIntelligenceNotEnabled:
+                return "Turn on Apple Intelligence in Settings to process notes on this device."
+            case .modelNotReady:
+                return "The Apple Intelligence model is still downloading. Try again when it is ready."
+            @unknown default:
+                return "Apple Intelligence is currently unavailable."
+            }
+        }
+    }
+
+    static func processingErrorMessage(for error: Error) -> String {
+        if let serviceError = error as? AIServiceError {
+            switch serviceError {
+            case .appleIntelligenceNotImplemented:
+                return "Apple Intelligence is not implemented yet. Complete the Day 4 TODOs and try again."
+            case .appleIntelligenceUnavailable(let reason):
+                return reason
+            default:
+                break
+            }
+        }
+
+        if let generationError = error as? LanguageModelSession.GenerationError {
+            switch generationError {
+            case .exceededContextWindowSize:
+                return "This note is too long for Apple Intelligence. Shorten it and try again."
+            case .assetsUnavailable:
+                return "The Apple Intelligence model is unavailable. Check that it has finished downloading."
+            case .guardrailViolation, .refusal:
+                return "Apple Intelligence could not process this note. Nothing was saved."
+            case .unsupportedLanguageOrLocale:
+                return "Apple Intelligence does not support this note's language or the current locale."
+            case .decodingFailure:
+                return "Apple Intelligence returned an unusable result. Nothing was saved."
+            default:
+                break
+            }
+        }
+
+        return "Could not process this note right now. Nothing was saved."
     }
 
     static func processNote(
@@ -486,21 +542,46 @@ private enum NoteFollowupAIService {
     }
 
     private static func processNoteWithApple(noteText: String, referenceDate: Date) async throws -> AIProcessedNoteDraft {
-        // TODO(Learner):
-        // 1) Define @Generable draft structs for Apple Intelligence output (actions, balance_due, processed note).
-        // 2) Build prompts from noteText + referenceDate (reuse the prompt template loader).
-        // 3) Invoke the on-device Apple Intelligence model and decode into AIProcessedNoteDraft.
-        // 4) Return the parsed draft so normalizeProcessedResult can map it to ProcessedNoteResult.
-        // 5) Preserve safe behavior for empty notes and model/parsing failures.
-        let _ = noteText
-        let _ = referenceDate
-        return AIProcessedNoteDraft(
-            summary: "This feature has not been implemented.",
-            categories: [],
-            balance_due: nil,
-            actions: [],
-            appointment_timing: nil
-        )
+        if let reason = appleUnavailableReason() {
+            throw AIServiceError.appleIntelligenceUnavailable(reason)
+        }
+
+        var draft = try await generateAppleDraft(noteText: noteText, referenceDate: referenceDate)
+
+        // Prepared lab plumbing: after the learner's model request works, notes using
+        // the markers from the slides exercise the generated-summary output path.
+        if let labSummary = try await Day4LabProbe.summary(from: noteText) {
+            draft.summary = labSummary
+        }
+
+        return draft
+    }
+
+    private static func generateAppleDraft(
+        noteText: String,
+        referenceDate: Date
+    ) async throws -> AIProcessedNoteDraft {
+        // TODO(Day 4 learner):
+        // 1. Add @Generable to AIActionDraft, AIBalanceDueDraft and AIProcessedNoteDraft.
+        // 2. Render PromptSystem.md and PromptUser.md with AIPromptTemplateLoader.
+        // 3. Create a LanguageModelSession using the rendered system instructions.
+        // 4. Call session.respond(to:generating:) with the rendered user prompt.
+        // 5. Return response.content.
+        //
+        // Intended call shape after the output types conform to Generable:
+        // let prompts = try AIPromptTemplateLoader.render(
+        //     noteText: noteText,
+        //     referenceDate: referenceDate
+        // )
+        // let session = LanguageModelSession(model: .default, instructions: prompts.system)
+        // let response = try await session.respond(
+        //     to: prompts.user,
+        //     generating: AIProcessedNoteDraft.self
+        // )
+        // return response.content
+        _ = noteText
+        _ = referenceDate
+        throw AIServiceError.appleIntelligenceNotImplemented
     }
 
     private static func processNoteWithThirdParty(
@@ -979,7 +1060,7 @@ private struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("AI Method") {
+                Section {
                     Picker("Provider", selection: Binding(
                         get: { selectedProvider },
                         set: { newValue in
@@ -991,6 +1072,12 @@ private struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.menu)
+                } header: {
+                    Text("AI Method")
+                } footer: {
+                    if let reason = NoteFollowupAIService.appleUnavailableReason() {
+                        Text(reason)
+                    }
                 }
 
                 Section("Security Demos") {
@@ -1241,9 +1328,12 @@ private struct NoteDetailView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiProcessError = "Could not generate followups right now."
+                    aiProcessError = NoteFollowupAIService.processingErrorMessage(for: error)
+                    pendingProcessedResult = nil
+                    pendingProcessedEditedAtUTC = nil
+                    showingProcessApproval = false
                     proposedFollowups = []
-                    aiHasProcessed = true
+                    aiHasProcessed = false
                     isProcessingWithAI = false
                 }
             }
@@ -1400,7 +1490,7 @@ private struct NoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    SanitizedHTMLView(html: summary)
+                    GeneratedSummaryHTMLView(html: summary)
                         .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)
@@ -1683,7 +1773,7 @@ private struct ProcessedNoteMetadataSection: View {
                     Text("Summary")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    SanitizedHTMLView(html: summary)
+                    GeneratedSummaryHTMLView(html: summary)
                         .frame(minHeight: 64)
                 }
                 .padding(.vertical, 4)
