@@ -298,19 +298,19 @@ private enum AppSettingsStore {
     }
 }
 
-// TODO(Day 4 learner): Add @Generable to this type.
+@Generable
 private struct AIActionDraft {
     var type: String
     var description: String
 }
 
-// TODO(Day 4 learner): Add @Generable to this type.
+@Generable
 private struct AIBalanceDueDraft {
     var amount: Double?
     var currency: String?
 }
 
-// TODO(Day 4 learner): Add @Generable to this type.
+@Generable
 private struct AIProcessedNoteDraft {
     var summary: String
     var categories: [String]
@@ -320,7 +320,6 @@ private struct AIProcessedNoteDraft {
 }
 
 private enum AIServiceError: Error {
-    case appleIntelligenceNotImplemented
     case appleIntelligenceUnavailable(String)
     case invalidConfiguration
     case invalidURL
@@ -446,8 +445,6 @@ private enum NoteFollowupAIService {
     static func processingErrorMessage(for error: Error) -> String {
         if let serviceError = error as? AIServiceError {
             switch serviceError {
-            case .appleIntelligenceNotImplemented:
-                return "Apple Intelligence is not implemented yet. Complete the Day 4 TODOs and try again."
             case .appleIntelligenceUnavailable(let reason):
                 return reason
             default:
@@ -561,27 +558,19 @@ private enum NoteFollowupAIService {
         noteText: String,
         referenceDate: Date
     ) async throws -> AIProcessedNoteDraft {
-        // TODO(Day 4 learner):
-        // 1. Add @Generable to AIActionDraft, AIBalanceDueDraft and AIProcessedNoteDraft.
-        // 2. Render PromptSystem.md and PromptUser.md with AIPromptTemplateLoader.
-        // 3. Create a LanguageModelSession using the rendered system instructions.
-        // 4. Call session.respond(to:generating:) with the rendered user prompt.
-        // 5. Return response.content.
-        //
-        // Intended call shape after the output types conform to Generable:
-        // let prompts = try AIPromptTemplateLoader.render(
-        //     noteText: noteText,
-        //     referenceDate: referenceDate
-        // )
-        // let session = LanguageModelSession(model: .default, instructions: prompts.system)
-        // let response = try await session.respond(
-        //     to: prompts.user,
-        //     generating: AIProcessedNoteDraft.self
-        // )
-        // return response.content
-        _ = noteText
-        _ = referenceDate
-        throw AIServiceError.appleIntelligenceNotImplemented
+        let prompts = try AIPromptTemplateLoader.render(
+            noteText: noteText,
+            referenceDate: referenceDate
+        )
+        let session = LanguageModelSession(
+            model: .default,
+            instructions: prompts.system
+        )
+        let response = try await session.respond(
+            to: prompts.user,
+            generating: AIProcessedNoteDraft.self
+        )
+        return response.content
     }
 
     private static func processNoteWithThirdParty(
