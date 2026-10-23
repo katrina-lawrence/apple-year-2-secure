@@ -605,9 +605,6 @@ final class AppSessionViewModel: ObservableObject {
                 requiresAuthentication: false
             )
 
-            // Temporary diagnostics for troubleshooting login failures.
-            NSLog("Day 5 lab access token: %@", loginResponse.accessToken)
-
             setTokens(accessToken: loginResponse.accessToken, refreshToken: loginResponse.refreshToken)
             let synced = await refreshUserData(modelContext: modelContext)
             if !synced {
