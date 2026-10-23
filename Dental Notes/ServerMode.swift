@@ -605,6 +605,9 @@ final class AppSessionViewModel: ObservableObject {
                 requiresAuthentication: false
             )
 
+            // Temporary diagnostics for troubleshooting login failures.
+            NSLog("Day 5 lab access token: %@", loginResponse.accessToken)
+
             setTokens(accessToken: loginResponse.accessToken, refreshToken: loginResponse.refreshToken)
             let synced = await refreshUserData(modelContext: modelContext)
             if !synced {
@@ -668,6 +671,12 @@ final class AppSessionViewModel: ObservableObject {
             syncError = message(for: error)
             return false
         }
+    }
+
+    func restoreBackup(_ backup: NotesBackup) async throws -> BackupRestoreResult {
+        try await sendRequest(
+            path: "/backups/restore", method: "POST", body: backup, requiresAuthentication: true
+        )
     }
 
     func createNote(value: String, modelContext: ModelContext) async -> Bool {
@@ -1010,7 +1019,9 @@ final class AppSessionViewModel: ObservableObject {
 
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONEncoder().encode(body)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            request.httpBody = try encoder.encode(body)
         }
 
         if requiresAuthentication {

@@ -15,6 +15,7 @@ build/
 # Swift Package Manager
 .build/
 Package.resolved
+!Dental Notes.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 # Fastlane
 fastlane/report.xml

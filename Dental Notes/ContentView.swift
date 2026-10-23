@@ -772,6 +772,19 @@ private struct SettingsView: View {
                     .pickerStyle(.menu)
                 }
 
+                Section("Backups") {
+                    NavigationLink {
+                        Day5BackupExportView()
+                    } label: {
+                        Label("Export Notes Backup", systemImage: "square.and.arrow.up")
+                    }
+                    NavigationLink {
+                        Day5BackupImportView()
+                    } label: {
+                        Label("Import Notes Backup", systemImage: "archivebox")
+                    }
+                }
+
                 if session.isAuthenticated {
                     Section("Account") {
                         Button("Log Out", role: .destructive) {
