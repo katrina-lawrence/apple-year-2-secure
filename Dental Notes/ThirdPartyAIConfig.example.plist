@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>endpoint</key>
-	<string>https://api.example.com/v1/messages</string>
+	<string>https://api.anthropic.com/v1/messages</string>
 	<key>model</key>
-	<string>example-model-id</string>
+	<string>claude-haiku-4-5-20251001</string>
 	<key>apiKey</key>
-	<string>replace-with-local-dev-key</string>
+	<string>REPLACE_WITH_YOUR_ANTHROPIC_API_KEY</string>
 </dict>
 </plist>

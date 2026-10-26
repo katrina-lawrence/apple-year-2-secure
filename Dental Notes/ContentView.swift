@@ -297,77 +297,9 @@ private enum AppSettingsStore {
     }
 }
 
-private struct AIActionDraft {
-    var type: String
-    var description: String
-}
-
-private struct AIBalanceDueDraft {
-    var amount: Double?
-    var currency: String?
-}
-
-private struct AIProcessedNoteDraft {
-    var summary: String
-    var categories: [String]
-    var balance_due: AIBalanceDueDraft?
-    var actions: [AIActionDraft]
-    var appointment_timing: String?
-}
-
-private enum AIServiceError: Error {
-    case missingPromptResource(String)
-    case unreadablePromptResource(String)
-    case emptyPromptResource(String)
-    case unresolvedPromptPlaceholders
-}
-
-private struct AIPromptTemplates {
-    let system: String
-    let user: String
-}
-
-private enum AIPromptTemplateLoader {
-    private static let systemTemplateName = "PromptSystem"
-    private static let userTemplateName = "PromptUser"
-    private static let placeholderReferenceISO = "{{referenceISO}}"
-    private static let placeholderNoteText = "{{noteText}}"
-
-    static func render(noteText: String, referenceDate: Date) throws -> AIPromptTemplates {
-        let system = try loadTemplate(named: systemTemplateName)
-        let userTemplate = try loadTemplate(named: userTemplateName)
-
-        let referenceISO = ISO8601DateFormatter().string(from: referenceDate)
-        let user = userTemplate
-            .replacingOccurrences(of: placeholderReferenceISO, with: referenceISO)
-            .replacingOccurrences(of: placeholderNoteText, with: noteText)
-
-        if user.contains("{{") || user.contains("}}") {
-            throw AIServiceError.unresolvedPromptPlaceholders
-        }
-
-        return AIPromptTemplates(system: system, user: user)
-    }
-
-    private static func loadTemplate(named resourceName: String) throws -> String {
-        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "md") else {
-            throw AIServiceError.missingPromptResource(resourceName)
-        }
-        guard let content = try? String(contentsOf: url, encoding: .utf8) else {
-            throw AIServiceError.unreadablePromptResource(resourceName)
-        }
-
-        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            throw AIServiceError.emptyPromptResource(resourceName)
-        }
-        return trimmed
-    }
-}
-
 private enum NoteFollowupAIService {
     static func isAppleAvailable() -> Bool {
-        true
+        false
     }
 
     static func processNote(
@@ -467,23 +399,14 @@ private enum NoteFollowupAIService {
             referenceDate: referenceDate
         )
 
-        // TODO(Learner):
-        // 1) Validate config fields required by your chosen provider (endpoint/model/key).
-        // 2) Send prompts.system as the system prompt and prompts.user as the user message.
-        // 3) Build a provider request/response adapter that maps output to AIProcessedNoteDraft.
-        // 4) Handle failures safely (timeouts, bad status, malformed JSON) with clear fallbacks.
-        //
-        // Stubbed local implementation for learner exercise:
-        // no direct third-party API call is made from the client app.
-        let _ = prompts
-        let _ = config
-        return AIProcessedNoteDraft(
-            summary: "Tnis feature has not been implemented.",
-            categories: [],
-            balance_due: nil,
-            actions: [],
-            appointment_timing: nil
+        guard let config else { throw HostedAIError.missingConfig }
+        let response = try await HostedAIClient.send(
+            prompts: prompts,
+            endpoint: config.baseURL,
+            modelID: config.modelID,
+            apiKey: config.apiKey
         )
+        return try response.decodedDraft()
     }
 
     private static func trimmedOrNil(_ value: String?) -> String? {
@@ -970,7 +893,7 @@ private struct NoteDetailView: View {
                 }
             } catch {
                 await MainActor.run {
-                    aiProcessError = "Could not generate followups right now."
+                    aiProcessError = error.localizedDescription
                     proposedFollowups = []
                     aiHasProcessed = true
                     isProcessingWithAI = false

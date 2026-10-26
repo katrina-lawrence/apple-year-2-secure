@@ -1,5 +1,7 @@
 # Day 1: Hosted AI and prompt injection
 
+This file retains the learner instructions from Day-1-local. On `day1-prompt-injection`, the hosted call is already implemented; use [README-Prompt-Test.md](README-Prompt-Test.md) to run it.
+
 Complete the hosted AI call in `processNoteWithThirdParty(...)` in `Dental Notes/ContentView.swift`, then investigate a secret placed in the system prompt by mistake.
 
 The starter loads the prompt files but still returns a placeholder result. Students implement the provider request and response parsing before running the injection exercise.

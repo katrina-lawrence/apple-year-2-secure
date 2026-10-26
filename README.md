@@ -1,22 +1,9 @@
-# My Dental Companion
+# My Dental Companion Day 1 test
 
-See [README-Day-1.md](README-Day-1.md) for the hosted AI build activity and prompt-injection exercise.
+The `day1-prompt-injection` branch implements the hosted Anthropic call using the vulnerable Day 1 prompt template.
 
-`Dental Notes/PromptSystem.md` deliberately contains a fake `ANTHROPIC_API_KEY` GUID for that exercise. It is not a working key and must never be replaced with a real credential. The starter loads the template; students complete the hosted provider call before testing it.
+See [README-Prompt-Test.md](README-Prompt-Test.md) for API-key setup, the three-note test runner and the comparison without the fake secret.
 
-## Third-party AI Local Configuration
+The supplied API credential is a placeholder. Add your own key only to the ignored `Dental Notes/ThirdPartyAIConfig.plist`. Keep the fake GUID in `Dental Notes/PromptSystem.md` for the exposure test.
 
-In local-only builds, selecting `Third-party provider` now uses a deterministic in-app stub and does not call any external AI API directly.
-
-The app still includes third-party configuration scaffolding at `Dental Notes/ThirdPartyAIConfig.plist` for learner exercises.
-
-1. Copy `Dental Notes/ThirdPartyAIConfig.example.plist` to `Dental Notes/ThirdPartyAIConfig.plist`.
-2. Replace placeholder values with your local development endpoint, model, and API key when implementing the learner exercise.
-3. Run the app.
-
-When `Third-party provider` is selected in Settings in local mode, note processing is stubbed.
-
-Security notes:
-- `Dental Notes/ThirdPartyAIConfig.plist` is gitignored and should stay local-only.
-- `Dental Notes/ThirdPartyAIConfig.example.plist` is safe to commit because it contains placeholders only.
-- Do not commit real secrets.
+The learner starter is on `Day-1-local`. Its exercise instructions are retained in [README-Day-1.md](README-Day-1.md).
