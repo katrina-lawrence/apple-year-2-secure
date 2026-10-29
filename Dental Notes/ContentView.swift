@@ -1,4 +1,6 @@
 import Foundation
+import CoreML
+import NaturalLanguage
 import SwiftData
 import SwiftUI
 
@@ -739,6 +741,8 @@ private struct NoteDetailView: View {
     @State private var showingProcessApproval = false
     @State private var isSavingProcessedNote = false
     @State private var pendingClassificationResult: NoteClassificationResult?
+    @State private var showingClassificationError = false
+    @State private var classificationErrorMessage: String?
 
     private var associatedFollowups: [FollowupEntity] {
         allFollowups.filter { $0.noteID == note.id }
@@ -848,6 +852,11 @@ private struct NoteDetailView: View {
         } message: {
             Text(session.syncError ?? "Request failed.")
         }
+        .alert("Classification Error", isPresented: $showingClassificationError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(classificationErrorMessage ?? "Could not classify this note right now.")
+        }
     }
 
     private var followupsSection: some View {
@@ -937,25 +946,66 @@ private struct NoteDetailView: View {
     }
 
     private func classifyNote() {
-        pendingClassificationResult = generateClassificationStub(for: note.value)
+        do {
+            pendingClassificationResult = try classifyNoteWithModel(note.value)
+        } catch {
+            pendingClassificationResult = nil
+            classificationErrorMessage = error.localizedDescription
+            showingClassificationError = true
+        }
     }
 
     private func dismissClassificationResult() {
         pendingClassificationResult = nil
     }
 
-    private func generateClassificationStub(for noteText: String) -> NoteClassificationResult {
-        // Temporary stub for future on-device Apple Intelligence classification from the note text.
-        _ = noteText
-        return NoteClassificationResult(
-            scores: [
-                NoteCategoryScore(category: "Follow-up", score: 0.92),
-                NoteCategoryScore(category: "Appointment", score: 0.04),
-                NoteCategoryScore(category: "Treatment", score: 0.02),
-                NoteCategoryScore(category: "Insurance", score: 0.01),
-                NoteCategoryScore(category: "Billing", score: 0.01)
-            ]
+    private func classifyNoteWithModel(_ noteText: String) throws -> NoteClassificationResult {
+        guard let modelURL = Bundle.main.url(
+            forResource: "Instructor_Dental_Note_Classifier",
+            withExtension: "mlmodelc"
+        ) else {
+            throw NSError(
+                domain: "NoteClassification",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Classifier model is not available in the app bundle."]
+            )
+        }
+
+        let coreModel = try MLModel(contentsOf: modelURL, configuration: MLModelConfiguration())
+        let classifier = try NLModel(mlModel: coreModel)
+
+        let maxHypothesisCount = 64
+        let hypotheses = classifier.predictedLabelHypotheses(
+            for: noteText,
+            maximumCount: maxHypothesisCount
         )
+
+        let categoryScores: [String: Double]
+        if !hypotheses.isEmpty {
+            categoryScores = hypotheses
+        } else if let predictedLabel = classifier.predictedLabel(for: noteText) {
+            categoryScores = [predictedLabel: 1.0]
+        } else {
+            throw NSError(
+                domain: "NoteClassification",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "Classifier output is missing both category hypotheses and a predicted label."]
+            )
+        }
+
+        let scores = categoryScores.map { category, score in
+            NoteCategoryScore(category: category, score: score)
+        }
+
+        guard !scores.isEmpty else {
+            throw NSError(
+                domain: "NoteClassification",
+                code: 3,
+                userInfo: [NSLocalizedDescriptionKey: "Classifier returned no category scores."]
+            )
+        }
+
+        return NoteClassificationResult(scores: scores)
     }
 
     private func deleteCurrentNote() async {
