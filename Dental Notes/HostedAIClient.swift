@@ -71,13 +71,23 @@ enum HostedAIClient {
 
     private static func cleanedJSONText(_ text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix("```") else { return trimmed }
-        var lines = trimmed.components(separatedBy: .newlines)
-        lines.removeFirst()
-        if lines.last?.trimmingCharacters(in: .whitespacesAndNewlines) == "```" {
-            lines.removeLast()
+        let lines = trimmed.components(separatedBy: .newlines)
+
+        if let openingFence = lines.firstIndex(where: {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("```")
+        }) {
+            let contentStart = lines.index(after: openingFence)
+            if contentStart < lines.endIndex,
+               let closingFence = lines[contentStart...].firstIndex(where: {
+                   $0.trimmingCharacters(in: .whitespacesAndNewlines) == "```"
+               }) {
+                return lines[contentStart..<closingFence]
+                    .joined(separator: "\n")
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
         }
-        return lines.joined(separator: "\n")
+
+        return trimmed
     }
 
     private struct MessageRequest: Encodable {
