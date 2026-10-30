@@ -937,6 +937,11 @@ private struct NoteDetailView: View {
     }
 
     private func classifyNote() {
+        // TODO(Learner): 
+        // 1. Drop the generated .mlmodel into the Models folder in Xcode.
+        // 2. Replace the fake/mock classification function with real logic that loads the bundled model and runs prediction on the note text.
+        // 3. Read the model output as label-probability pairs.
+        // 4. Convert predictions into your app's display format (category + score list).
         pendingClassificationResult = generateClassificationStub(for: note.value)
     }
 

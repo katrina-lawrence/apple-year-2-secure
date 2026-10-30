@@ -1,0 +1,2 @@
+Drop the generated .mlmodel file in this folder, and implement it in the project.
+Follow the steps in ContentView.swift in the function classifyNote().
