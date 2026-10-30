@@ -58,7 +58,7 @@ struct CreateDentalFollowupIntent: AppIntent {
     static let description = IntentDescription("Create a followup that is not attached to a note.")
     static let openAppWhenRun = false
     static var authenticationPolicy: IntentAuthenticationPolicy {
-        .requiresAuthentication
+        .requiresLocalDeviceAuthentication
     }
 
     @Parameter(
