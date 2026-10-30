@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
     <key>baseURL</key>
-    <string>http://127.0.0.1:8080</string>
+    <string>http://127.0.0.1:8000</string>
 </dict>
 </plist>
