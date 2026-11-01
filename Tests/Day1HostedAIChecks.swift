@@ -102,7 +102,12 @@ private struct Day1HostedAIChecks {
         let raw = try await send()
         try check(raw.text.contains(guid), "Raw reply was lost")
         do { _ = try raw.decodedDraft(); throw CheckFailure(description: "Malformed draft accepted") }
-        catch HostedAIError.invalidDraft {}
+        catch HostedAIError.invalidDraft(let responseText) {
+            try check(responseText.contains(guid), "Invalid draft error lost raw response text")
+            let description = HostedAIError.invalidDraft(responseText: responseText).localizedDescription
+            try check(description.contains("LLM response excerpt:"), "Invalid draft message missed response label")
+            try check(description.contains(guid), "Invalid draft message missed response excerpt")
+        }
         print("PASS: fenced JSON, trailing explanation and raw reply retention")
 
         FixtureProtocol.handler = { _ in (200, try envelope(draft, stopReason: "max_tokens")) }

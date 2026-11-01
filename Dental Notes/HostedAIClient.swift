@@ -30,11 +30,11 @@ nonisolated struct HostedAIResponse {
         var json = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if json.hasPrefix("```") {
             guard let firstNewline = json.firstIndex(of: "\n") else {
-                throw HostedAIError.invalidDraft
+                throw HostedAIError.invalidDraft(responseText: text)
             }
             let contentStart = json.index(after: firstNewline)
             guard let closingFence = json.range(of: "```", range: contentStart..<json.endIndex) else {
-                throw HostedAIError.invalidDraft
+                throw HostedAIError.invalidDraft(responseText: text)
             }
             json = String(json[contentStart..<closingFence.lowerBound])
                 .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -42,7 +42,7 @@ nonisolated struct HostedAIResponse {
         do {
             return try JSONDecoder().decode(AIProcessedNoteDraft.self, from: Data(json.utf8))
         } catch {
-            throw HostedAIError.invalidDraft
+            throw HostedAIError.invalidDraft(responseText: text)
         }
     }
 }
@@ -139,7 +139,7 @@ nonisolated enum HostedAIError: LocalizedError {
     case httpStatus(Int)
     case invalidResponse
     case emptyResponse
-    case invalidDraft
+    case invalidDraft(responseText: String)
     case truncatedOutput
 
     var errorDescription: String? {
@@ -164,10 +164,24 @@ nonisolated enum HostedAIError: LocalizedError {
             return "The Anthropic response could not be read. The note has not been changed."
         case .emptyResponse:
             return "Anthropic returned no text. The note has not been changed."
-        case .invalidDraft:
-            return "The model reply did not match the expected note format. The note has not been changed. Use the prompt test runner to inspect the raw reply."
+        case .invalidDraft(let responseText):
+            let excerpt = Self.invalidDraftExcerpt(from: responseText)
+            return """
+            The model reply did not match the expected note format. The note has not been changed.
+            LLM response excerpt:
+            \(excerpt)
+            """
         case .truncatedOutput:
             return "The model reply reached the output limit. The note has not been changed."
         }
+    }
+
+    private static func invalidDraftExcerpt(from responseText: String) -> String {
+        let trimmed = responseText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "[empty model response]" }
+        let limit = 1500
+        if trimmed.count <= limit { return trimmed }
+        let end = trimmed.index(trimmed.startIndex, offsetBy: limit)
+        return "\(trimmed[..<end])\n...[truncated]"
     }
 }
