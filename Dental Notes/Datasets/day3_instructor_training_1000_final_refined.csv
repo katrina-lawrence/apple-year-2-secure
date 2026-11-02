@@ -1,0 +1,1001 @@
+﻿id,label,text
+DN-0001,Appointment,Need to coordinate the kids’ dental appointments for the same day. I can take a morning off if necessary.
+DN-0002,Appointment,The office sent a reminder about my scheduled checkup. The office called while I was driving.
+DN-0003,Treatment,I still owe for the visit when they replaced the temporary bridge.
+DN-0004,Follow-up,Quick note after my dental visit: they said to contact the office if the bleeding starts again. I have the photos from last week if they need them.
+DN-0005,Billing,I kept the receipt from the front desk. I need an itemized invoice for my records.
+DN-0006,Insurance,The receptionist gave me a reference number. The claim for my last visit was denied and I need an explanation.
+DN-0007,Billing,Quick note after my dental visit: the office refunded the overpayment from last month. I am trying to sort out my monthly expenses.
+DN-0008,Insurance,The insurance company requested more information about the X-ray; the insurer told me to keep the estimate.
+DN-0009,Follow-up,Quick note after my dental visit: i had a filling yesterday and need to tell the dentist whether the ache settles. It seems worse in the evenings.
+DN-0010,Follow-up,I was distracted during the last part of the visit. The jaw pain comes and goes; I should probably update the office if it continues.
+DN-0011,Appointment,I put the hygienist visit on my calendar for Monday. The reminder text arrived while I was at work.
+DN-0012,Treatment,The dentist took impressions for a replacement crown; i had been avoiding chewing on that side.
+DN-0013,Billing,The office refunded the overpayment from last month; i kept the receipt from the front desk.
+DN-0014,Billing,"Insurance covered part of the filling, but I need to pay the rest of the invoice. The amount looked different on my statement."
+DN-0015,Insurance,"I paid the clinic, but the reimbursement claim has not appeared in my benefits portal."
+DN-0016,Treatment,"They showed me the X-ray at the chair. My appointment was delayed, but they eventually fitted the new night guard."
+DN-0017,Treatment,"I think they adjusted the temporary restoration, but I am unsure what the procedure was called."
+DN-0018,Insurance,Quick note after my dental visit: the claim was submitted but the reimbursement has not been processed. My employer changed providers recently.
+DN-0019,Treatment,I was told the old filling may have to be replaced if the sensitivity continues. I was nervous about what they might find.
+DN-0020,Billing,The clinic sent a reminder about an unpaid invoice; the amount looked different on my statement.
+DN-0021,Appointment,I was thinking about this on the way home. The dentist has an opening on the first Monday in June. I can usually get to the clinic after school pickup.
+DN-0022,Insurance,Quick note after my dental visit: i have an appointment for the crown but need to know whether insurance will pay for it. The online status is different from what I was told.
+DN-0023,Treatment,My mouth was numb for a while afterward. The dentist replaced my cracked filling today.
+DN-0024,Billing,I was thinking about this on the way home. I paid the deposit for the dental work today. I do not want to pay the same charge twice.
+DN-0025,Treatment,I was thinking about this on the way home. The dentist suggested a deep cleaning for my gums. I was relieved that the visit was finished.
+DN-0026,Appointment,The dentist mentioned a possible extraction and asked me to book a consultation. I can take a morning off if necessary.
+DN-0027,Follow-up,The office requested an update on the sore spot under my denture.
+DN-0028,Appointment,The calendar on my phone might be wrong. Need to move my checkup because I will be away that week.
+DN-0029,Appointment,The office called while I was driving. I booked a cleaning for next Thursday morning.
+DN-0030,Follow-up,Need to see whether the dentist reviewed the photos I sent.
+DN-0031,Treatment,I need to check back on the healing after they removed the wisdom tooth.
+DN-0032,Billing,"I think the payment plan starts next month, though the statement is confusing."
+DN-0033,Billing,I paid the deposit for the dental work today. I paid by card rather than cash.
+DN-0034,Appointment,My appointment was confirmed by text this morning.
+DN-0035,Appointment,"I owe a balance from my last visit, but I am trying to move tomorrow’s cleaning. I am trying to avoid missing another visit."
+DN-0036,Billing,"I have a follow-up visit coming, and I need to settle the old balance first. The payment was supposed to go through last week."
+DN-0037,Treatment,The dentist showed me where the damage was. They talked about a filling or possibly a root canal; no treatment was decided.
+DN-0038,Insurance,I was thinking about this on the way home. My plan only covers one cleaning within the benefit period. My employer changed providers recently.
+DN-0039,Insurance,The office is waiting for approval from my insurer. The online status is different from what I was told.
+DN-0040,Appointment,I can take a morning off if necessary. I need to confirm the time of my appointment.
+DN-0041,Follow-up,I am supposed to check in after trying the fluoride rinse. I have the photos from last week if they need them.
+DN-0042,Treatment,I was nervous about what they might find. The dentist applied fluoride varnish after the cleaning.
+DN-0043,Follow-up,It seems worse in the evenings. Need to see whether the dentist reviewed the photos I sent.
+DN-0044,Billing,The receipt is in my email somewhere. I paid the deposit for the dental work today.
+DN-0045,Follow-up,"I think the dentist wanted me to call back if the tooth still felt sensitive, but I am not sure when. The area looks better than it did on Monday."
+DN-0046,Appointment,"Insurance may cover the X-ray, and I need to confirm the appointment time. I can usually get to the clinic after school pickup."
+DN-0047,Appointment,"The treatment estimate arrived, and now I need to arrange the first visit; the office called while I was driving."
+DN-0048,Insurance,My plan might reimburse the specialist visit; I need to verify that.
+DN-0049,Billing,"I think I paid the balance, but the invoice still shows an amount due."
+DN-0050,Treatment,Quick note after my dental visit: they put a temporary filling in while the tooth settles. I did not catch the name of the material.
+DN-0051,Follow-up,The area looks better than it did on Monday. I should message the clinic if the temporary filling starts to hurt.
+DN-0052,Appointment,I am away for the long weekend. The receptionist said the earliest opening is in three weeks.
+DN-0053,Appointment,I was thinking about this on the way home. I need to book the next visit before the end of the month. I am trying to avoid missing another visit.
+DN-0054,Appointment,The reminder text arrived while I was at work. I am waiting for a call about an available appointment.
+DN-0055,Follow-up,The crown feels high when I bite; I need to contact the dentist with an update; it only bothers me when I chew on that side.
+DN-0056,Insurance,I cannot tell whether the payment from insurance is still processing or was denied. I have the benefits card in my wallet.
+DN-0057,Billing,Quick note after my dental visit: i need a copy of the receipt showing the tax breakdown. The amount looked different on my statement.
+DN-0058,Billing,Quick note after my dental visit: i want to know why the invoice includes an extra fee. I am trying to sort out my monthly expenses.
+DN-0059,Insurance,I was thinking about this on the way home. My dental benefits changed when I switched employers. The receptionist gave me a reference number.
+DN-0060,Insurance,The insurer asked for a predetermination before the procedure.
+DN-0061,Appointment,I booked a cleaning for next Thursday morning.
+DN-0062,Appointment,The reminder text arrived while I was at work. Not sure whether I booked the consultation or only asked about availability.
+DN-0063,Follow-up,The dentist asked me to report back if the sensitivity continues. I wrote down the symptoms over the weekend.
+DN-0064,Billing,I was told the outstanding balance is due next week.
+DN-0065,Appointment,I am away for the long weekend. I was told there might be an opening for a checkup next week.
+DN-0066,Insurance,"My checkup went well, though the insurer denied the fluoride charge."
+DN-0067,Insurance,"My checkup went well, though the insurer denied the fluoride charge; the portal has not updated since Friday."
+DN-0068,Follow-up,The dentist asked me to report back if the sensitivity continues.
+DN-0069,Billing,"I checked the banking app this morning. The dentist recommended a crown, and I need an itemized estimate of the charges."
+DN-0070,Treatment,They talked about a filling or possibly a root canal; no treatment was decided. They explained the options before starting.
+DN-0071,Billing,I was thinking about this on the way home. The clinic charged my card twice for the same visit. I am trying to sort out my monthly expenses.
+DN-0072,Insurance,I need to check if my dependent is listed on the dental plan.
+DN-0073,Follow-up,The dentist asked me to report back if the sensitivity continues; i have the photos from last week if they need them.
+DN-0074,Billing,I do not want to pay the same charge twice. The payment terminal did not accept my card at checkout.
+DN-0075,Treatment,"They explained the options before starting. The dentist discussed a possible night guard, but nothing has been fitted."
+DN-0076,Follow-up,Quick note after my dental visit: i have not heard back about the specialist recommendation. I have the photos from last week if they need them.
+DN-0077,Billing,I need an itemized invoice for my records.
+DN-0078,Follow-up,I was thinking about this on the way home. Need to see whether the dentist reviewed the photos I sent. It only bothers me when I chew on that side.
+DN-0079,Follow-up,Need to ask whether the soreness after the filling is normal. I noticed it again while eating breakfast.
+DN-0080,Appointment,I can usually get to the clinic after school pickup. I have to cancel tomorrow’s visit and choose another day.
+DN-0081,Billing,I was thinking about this on the way home. The invoice shows a balance that I thought I had already paid. The payment was supposed to go through last week.
+DN-0082,Treatment,"The crown may not be covered, but the dentist recommended it for the cracked molar."
+DN-0083,Appointment,"I owe a balance from my last visit, but I am trying to move tomorrow’s cleaning; i would prefer not to miss class."
+DN-0084,Billing,Quick note after my dental visit: the office said I can split the charge for the bridge into monthly payments. The amount looked different on my statement.
+DN-0085,Treatment,It feels different when I bite down now. I cannot tell whether they recommended a deep cleaning or just more frequent regular cleanings.
+DN-0086,Follow-up,It seems worse in the evenings. I got a reminder for my checkup and still need to report the jaw clicking.
+DN-0087,Insurance,I need to send the treatment estimate to my insurance company; my employer changed providers recently.
+DN-0088,Billing,I was told the outstanding balance is due next week. The office emailed a copy of the invoice.
+DN-0089,Billing,The estimate was lower than the final amount on my bill. I am trying to sort out my monthly expenses.
+DN-0090,Treatment,Quick note after my dental visit: they discussed using a night guard for grinding. They showed me the X-ray at the chair.
+DN-0091,Treatment,They discussed using a night guard for grinding; i was nervous about what they might find.
+DN-0092,Follow-up,Quick note after my dental visit: i should call in a week to let them know how the gum is healing. It only bothers me when I chew on that side.
+DN-0093,Billing,"The payment was supposed to go through last week. The amount due looks different from the estimate, but I may have missed a fee."
+DN-0094,Follow-up,"They suggested an extraction, but first I have to report whether the antibiotics helped."
+DN-0095,Treatment,They showed me the X-ray at the chair. I was told the old filling may have to be replaced if the sensitivity continues.
+DN-0096,Follow-up,The hygienist wants to know whether the new brushing routine helped; i have not heard anything from the office since the visit.
+DN-0097,Insurance,My plan only covers one cleaning within the benefit period; the portal has not updated since Friday.
+DN-0098,Appointment,"I can take a morning off if necessary. The dentist suggested coming back soon, and I still need to arrange a time."
+DN-0099,Billing,"The amount due looks different from the estimate, but I may have missed a fee."
+DN-0100,Insurance,My employer changed providers recently. The insurer requested the dentist’s supporting notes.
+DN-0101,Treatment,They recommended a crown for the damaged molar.
+DN-0102,Follow-up,I have the photos from last week if they need them. The office requested an update on the sore spot under my denture.
+DN-0103,Treatment,I need to check back on the healing after they removed the wisdom tooth. The dentist showed me where the damage was.
+DN-0104,Insurance,The office is waiting for approval from my insurer.
+DN-0105,Appointment,I need to reschedule the X-ray appointment.
+DN-0106,Follow-up,"My cleaning is booked, but I mainly need to ask whether the gum swelling is improving normally."
+DN-0107,Treatment,Quick note after my dental visit: the dentist discussed extracting the tooth and said we can schedule it later. The dentist showed me where the damage was.
+DN-0108,Follow-up,I was thinking about this on the way home. I need to ask about the test result they said would come later. The area looks better than it did on Monday.
+DN-0109,Insurance,I need the insurer to explain why the crown claim was reduced. I have not received a response to the claim yet.
+DN-0110,Treatment,I was thinking about this on the way home. The hygienist explained the periodontal treatment plan. It feels different when I bite down now.
+DN-0111,Appointment,Not sure whether I booked the consultation or only asked about availability.
+DN-0112,Follow-up,I wrote down the symptoms over the weekend. They said to contact the office if the bleeding starts again.
+DN-0113,Follow-up,I have not heard anything from the office since the visit. I want to check what the dentist thought of the X-rays from last week.
+DN-0114,Treatment,I had a loose crown recemented at the clinic.
+DN-0115,Appointment,Quick note after my dental visit: my appointment was confirmed by text this morning. I am trying to avoid missing another visit.
+DN-0116,Appointment,Quick note after my dental visit: i need to schedule the crown fitting once the insurer approves it. I can take a morning off if necessary.
+DN-0117,Billing,The invoice shows a balance that I thought I had already paid. I kept the receipt from the front desk.
+DN-0118,Insurance,The insurer says the waiting period applies to major work; the online status is different from what I was told.
+DN-0119,Follow-up,The soreness was still there when I woke up. They asked me to keep track of the pain and call with an update.
+DN-0120,Billing,I need to pay the remaining amount on my account.
+DN-0121,Treatment,I was thinking about this on the way home. They discussed using a night guard for grinding. My mouth was numb for a while afterward.
+DN-0122,Appointment,I asked for a morning appointment because of work.
+DN-0123,Insurance,I cannot tell whether the payment from insurance is still processing or was denied.
+DN-0124,Appointment,Quick note after my dental visit: the office sent a reminder about my scheduled checkup. My work shifts have changed this month.
+DN-0125,Billing,"The dentist recommended a crown, and I need an itemized estimate of the charges; the amount looked different on my statement."
+DN-0126,Follow-up,The jaw pain comes and goes; I should probably update the office if it continues. It only bothers me when I chew on that side.
+DN-0127,Treatment,I was thinking about this on the way home. I had a root canal on the lower left tooth. I had been avoiding chewing on that side.
+DN-0128,Insurance,"The insurer told me to keep the estimate. The dentist recommended deep cleaning, and the insurer requested more documentation."
+DN-0129,Follow-up,I am supposed to check in after trying the fluoride rinse.
+DN-0130,Follow-up,They said to keep an eye on the temporary filling and let them know if anything changes.
+DN-0131,Treatment,The dentist polished the chipped edge of my front tooth.
+DN-0132,Appointment,The clinic sent an invoice while I was trying to reschedule the root canal.
+DN-0133,Treatment,I was relieved that the visit was finished. I need to check back on the healing after they removed the wisdom tooth.
+DN-0134,Appointment,I have a referral for a specialist and need to book the consultation. The reminder text arrived while I was at work.
+DN-0135,Appointment,"The reminder says Tuesday, but I had written Wednesday in my calendar. The calendar on my phone might be wrong."
+DN-0136,Insurance,I cannot tell which plan year they are using. I want to confirm the annual maximum remaining on my plan.
+DN-0137,Billing,The root canal went fine; the problem is the extra fee on the bill; i kept the receipt from the front desk.
+DN-0138,Billing,"I have a follow-up visit coming, and I need to settle the old balance first; i am trying to sort out my monthly expenses."
+DN-0139,Billing,I need a receipt for the payment I made yesterday. The receipt is in my email somewhere.
+DN-0140,Treatment,I had a small cavity repaired this afternoon; i did not catch the name of the material.
+DN-0141,Follow-up,I promised to send a photo if the redness does not improve.
+DN-0142,Follow-up,"They mentioned checking how things are healing, although I cannot remember the exact instructions."
+DN-0143,Follow-up,I am supposed to check in after trying the fluoride rinse; i have not heard anything from the office since the visit.
+DN-0144,Treatment,I was thinking about this on the way home. I had the damaged sealant replaced on a molar. My mouth was numb for a while afterward.
+DN-0145,Appointment,I have a referral for a specialist and need to book the consultation.
+DN-0146,Insurance,Quick note after my dental visit: the clinic can schedule the consultation once the coverage details are confirmed. I need to compare the details with my policy.
+DN-0147,Appointment,"The filling has been uncomfortable, so I asked reception for a visit next week. I would prefer not to miss class."
+DN-0148,Insurance,I need to clarify whether my secondary insurance can be billed; i have the benefits card in my wallet.
+DN-0149,Billing,There is a charge on my statement that I do not recognize; the receipt is in my email somewhere.
+DN-0150,Billing,I have to ask reception about the deposit before my appointment. I do not want to pay the same charge twice.
+DN-0151,Billing,I was thinking about this on the way home. I received a credit on my account after the adjustment. I kept the receipt from the front desk.
+DN-0152,Appointment,Need to move my checkup because I will be away that week. I am trying to avoid missing another visit.
+DN-0153,Insurance,I need to find out whether the specialist is covered; the paperwork is still sitting in my email.
+DN-0154,Appointment,"The calendar on my phone might be wrong. I owe a balance from my last visit, but I am trying to move tomorrow’s cleaning."
+DN-0155,Treatment,I still owe for the visit when they replaced the temporary bridge; they showed me the X-ray at the chair.
+DN-0156,Treatment,I was thinking about this on the way home. I had a loose crown recemented at the clinic. They showed me the X-ray at the chair.
+DN-0157,Insurance,I want to confirm the annual maximum remaining on my plan. I have the benefits card in my wallet.
+DN-0158,Appointment,I am not certain whether the appointment request went through online. I would prefer not to miss class.
+DN-0159,Billing,"I do not want to pay the same charge twice. Insurance covered part of the filling, but I need to pay the rest of the invoice."
+DN-0160,Billing,The root canal went fine; the problem is the extra fee on the bill. I need to reconcile this with my records.
+DN-0161,Treatment,I booked next Tuesday to have the broken filling repaired. They showed me the X-ray at the chair.
+DN-0162,Treatment,The dentist showed me where the damage was. They removed plaque buildup around the back teeth.
+DN-0163,Follow-up,Quick note after my dental visit: need to see whether the dentist reviewed the photos I sent. The area looks better than it did on Monday.
+DN-0164,Treatment,"They asked me to return for a check, after adjusting the filling today. I was relieved that the visit was finished."
+DN-0165,Treatment,They examined the cracked tooth and recommended a repair. The dentist showed me where the damage was.
+DN-0166,Billing,Quick note after my dental visit: i need to confirm that my e-transfer was received. I need to reconcile this with my records.
+DN-0167,Billing,I checked the banking app this morning. Not sure whether the deposit was applied to the final invoice.
+DN-0168,Billing,I paid the deposit for the dental work today; i checked the banking app this morning.
+DN-0169,Treatment,The dentist discussed whether a filling or crown would work better. I was relieved that the visit was finished.
+DN-0170,Appointment,I was thinking about this on the way home. My appointment was confirmed by text this morning. The calendar on my phone might be wrong.
+DN-0171,Billing,Quick note after my dental visit: the invoice shows a balance that I thought I had already paid. I need to reconcile this with my records.
+DN-0172,Appointment,"Quick note after my dental visit: insurance may cover the X-ray, and I need to confirm the appointment time. The calendar on my phone might be wrong."
+DN-0173,Insurance,I cannot tell which plan year they are using. My benefits provider needs the procedure code for the estimate.
+DN-0174,Follow-up,The soreness was still there when I woke up. I should call in a week to let them know how the gum is healing.
+DN-0175,Insurance,The clinic said it is possible the waiting period applies to this treatment.
+DN-0176,Billing,The payment was supposed to go through last week. I want to know why the invoice includes an extra fee.
+DN-0177,Billing,I am trying to sort out my monthly expenses. The invoice shows a balance that I thought I had already paid.
+DN-0178,Billing,The office emailed a copy of the invoice. The receipt shows a credit and I do not know whether I still owe anything.
+DN-0179,Follow-up,"I think I am supposed to check back about the night guard, but nothing is arranged yet."
+DN-0180,Appointment,I was told there might be an opening for a checkup next week. My work shifts have changed this month.
+DN-0181,Insurance,The office sent the estimate for the bridge and is waiting for insurer approval. The receptionist gave me a reference number.
+DN-0182,Follow-up,Quick note after my dental visit: i need to check whether the swelling has gone down since my last visit. It seems worse in the evenings.
+DN-0183,Treatment,Quick note after my dental visit: i need to check back on the healing after they removed the wisdom tooth. I did not catch the name of the material.
+DN-0184,Appointment,I need to book the next visit before the end of the month.
+DN-0185,Billing,I was thinking about this on the way home. The cashier said my account is now fully paid. I need to reconcile this with my records.
+DN-0186,Appointment,"The treatment estimate arrived, and now I need to arrange the first visit. My work shifts have changed this month."
+DN-0187,Billing,I received a credit on my account after the adjustment.
+DN-0188,Billing,The root canal went fine; the problem is the extra fee on the bill.
+DN-0189,Follow-up,I had a filling yesterday and need to tell the dentist whether the ache settles. The area looks better than it did on Monday.
+DN-0190,Follow-up,"The bill came through, but I am more concerned about checking whether the swelling has returned. I have the photos from last week if they need them."
+DN-0191,Billing,"I am trying to sort out my monthly expenses. The clinic may have billed me twice, although one charge could be pending."
+DN-0192,Follow-up,I have not heard back about the specialist recommendation.
+DN-0193,Follow-up,Quick note after my dental visit: i need to ask if the numb feeling should still be there. It seems worse in the evenings.
+DN-0194,Appointment,My dental consultation is set for Friday at two.
+DN-0195,Treatment,"The dentist said the molar might need a crown, but wants to look at it again. They showed me the X-ray at the chair."
+DN-0196,Insurance,The insurer told me to keep the estimate. I received an explanation of benefits but do not understand the coverage.
+DN-0197,Insurance,The clinic can schedule the consultation once the coverage details are confirmed; the insurer told me to keep the estimate.
+DN-0198,Follow-up,They want an update on the irritation near my wisdom tooth; it seems worse in the evenings.
+DN-0199,Appointment,The receptionist said the earliest opening is in three weeks.
+DN-0200,Follow-up,Quick note after my dental visit: i am supposed to check in after trying the fluoride rinse. I wrote down the symptoms over the weekend.
+DN-0201,Treatment,I was relieved that the visit was finished. They examined the cracked tooth and recommended a repair.
+DN-0202,Appointment,"My work shifts have changed this month. They offered a cancellation slot, but I have not decided whether I can take it."
+DN-0203,Insurance,I was told my annual dental maximum might already be used up. The receptionist gave me a reference number.
+DN-0204,Insurance,"I think the plan might cover the crown, but the estimate has not been approved."
+DN-0205,Appointment,I am trying to avoid missing another visit. I have a referral for a specialist and need to book the consultation.
+DN-0206,Insurance,My dental benefits changed when I switched employers; i have the benefits card in my wallet.
+DN-0207,Insurance,Not sure whether the dentist is in my benefits network. The online status is different from what I was told.
+DN-0208,Appointment,"They offered a cancellation slot, but I have not decided whether I can take it."
+DN-0209,Follow-up,"They suggested an extraction, but first I have to report whether the antibiotics helped. It only bothers me when I chew on that side."
+DN-0210,Follow-up,They asked me to keep track of the pain and call with an update. It seems worse in the evenings.
+DN-0211,Appointment,I can make the Wednesday appointment if it starts after four.
+DN-0212,Follow-up,Quick note after my dental visit: i should message the clinic if the temporary filling starts to hurt. I was distracted during the last part of the visit.
+DN-0213,Insurance,Quick note after my dental visit: the office is waiting for approval from my insurer. The receptionist gave me a reference number.
+DN-0214,Billing,I cannot tell whether the refund has reached my card yet. I do not want to pay the same charge twice.
+DN-0215,Treatment,The tooth has been bothering me for weeks. I had the damaged sealant replaced on a molar.
+DN-0216,Treatment,The dentist adjusted my bite after placing the new filling; the dentist showed me where the damage was.
+DN-0217,Appointment,"I think the office moved my visit to the afternoon, though I need to check."
+DN-0218,Insurance,I need to check whether my plan covers a new crown.
+DN-0219,Follow-up,I should follow up on the referral they mentioned last time; the soreness was still there when I woke up.
+DN-0220,Follow-up,Quick note after my dental visit: the hygienist wants to know whether the new brushing routine helped. I wrote down the symptoms over the weekend.
+DN-0221,Treatment,Quick note after my dental visit: the dentist replaced my cracked filling today. The tooth has been bothering me for weeks.
+DN-0222,Insurance,I have not received a response to the claim yet. The office sent the estimate for the bridge and is waiting for insurer approval.
+DN-0223,Insurance,The benefits provider may need another document before deciding.
+DN-0224,Billing,The office refunded the overpayment from last month. I need to reconcile this with my records.
+DN-0225,Billing,I need to reconcile this with my records. The clinic charged my card twice for the same visit.
+DN-0226,Treatment,The dentist discussed extracting the tooth and said we can schedule it later.
+DN-0227,Billing,I want to know why the invoice includes an extra fee; i kept the receipt from the front desk.
+DN-0228,Billing,I was thinking about this on the way home. I need a receipt for the payment I made yesterday. I paid by card rather than cash.
+DN-0229,Appointment,I still need to call reception to arrange a consultation; i can usually get to the clinic after school pickup.
+DN-0230,Insurance,The insurer requested the dentist’s supporting notes; the insurer told me to keep the estimate.
+DN-0231,Follow-up,I want to check what the dentist thought of the X-rays from last week.
+DN-0232,Insurance,The paperwork is still sitting in my email. I need to check if my dependent is listed on the dental plan.
+DN-0233,Billing,I received a credit on my account after the adjustment. I am trying to sort out my monthly expenses.
+DN-0234,Follow-up,"The claim is still pending, and I should ask whether the temporary filling can wait."
+DN-0235,Insurance,Quick note after my dental visit: i received an explanation of benefits but do not understand the coverage. The portal has not updated since Friday.
+DN-0236,Insurance,Quick note after my dental visit: my benefits portal still shows the dental claim as pending. The receptionist gave me a reference number.
+DN-0237,Insurance,Quick note after my dental visit: i have to follow up with the benefits provider about the missing claim payment. My employer changed providers recently.
+DN-0238,Appointment,I need to confirm the time of my appointment.
+DN-0239,Insurance,I have not received a response to the claim yet. The clinic said they would submit the claim electronically.
+DN-0240,Billing,The clinic charged my card twice for the same visit. The office emailed a copy of the invoice.
+DN-0241,Appointment,I am not certain whether the appointment request went through online.
+DN-0242,Treatment,Quick note after my dental visit: they removed plaque buildup around the back teeth. It feels different when I bite down now.
+DN-0243,Billing,"I am trying to sort out my monthly expenses. I submitted a claim, but the clinic charged me twice at checkout."
+DN-0244,Follow-up,"I paid the invoice, and now I need to check in about the soreness after treatment. I noticed it again while eating breakfast."
+DN-0245,Treatment,"They mentioned periodontal treatment, though I do not know which option they recommend yet. My mouth was numb for a while afterward."
+DN-0246,Insurance,I have the benefits card in my wallet. Not sure whether the dentist is in my benefits network.
+DN-0247,Treatment,I was nervous about what they might find. I had a root canal on the lower left tooth.
+DN-0248,Treatment,The dentist replaced my cracked filling today.
+DN-0249,Follow-up,There was some discussion about contacting the specialist again if the symptoms remain.
+DN-0250,Appointment,Quick note after my dental visit: the receptionist said the earliest opening is in three weeks. I need enough time to get across town.
+DN-0251,Insurance,The insurer asked for a predetermination before the procedure. My employer changed providers recently.
+DN-0252,Treatment,They removed plaque buildup around the back teeth. They explained the options before starting.
+DN-0253,Billing,The receipt shows a credit and I do not know whether I still owe anything.
+DN-0254,Treatment,The dentist suggested a deep cleaning for my gums.
+DN-0255,Billing,I need a receipt for the visit so I can submit it to insurance; i do not want to pay the same charge twice.
+DN-0256,Follow-up,Need to ask whether the soreness after the filling is normal.
+DN-0257,Treatment,I was thinking about this on the way home. The dentist polished the chipped edge of my front tooth. They showed me the X-ray at the chair.
+DN-0258,Treatment,"My mouth was numb for a while afterward. The dentist said the molar might need a crown, but wants to look at it again."
+DN-0259,Treatment,"Quick note after my dental visit: my appointment was delayed, but they eventually fitted the new night guard. I had been avoiding chewing on that side."
+DN-0260,Follow-up,Not sure whether I should report this soreness now or wait a few more days.
+DN-0261,Billing,I was thinking about this on the way home. I need to confirm that my e-transfer was received. The payment was supposed to go through last week.
+DN-0262,Treatment,Quick note after my dental visit: the hygienist explained the periodontal treatment plan. I was relieved that the visit was finished.
+DN-0263,Billing,The receipt is in my email somewhere. There is a charge for an X-ray that I do not remember paying for.
+DN-0264,Follow-up,The dentist said it might take a few days to settle. I have to report whether the jaw clicking is getting worse.
+DN-0265,Insurance,My benefits portal still shows the dental claim as pending.
+DN-0266,Treatment,I was told I may need an extraction for the broken tooth; my mouth was numb for a while afterward.
+DN-0267,Appointment,I need to schedule the crown fitting once the insurer approves it.
+DN-0268,Appointment,The clinic moved my appointment to the afternoon.
+DN-0269,Treatment,They recommended a crown for the damaged molar; i was relieved that the visit was finished.
+DN-0270,Follow-up,"My cleaning is booked, but I mainly need to ask whether the gum swelling is improving normally. I wrote down the symptoms over the weekend."
+DN-0271,Treatment,They explained the options before starting. The hygienist explained the periodontal treatment plan.
+DN-0272,Billing,"The amount looked different on my statement. I think the payment plan starts next month, though the statement is confusing."
+DN-0273,Follow-up,Quick note after my dental visit: i should follow up on the referral they mentioned last time. The area looks better than it did on Monday.
+DN-0274,Appointment,Need to coordinate the kids’ dental appointments for the same day; i am away for the long weekend.
+DN-0275,Billing,The cashier said my account is now fully paid.
+DN-0276,Treatment,They examined the cracked tooth and recommended a repair; it feels different when I bite down now.
+DN-0277,Insurance,Quick note after my dental visit: i need to clarify whether my secondary insurance can be billed. I cannot tell which plan year they are using.
+DN-0278,Follow-up,I have the photos from last week if they need them. I promised to send a photo if the redness does not improve.
+DN-0279,Follow-up,"I think the dentist wanted me to call back if the tooth still felt sensitive, but I am not sure when."
+DN-0280,Treatment,The tooth has been bothering me for weeks. There was talk of extracting the tooth if the repair does not hold.
+DN-0281,Billing,There might be an extra charge on the bill; I need to compare receipts.
+DN-0282,Follow-up,I need to ask if the numb feeling should still be there. The area looks better than it did on Monday.
+DN-0283,Treatment,"The bill lists a root canal, which is the procedure I had on Monday."
+DN-0284,Follow-up,"Quick note after my dental visit: my cleaning is booked, but I mainly need to ask whether the gum swelling is improving normally. I noticed it again while eating breakfast."
+DN-0285,Treatment,I was relieved that the visit was finished. The hygienist said the stain might need polishing or another procedure.
+DN-0286,Appointment,I have a referral for a specialist and need to book the consultation; the calendar on my phone might be wrong.
+DN-0287,Treatment,I had the damaged sealant replaced on a molar; i was nervous about what they might find.
+DN-0288,Follow-up,I was thinking about this on the way home. I am supposed to check in after trying the fluoride rinse. The dentist said it might take a few days to settle.
+DN-0289,Insurance,I have an appointment for the crown but need to know whether insurance will pay for it. I cannot tell which plan year they are using.
+DN-0290,Appointment,"The office called while I was driving. I might have a cleaning next Thursday, but I have not seen a confirmation."
+DN-0291,Follow-up,I was thinking about this on the way home. I should follow up on the referral they mentioned last time. It only bothers me when I chew on that side.
+DN-0292,Billing,I need a copy of the receipt showing the tax breakdown. I paid by card rather than cash.
+DN-0293,Follow-up,I should message the clinic if the temporary filling starts to hurt. The soreness was still there when I woke up.
+DN-0294,Insurance,I was thinking about this on the way home. I need to check if my dependent is listed on the dental plan. I need to compare the details with my policy.
+DN-0295,Billing,I checked the banking app this morning. The clinic sent a reminder about an unpaid invoice.
+DN-0296,Billing,"Quick note after my dental visit: i have a follow-up visit coming, and I need to settle the old balance first. The office emailed a copy of the invoice."
+DN-0297,Billing,The payment terminal did not accept my card at checkout; i paid by card rather than cash.
+DN-0298,Billing,I need a receipt for the visit so I can submit it to insurance. I checked the banking app this morning.
+DN-0299,Insurance,Quick note after my dental visit: the clinic said they would submit the claim electronically. I have the benefits card in my wallet.
+DN-0300,Insurance,I need the insurer to explain why the crown claim was reduced.
+DN-0301,Appointment,I was thinking about this on the way home. I am on the waitlist for an earlier cleaning slot. The reminder text arrived while I was at work.
+DN-0302,Billing,I want to ask whether I can split the payment into two parts.
+DN-0303,Treatment,They removed plaque buildup around the back teeth.
+DN-0304,Follow-up,Need to ask whether the soreness after the filling is normal; i wrote down the symptoms over the weekend.
+DN-0305,Billing,I need to confirm that my e-transfer was received; the office emailed a copy of the invoice.
+DN-0306,Appointment,Quick note after my dental visit: i asked for a morning appointment because of work. The calendar on my phone might be wrong.
+DN-0307,Appointment,I can take a morning off if necessary. I need to reschedule the X-ray appointment.
+DN-0308,Appointment,Quick note after my dental visit: the clinic sent an invoice while I was trying to reschedule the root canal. The reminder text arrived while I was at work.
+DN-0309,Follow-up,I have to check back about the mouth guard fitting properly.
+DN-0310,Insurance,I need to find out whether the specialist is covered. I need to compare the details with my policy.
+DN-0311,Follow-up,I need to ask about the test result they said would come later; it seems worse in the evenings.
+DN-0312,Follow-up,The insurer approved the crown; I still need to call the dentist back about the pain.
+DN-0313,Treatment,I did not catch the name of the material. The dentist said the cracked tooth may be repairable without removing it.
+DN-0314,Billing,Quick note after my dental visit: the cashier said my account is now fully paid. The office emailed a copy of the invoice.
+DN-0315,Appointment,"I am trying to avoid missing another visit. I think reception pencilled me in, but they said they would call to confirm."
+DN-0316,Follow-up,"They mentioned checking how things are healing, although I cannot remember the exact instructions. It seems worse in the evenings."
+DN-0317,Follow-up,"My cleaning is booked, but I mainly need to ask whether the gum swelling is improving normally; i have the photos from last week if they need them."
+DN-0318,Follow-up,I got a reminder for my checkup and still need to report the jaw clicking.
+DN-0319,Billing,There is a charge on my statement that I do not recognize.
+DN-0320,Appointment,"I might have a cleaning next Thursday, but I have not seen a confirmation."
+DN-0321,Insurance,"The dentist recommended deep cleaning, and the insurer requested more documentation; i need to compare the details with my policy."
+DN-0322,Follow-up,I should call in a week to let them know how the gum is healing. It seems worse in the evenings.
+DN-0323,Treatment,They discussed using a night guard for grinding.
+DN-0324,Appointment,I need to schedule the crown fitting once the insurer approves it; i need enough time to get across town.
+DN-0325,Follow-up,Not sure whether I should report this soreness now or wait a few more days. I wrote down the symptoms over the weekend.
+DN-0326,Billing,I was thinking about this on the way home. I want to ask whether I can split the payment into two parts. The amount looked different on my statement.
+DN-0327,Appointment,Need to move my checkup because I will be away that week; i would prefer not to miss class.
+DN-0328,Treatment,I was thinking about this on the way home. I was told I may need an extraction for the broken tooth. The tooth has been bothering me for weeks.
+DN-0329,Billing,Quick note after my dental visit: the payment terminal did not accept my card at checkout. The receipt is in my email somewhere.
+DN-0330,Follow-up,I want to check what the dentist thought of the X-rays from last week; i wrote down the symptoms over the weekend.
+DN-0331,Treatment,They talked about a filling or possibly a root canal; no treatment was decided.
+DN-0332,Insurance,I have the benefits card in my wallet. My benefits portal still shows the dental claim as pending.
+DN-0333,Follow-up,"I noticed it again while eating breakfast. I am unsure whether the dentist has reviewed the referral, so I may need to ask."
+DN-0334,Billing,My cleaning is booked and there is still an unpaid balance on my account. The office emailed a copy of the invoice.
+DN-0335,Billing,The office offered a payment plan for the balance. I checked the banking app this morning.
+DN-0336,Billing,I was thinking about this on the way home. I was told the outstanding balance is due next week. I am trying to sort out my monthly expenses.
+DN-0337,Treatment,There was talk of extracting the tooth if the repair does not hold.
+DN-0338,Appointment,"The treatment estimate arrived, and now I need to arrange the first visit."
+DN-0339,Appointment,I am waiting for a call about an available appointment. I can usually get to the clinic after school pickup.
+DN-0340,Appointment,"I might have a cleaning next Thursday, but I have not seen a confirmation. I am away for the long weekend."
+DN-0341,Appointment,I was thinking about this on the way home. I booked a cleaning for next Thursday morning. My work shifts have changed this month.
+DN-0342,Billing,I was thinking about this on the way home. The payment terminal did not accept my card at checkout. I checked the banking app this morning.
+DN-0343,Follow-up,"I have an appointment next month, though they asked for an update on the bleeding this week; i noticed it again while eating breakfast."
+DN-0344,Appointment,Quick note after my dental visit: i need to reschedule the X-ray appointment. I am away for the long weekend.
+DN-0345,Treatment,The hygienist explained the periodontal treatment plan.
+DN-0346,Appointment,Quick note after my dental visit: i need to confirm the time of my appointment. I am away for the long weekend.
+DN-0347,Follow-up,"I have an appointment next month, though they asked for an update on the bleeding this week. The dentist said it might take a few days to settle."
+DN-0348,Treatment,The dentist polished the chipped edge of my front tooth; the tooth has been bothering me for weeks.
+DN-0349,Insurance,I was thinking about this on the way home. I need to send the treatment estimate to my insurance company. I need to compare the details with my policy.
+DN-0350,Follow-up,They said to keep an eye on the temporary filling and let them know if anything changes. The soreness was still there when I woke up.
+DN-0351,Follow-up,I cannot remember whether they wanted a photo of the gum or just a phone update. The dentist said it might take a few days to settle.
+DN-0352,Billing,I was thinking about this on the way home. I need a copy of the receipt showing the tax breakdown. I do not want to pay the same charge twice.
+DN-0353,Insurance,My employer changed providers recently. The insurance company requested more information about the X-ray.
+DN-0354,Treatment,Quick note after my dental visit: the dentist suggested a deep cleaning for my gums. The dentist showed me where the damage was.
+DN-0355,Treatment,I still owe for the visit when they replaced the temporary bridge. The tooth has been bothering me for weeks.
+DN-0356,Treatment,"It feels different when I bite down now. They asked me to return for a check, after adjusting the filling today."
+DN-0357,Treatment,The dentist fitted a temporary bridge today; my mouth was numb for a while afterward.
+DN-0358,Billing,Quick note after my dental visit: there is a charge on my statement that I do not recognize. I checked the banking app this morning.
+DN-0359,Billing,My cleaning is booked and there is still an unpaid balance on my account.
+DN-0360,Treatment,I did not catch the name of the material. The dentist discussed extracting the tooth and said we can schedule it later.
+DN-0361,Billing,The invoice shows a balance that I thought I had already paid; the office emailed a copy of the invoice.
+DN-0362,Insurance,Quick note after my dental visit: my benefits provider needs the procedure code for the estimate. I have not received a response to the claim yet.
+DN-0363,Appointment,I was thinking about this on the way home. My dental consultation is set for Friday at two. I am away for the long weekend.
+DN-0364,Insurance,I should verify whether the fluoride treatment is eligible. The insurer told me to keep the estimate.
+DN-0365,Billing,"Quick note after my dental visit: the dentist recommended a crown, and I need an itemized estimate of the charges. I do not want to pay the same charge twice."
+DN-0366,Appointment,I still need to call reception to arrange a consultation.
+DN-0367,Follow-up,I want to check what the dentist thought of the X-rays from last week. I noticed it again while eating breakfast.
+DN-0368,Insurance,The insurer told me to keep the estimate. The insurer asked for a predetermination before the procedure.
+DN-0369,Appointment,I need to schedule the crown fitting once the insurer approves it. I am away for the long weekend.
+DN-0370,Insurance,The receptionist gave me a reference number. I need to check whether my plan covers a new crown.
+DN-0371,Follow-up,I need to ask about the test result they said would come later. It only bothers me when I chew on that side.
+DN-0372,Billing,I am trying to sort out my monthly expenses. I need to confirm that my e-transfer was received.
+DN-0373,Treatment,I am waiting for insurance approval before the dentist can place the permanent crown; i was nervous about what they might find.
+DN-0374,Insurance,My dental benefits changed when I switched employers. I have not received a response to the claim yet.
+DN-0375,Follow-up,"Quick note after my dental visit: i have an appointment next month, though they asked for an update on the bleeding this week. I have not heard anything from the office since the visit."
+DN-0376,Appointment,"I still have questions about coverage, but the immediate task is cancelling Friday’s appointment. I need enough time to get across town."
+DN-0377,Billing,I want to know why the invoice includes an extra fee. I need to reconcile this with my records.
+DN-0378,Follow-up,Quick note after my dental visit: the insurer approved the crown; I still need to call the dentist back about the pain. It only bothers me when I chew on that side.
+DN-0379,Follow-up,I was thinking about this on the way home. They want an update on the irritation near my wisdom tooth. The area looks better than it did on Monday.
+DN-0380,Appointment,Quick note after my dental visit: the dentist mentioned a possible extraction and asked me to book a consultation. The office called while I was driving.
+DN-0381,Insurance,"My employer changed providers recently. I thought the X-rays were covered, but the statement is unclear."
+DN-0382,Follow-up,Quick note after my dental visit: i have to check back about the mouth guard fitting properly. I was distracted during the last part of the visit.
+DN-0383,Treatment,I had a root canal on the lower left tooth; they showed me the X-ray at the chair.
+DN-0384,Insurance,I was thinking about this on the way home. I received an explanation of benefits but do not understand the coverage. The paperwork is still sitting in my email.
+DN-0385,Treatment,"They mentioned periodontal treatment, though I do not know which option they recommend yet."
+DN-0386,Appointment,"Quick note after my dental visit: the treatment estimate arrived, and now I need to arrange the first visit. I need enough time to get across town."
+DN-0387,Appointment,I was thinking about this on the way home. Need to move my checkup because I will be away that week. The reminder text arrived while I was at work.
+DN-0388,Insurance,The online status is different from what I was told. I need to clarify whether my secondary insurance can be billed.
+DN-0389,Insurance,My plan might reimburse the specialist visit; I need to verify that. I have not received a response to the claim yet.
+DN-0390,Follow-up,I have the photos from last week if they need them. I cannot remember whether they wanted a photo of the gum or just a phone update.
+DN-0391,Insurance,"The insurer may have rejected the claim, though the portal still says pending. My employer changed providers recently."
+DN-0392,Appointment,I was thinking about this on the way home. I have to cancel tomorrow’s visit and choose another day. The calendar on my phone might be wrong.
+DN-0393,Follow-up,Quick note after my dental visit: they asked me to keep track of the pain and call with an update. It only bothers me when I chew on that side.
+DN-0394,Billing,I do not want to pay the same charge twice. I still owe forty dollars from my cleaning.
+DN-0395,Billing,Quick note after my dental visit: the office offered a payment plan for the balance. I paid by card rather than cash.
+DN-0396,Insurance,The portal has not updated since Friday. The clinic said it is possible the waiting period applies to this treatment.
+DN-0397,Insurance,The claim for my last visit was denied and I need an explanation. I cannot tell which plan year they are using.
+DN-0398,Appointment,I am on the waitlist for an earlier cleaning slot; i would prefer not to miss class.
+DN-0399,Appointment,I can make the Wednesday appointment if it starts after four. My work shifts have changed this month.
+DN-0400,Treatment,"My appointment was delayed, but they eventually fitted the new night guard; my mouth was numb for a while afterward."
+DN-0401,Follow-up,I should call in a week to let them know how the gum is healing.
+DN-0402,Billing,I need a receipt for the payment I made yesterday; the amount looked different on my statement.
+DN-0403,Billing,I was told the outstanding balance is due next week; the payment was supposed to go through last week.
+DN-0404,Insurance,The claim for my last visit was denied and I need an explanation; i have not received a response to the claim yet.
+DN-0405,Treatment,I had a loose crown recemented at the clinic. My mouth was numb for a while afterward.
+DN-0406,Appointment,I booked a cleaning for next Thursday morning. I am away for the long weekend.
+DN-0407,Billing,Quick note after my dental visit: i want to ask whether I can split the payment into two parts. I checked the banking app this morning.
+DN-0408,Billing,"The clinic may have billed me twice, although one charge could be pending."
+DN-0409,Treatment,It feels different when I bite down now. I had a small cavity repaired this afternoon.
+DN-0410,Follow-up,I should follow up on the referral they mentioned last time. I was distracted during the last part of the visit.
+DN-0411,Treatment,I had a small cavity repaired this afternoon. I was relieved that the visit was finished.
+DN-0412,Appointment,I need to reschedule the X-ray appointment; my work shifts have changed this month.
+DN-0413,Appointment,My appointment was confirmed by text this morning. I would prefer not to miss class.
+DN-0414,Billing,Quick note after my dental visit: i need an itemized invoice for my records. The office emailed a copy of the invoice.
+DN-0415,Insurance,Quick note after my dental visit: i received a bill for the filling and want to check how much the plan should cover. I have not received a response to the claim yet.
+DN-0416,Insurance,I have not received a response to the claim yet. The insurer says the waiting period applies to major work.
+DN-0417,Treatment,"The dentist discussed a possible night guard, but nothing has been fitted. I did not catch the name of the material."
+DN-0418,Billing,I need a copy of the receipt showing the tax breakdown.
+DN-0419,Billing,I need a receipt for the visit so I can submit it to insurance.
+DN-0420,Treatment,The hygienist cleaned below the gumline during my visit.
+DN-0421,Appointment,The office sent a reminder about my scheduled checkup; i can take a morning off if necessary.
+DN-0422,Treatment,I was thinking about this on the way home. The dentist applied fluoride varnish after the cleaning. I had been avoiding chewing on that side.
+DN-0423,Billing,Quick note after my dental visit: the clinic charged my card twice for the same visit. I kept the receipt from the front desk.
+DN-0424,Billing,I need to reconcile this with my records. There might be an extra charge on the bill; I need to compare receipts.
+DN-0425,Follow-up,"I have not heard anything from the office since the visit. I thought they would contact me about the X-ray, but maybe I am meant to call them."
+DN-0426,Billing,The office emailed a copy of the invoice. The estimate was lower than the final amount on my bill.
+DN-0427,Billing,The office offered a payment plan for the balance.
+DN-0428,Insurance,I received a bill for the filling and want to check how much the plan should cover.
+DN-0429,Insurance,The paperwork is still sitting in my email. I need to ask about coverage before I book the extraction.
+DN-0430,Appointment,Quick note after my dental visit: need to move my checkup because I will be away that week. I can usually get to the clinic after school pickup.
+DN-0431,Appointment,Quick note after my dental visit: i have to cancel tomorrow’s visit and choose another day. I am trying to avoid missing another visit.
+DN-0432,Treatment,Quick note after my dental visit: i had the damaged sealant replaced on a molar. They showed me the X-ray at the chair.
+DN-0433,Billing,I need to pay the remaining amount on my account. I checked the banking app this morning.
+DN-0434,Treatment,The dentist replaced my cracked filling today. They showed me the X-ray at the chair.
+DN-0435,Billing,The office offered a payment plan for the balance; i do not want to pay the same charge twice.
+DN-0436,Treatment,The dentist suggested a deep cleaning for my gums. It feels different when I bite down now.
+DN-0437,Insurance,The receptionist gave me a reference number. I have an appointment for the crown but need to know whether insurance will pay for it.
+DN-0438,Billing,The receipt is in my email somewhere. I need a copy of the receipt showing the tax breakdown.
+DN-0439,Treatment,The dentist applied fluoride varnish after the cleaning; they showed me the X-ray at the chair.
+DN-0440,Appointment,I am trying to avoid missing another visit. I put the hygienist visit on my calendar for Monday.
+DN-0441,Insurance,The paperwork is still sitting in my email. I need to send the treatment estimate to my insurance company.
+DN-0442,Insurance,The office said coverage could depend on the procedure code. The portal has not updated since Friday.
+DN-0443,Appointment,I have to cancel tomorrow’s visit and choose another day; the reminder text arrived while I was at work.
+DN-0444,Billing,I need to confirm that my e-transfer was received.
+DN-0445,Insurance,The clinic said they would submit the claim electronically; the online status is different from what I was told.
+DN-0446,Billing,Quick note after my dental visit: i need a receipt for the payment I made yesterday. I do not want to pay the same charge twice.
+DN-0447,Appointment,The office called while I was driving. I need to schedule the crown fitting once the insurer approves it.
+DN-0448,Insurance,"The receptionist gave me a reference number. I think the plan might cover the crown, but the estimate has not been approved."
+DN-0449,Appointment,I would prefer not to miss class. I need to book the next visit before the end of the month.
+DN-0450,Appointment,The office offered me a cancellation slot for Tuesday. I can take a morning off if necessary.
+DN-0451,Appointment,I was thinking about this on the way home. I need to reschedule the X-ray appointment. The office called while I was driving.
+DN-0452,Appointment,I was told there might be an opening for a checkup next week.
+DN-0453,Treatment,The dentist showed me where the damage was. They recommended a crown for the damaged molar.
+DN-0454,Billing,I cannot tell whether the refund has reached my card yet.
+DN-0455,Follow-up,They said to contact the office if the bleeding starts again.
+DN-0456,Treatment,The hygienist said the stain might need polishing or another procedure.
+DN-0457,Follow-up,"Quick note after my dental visit: they suggested an extraction, but first I have to report whether the antibiotics helped. The soreness was still there when I woke up."
+DN-0458,Billing,I paid by card rather than cash. There is a charge on my statement that I do not recognize.
+DN-0459,Appointment,My work shifts have changed this month. The office offered me a cancellation slot for Tuesday.
+DN-0460,Appointment,Quick note after my dental visit: my dental consultation is set for Friday at two. My work shifts have changed this month.
+DN-0461,Appointment,"I can take a morning off if necessary. I still have questions about coverage, but the immediate task is cancelling Friday’s appointment."
+DN-0462,Appointment,"Quick note after my dental visit: my gums still feel sore, so I want an earlier checkup slot. My work shifts have changed this month."
+DN-0463,Follow-up,I have to report whether the jaw clicking is getting worse; i have the photos from last week if they need them.
+DN-0464,Appointment,Quick note after my dental visit: the office offered me a cancellation slot for Tuesday. The office called while I was driving.
+DN-0465,Billing,I need a receipt for the payment I made yesterday.
+DN-0466,Insurance,The portal has not updated since Friday. I have to follow up with the benefits provider about the missing claim payment.
+DN-0467,Treatment,My mouth was numb for a while afterward. I booked next Tuesday to have the broken filling repaired.
+DN-0468,Appointment,Quick note after my dental visit: the dentist has an opening on the first Monday in June. I would prefer not to miss class.
+DN-0469,Appointment,"Insurance may cover the X-ray, and I need to confirm the appointment time; i am trying to avoid missing another visit."
+DN-0470,Insurance,I have not received a response to the claim yet. I was told my annual dental maximum might already be used up.
+DN-0471,Treatment,The dentist discussed extracting the tooth and said we can schedule it later; they explained the options before starting.
+DN-0472,Insurance,I should verify whether the fluoride treatment is eligible; the portal has not updated since Friday.
+DN-0473,Treatment,There was talk of extracting the tooth if the repair does not hold. I had been avoiding chewing on that side.
+DN-0474,Treatment,They put a temporary filling in while the tooth settles; it feels different when I bite down now.
+DN-0475,Treatment,"The crown may not be covered, but the dentist recommended it for the cracked molar. They explained the options before starting."
+DN-0476,Appointment,I am trying to avoid missing another visit. The dentist has an opening on the first Monday in June.
+DN-0477,Billing,I still owe forty dollars from my cleaning; i paid by card rather than cash.
+DN-0478,Treatment,I had a root canal on the lower left tooth. The tooth has been bothering me for weeks.
+DN-0479,Appointment,I was thinking about this on the way home. I am waiting for a call about an available appointment. I would prefer not to miss class.
+DN-0480,Treatment,I am waiting for insurance approval before the dentist can place the permanent crown.
+DN-0481,Appointment,I am waiting for a call about an available appointment; i am trying to avoid missing another visit.
+DN-0482,Treatment,The insurer wants more details about the periodontal cleaning they performed; the tooth has been bothering me for weeks.
+DN-0483,Insurance,I need to compare the details with my policy. I should verify whether the fluoride treatment is eligible.
+DN-0484,Billing,Quick note after my dental visit: i received a credit on my account after the adjustment. The payment was supposed to go through last week.
+DN-0485,Treatment,The dentist suggested a deep cleaning for my gums; they explained the options before starting.
+DN-0486,Billing,"I submitted a claim, but the clinic charged me twice at checkout. I kept the receipt from the front desk."
+DN-0487,Follow-up,I need to check whether the swelling has gone down since my last visit; i was distracted during the last part of the visit.
+DN-0488,Appointment,The office offered me a cancellation slot for Tuesday.
+DN-0489,Follow-up,It seems worse in the evenings. There was some discussion about contacting the specialist again if the symptoms remain.
+DN-0490,Billing,The office refunded the overpayment from last month.
+DN-0491,Insurance,"I need to compare the details with my policy. My checkup went well, though the insurer denied the fluoride charge."
+DN-0492,Treatment,The dentist said the cracked tooth may be repairable without removing it. It feels different when I bite down now.
+DN-0493,Appointment,Quick note after my dental visit: i put the hygienist visit on my calendar for Monday. I would prefer not to miss class.
+DN-0494,Insurance,I need the insurer to explain why the crown claim was reduced; i have the benefits card in my wallet.
+DN-0495,Billing,I was thinking about this on the way home. I want to know why the invoice includes an extra fee. The office emailed a copy of the invoice.
+DN-0496,Treatment,I did not catch the name of the material. The hygienist cleaned below the gumline during my visit.
+DN-0497,Follow-up,They asked me to keep track of the pain and call with an update.
+DN-0498,Treatment,The dentist discussed whether a filling or crown would work better.
+DN-0499,Follow-up,I had a filling yesterday and need to tell the dentist whether the ache settles; i was distracted during the last part of the visit.
+DN-0500,Insurance,"I paid the clinic, but the reimbursement claim has not appeared in my benefits portal; i cannot tell which plan year they are using."
+DN-0501,Insurance,The benefits provider may need another document before deciding. The insurer told me to keep the estimate.
+DN-0502,Follow-up,I was thinking about this on the way home. The hygienist wants to know whether the new brushing routine helped. The dentist said it might take a few days to settle.
+DN-0503,Insurance,I received a bill for the filling and want to check how much the plan should cover. I have the benefits card in my wallet.
+DN-0504,Insurance,I was thinking about this on the way home. The office is waiting for approval from my insurer. I have not received a response to the claim yet.
+DN-0505,Treatment,"They asked me to return for a check, after adjusting the filling today; i did not catch the name of the material."
+DN-0506,Insurance,"Quick note after my dental visit: my checkup went well, though the insurer denied the fluoride charge. The paperwork is still sitting in my email."
+DN-0507,Treatment,They showed me the X-ray at the chair. I was told I may need an extraction for the broken tooth.
+DN-0508,Billing,The cashier said my account is now fully paid. The payment was supposed to go through last week.
+DN-0509,Billing,I was thinking about this on the way home. I still owe forty dollars from my cleaning. I checked the banking app this morning.
+DN-0510,Insurance,The clinic said they would submit the claim electronically. The receptionist gave me a reference number.
+DN-0511,Treatment,The dentist discussed whether a filling or crown would work better; i did not catch the name of the material.
+DN-0512,Treatment,Quick note after my dental visit: the dentist applied fluoride varnish after the cleaning. My mouth was numb for a while afterward.
+DN-0513,Treatment,The dentist said the cracked tooth may be repairable without removing it.
+DN-0514,Follow-up,Quick note after my dental visit: the crown feels high when I bite; I need to contact the dentist with an update. I was distracted during the last part of the visit.
+DN-0515,Appointment,The reminder text arrived while I was at work. I asked for a morning appointment because of work.
+DN-0516,Insurance,"The insurer told me to keep the estimate. The insurer may have rejected the claim, though the portal still says pending."
+DN-0517,Insurance,I was thinking about this on the way home. The claim was submitted but the reimbursement has not been processed. The insurer told me to keep the estimate.
+DN-0518,Insurance,Quick note after my dental visit: my dental benefits changed when I switched employers. I cannot tell which plan year they are using.
+DN-0519,Appointment,Quick note after my dental visit: i booked a cleaning for next Thursday morning. I can take a morning off if necessary.
+DN-0520,Insurance,The insurer says the waiting period applies to major work. The receptionist gave me a reference number.
+DN-0521,Insurance,The paperwork is still sitting in my email. The office said coverage could depend on the procedure code.
+DN-0522,Treatment,They put a temporary filling in while the tooth settles. The dentist showed me where the damage was.
+DN-0523,Insurance,Quick note after my dental visit: i need to find out whether the specialist is covered. My employer changed providers recently.
+DN-0524,Appointment,I need enough time to get across town. I may need to move the appointment if my work schedule changes.
+DN-0525,Billing,I need to confirm that my e-transfer was received. I kept the receipt from the front desk.
+DN-0526,Insurance,Quick note after my dental visit: the insurer asked for a predetermination before the procedure. The portal has not updated since Friday.
+DN-0527,Treatment,I had been avoiding chewing on that side. The insurer wants more details about the periodontal cleaning they performed.
+DN-0528,Follow-up,The area looks better than it did on Monday. The crown feels high when I bite; I need to contact the dentist with an update.
+DN-0529,Follow-up,The area looks better than it did on Monday. I have to check back about the mouth guard fitting properly.
+DN-0530,Follow-up,I was thinking about this on the way home. I have to report whether the jaw clicking is getting worse. I have not heard anything from the office since the visit.
+DN-0531,Follow-up,I was distracted during the last part of the visit. They want an update on the irritation near my wisdom tooth.
+DN-0532,Insurance,Quick note after my dental visit: i need the insurer to explain why the crown claim was reduced. I cannot tell which plan year they are using.
+DN-0533,Insurance,I was thinking about this on the way home. My benefits provider needs the procedure code for the estimate. The online status is different from what I was told.
+DN-0534,Follow-up,The crown feels high when I bite; I need to contact the dentist with an update. The soreness was still there when I woke up.
+DN-0535,Billing,The amount looked different on my statement. The office offered a payment plan for the balance.
+DN-0536,Insurance,The claim was submitted but the reimbursement has not been processed.
+DN-0537,Follow-up,Quick note after my dental visit: i have to report whether the jaw clicking is getting worse. I noticed it again while eating breakfast.
+DN-0538,Treatment,The dentist fitted a temporary bridge today.
+DN-0539,Insurance,The online status is different from what I was told. My plan might reimburse the specialist visit; I need to verify that.
+DN-0540,Billing,I am unsure whether the account balance includes my last payment.
+DN-0541,Follow-up,Quick note after my dental visit: they want an update on the irritation near my wisdom tooth. The soreness was still there when I woke up.
+DN-0542,Insurance,I was thinking about this on the way home. I need to find out whether the specialist is covered. The insurer told me to keep the estimate.
+DN-0543,Follow-up,"The bill came through, but I am more concerned about checking whether the swelling has returned; i have not heard anything from the office since the visit."
+DN-0544,Insurance,Quick note after my dental visit: my plan only covers one cleaning within the benefit period. The paperwork is still sitting in my email.
+DN-0545,Billing,I need an itemized invoice for my records. The payment was supposed to go through last week.
+DN-0546,Follow-up,I was thinking about this on the way home. I need to check whether the swelling has gone down since my last visit. The soreness was still there when I woke up.
+DN-0547,Insurance,The office sent the estimate for the bridge and is waiting for insurer approval.
+DN-0548,Billing,I want to ask whether I can split the payment into two parts; the receipt is in my email somewhere.
+DN-0549,Appointment,I asked for a morning appointment because of work; i am trying to avoid missing another visit.
+DN-0550,Treatment,"The bill lists a root canal, which is the procedure I had on Monday; the dentist showed me where the damage was."
+DN-0551,Treatment,I was thinking about this on the way home. The dentist adjusted my bite after placing the new filling. It feels different when I bite down now.
+DN-0552,Treatment,I had a loose crown recemented at the clinic; the tooth has been bothering me for weeks.
+DN-0553,Insurance,I have to follow up with the benefits provider about the missing claim payment; the paperwork is still sitting in my email.
+DN-0554,Billing,Quick note after my dental visit: my cleaning is booked and there is still an unpaid balance on my account. I kept the receipt from the front desk.
+DN-0555,Billing,Not sure whether the deposit was applied to the final invoice.
+DN-0556,Insurance,The portal has not updated since Friday. The claim was submitted but the reimbursement has not been processed.
+DN-0557,Billing,The estimate was lower than the final amount on my bill; i need to reconcile this with my records.
+DN-0558,Billing,The receipt is in my email somewhere. The office said I can split the charge for the bridge into monthly payments.
+DN-0559,Appointment,"They offered a cancellation slot, but I have not decided whether I can take it. I can take a morning off if necessary."
+DN-0560,Billing,"I am waiting for a reimbursement, but the payment deadline is this Friday. I am trying to sort out my monthly expenses."
+DN-0561,Appointment,"I need enough time to get across town. My gums still feel sore, so I want an earlier checkup slot."
+DN-0562,Insurance,I need to check whether my plan covers a new crown. I cannot tell which plan year they are using.
+DN-0563,Billing,The office said I can split the charge for the bridge into monthly payments.
+DN-0564,Treatment,Quick note after my dental visit: they examined the cracked tooth and recommended a repair. I did not catch the name of the material.
+DN-0565,Appointment,I have to cancel tomorrow’s visit and choose another day. I would prefer not to miss class.
+DN-0566,Treatment,I was told I may need an extraction for the broken tooth.
+DN-0567,Treatment,I cannot tell whether they recommended a deep cleaning or just more frequent regular cleanings.
+DN-0568,Appointment,"Quick note after my dental visit: i owe a balance from my last visit, but I am trying to move tomorrow’s cleaning. I can usually get to the clinic after school pickup."
+DN-0569,Treatment,They removed plaque buildup around the back teeth; i was relieved that the visit was finished.
+DN-0570,Treatment,Quick note after my dental visit: i am waiting for insurance approval before the dentist can place the permanent crown. They showed me the X-ray at the chair.
+DN-0571,Treatment,Quick note after my dental visit: i had a small cavity repaired this afternoon. They explained the options before starting.
+DN-0572,Treatment,"The bill lists a root canal, which is the procedure I had on Monday. I did not catch the name of the material."
+DN-0573,Follow-up,Quick note after my dental visit: i promised to send a photo if the redness does not improve. I have not heard anything from the office since the visit.
+DN-0574,Insurance,"I thought the X-rays were covered, but the statement is unclear."
+DN-0575,Insurance,I need to send the treatment estimate to my insurance company.
+DN-0576,Treatment,I was relieved that the visit was finished. They put a temporary filling in while the tooth settles.
+DN-0577,Billing,The payment terminal did not accept my card at checkout.
+DN-0578,Appointment,I may need to move the appointment if my work schedule changes. The office called while I was driving.
+DN-0579,Treatment,I did not catch the name of the material. The dentist suggested a deep cleaning for my gums.
+DN-0580,Insurance,"The dentist recommended deep cleaning, and the insurer requested more documentation. My employer changed providers recently."
+DN-0581,Appointment,"My gums still feel sore, so I want an earlier checkup slot."
+DN-0582,Appointment,The clinic moved my appointment to the afternoon; i need enough time to get across town.
+DN-0583,Follow-up,It only bothers me when I chew on that side. I need to ask if the numb feeling should still be there.
+DN-0584,Billing,The amount looked different on my statement. I need to pay the remaining amount on my account.
+DN-0585,Follow-up,The dentist said it might take a few days to settle. Not sure whether I should report this soreness now or wait a few more days.
+DN-0586,Appointment,The dentist mentioned a possible extraction and asked me to book a consultation; i am away for the long weekend.
+DN-0587,Follow-up,"I was distracted during the last part of the visit. They suggested an extraction, but first I have to report whether the antibiotics helped."
+DN-0588,Follow-up,I promised to send a photo if the redness does not improve. The dentist said it might take a few days to settle.
+DN-0589,Insurance,The insurer requested the dentist’s supporting notes. The paperwork is still sitting in my email.
+DN-0590,Treatment,The dentist adjusted my bite after placing the new filling. I did not catch the name of the material.
+DN-0591,Billing,"I am waiting for a reimbursement, but the payment deadline is this Friday."
+DN-0592,Appointment,"The calendar on my phone might be wrong. I think the office moved my visit to the afternoon, though I need to check."
+DN-0593,Insurance,I have an appointment for the crown but need to know whether insurance will pay for it; i have not received a response to the claim yet.
+DN-0594,Follow-up,"I noticed it again while eating breakfast. The bill came through, but I am more concerned about checking whether the swelling has returned."
+DN-0595,Appointment,I still need to call reception to arrange a consultation. The calendar on my phone might be wrong.
+DN-0596,Insurance,I have to follow up with the benefits provider about the missing claim payment.
+DN-0597,Insurance,Quick note after my dental visit: the insurer requested the dentist’s supporting notes. I need to compare the details with my policy.
+DN-0598,Treatment,They discussed using a night guard for grinding. I had been avoiding chewing on that side.
+DN-0599,Treatment,I was thinking about this on the way home. I had a small cavity repaired this afternoon. The dentist showed me where the damage was.
+DN-0600,Follow-up,The office requested an update on the sore spot under my denture. The dentist said it might take a few days to settle.
+DN-0601,Insurance,"I thought the X-rays were covered, but the statement is unclear. The paperwork is still sitting in my email."
+DN-0602,Appointment,"I think reception pencilled me in, but they said they would call to confirm."
+DN-0603,Billing,"The amount due looks different from the estimate, but I may have missed a fee. I need to reconcile this with my records."
+DN-0604,Appointment,The dentist mentioned a possible extraction and asked me to book a consultation.
+DN-0605,Follow-up,The soreness was still there when I woke up. The insurer approved the crown; I still need to call the dentist back about the pain.
+DN-0606,Follow-up,"I think I am supposed to check back about the night guard, but nothing is arranged yet. I have not heard anything from the office since the visit."
+DN-0607,Billing,I want to know why the invoice includes an extra fee.
+DN-0608,Follow-up,I was thinking about this on the way home. I have to check back about the mouth guard fitting properly. It seems worse in the evenings.
+DN-0609,Follow-up,The dentist said it might take a few days to settle. The dentist asked me to report back if the sensitivity continues.
+DN-0610,Billing,Quick note after my dental visit: i need a receipt for the visit so I can submit it to insurance. I paid by card rather than cash.
+DN-0611,Follow-up,The area looks better than it did on Monday. They said to keep an eye on the temporary filling and let them know if anything changes.
+DN-0612,Billing,I have to ask reception about the deposit before my appointment.
+DN-0613,Insurance,"The dentist recommended deep cleaning, and the insurer requested more documentation."
+DN-0614,Billing,"The clinic may have billed me twice, although one charge could be pending. I kept the receipt from the front desk."
+DN-0615,Follow-up,"I wrote down the symptoms over the weekend. The claim is still pending, and I should ask whether the temporary filling can wait."
+DN-0616,Appointment,I need to book the next visit before the end of the month; i can usually get to the clinic after school pickup.
+DN-0617,Follow-up,"Quick note after my dental visit: the bill came through, but I am more concerned about checking whether the swelling has returned. I wrote down the symptoms over the weekend."
+DN-0618,Billing,I kept the receipt from the front desk. I am unsure whether the account balance includes my last payment.
+DN-0619,Follow-up,"I thought they would contact me about the X-ray, but maybe I am meant to call them."
+DN-0620,Billing,Quick note after my dental visit: the root canal went fine; the problem is the extra fee on the bill. I am trying to sort out my monthly expenses.
+DN-0621,Appointment,Quick note after my dental visit: i still need to call reception to arrange a consultation. The reminder text arrived while I was at work.
+DN-0622,Follow-up,I have not heard back about the specialist recommendation. I have not heard anything from the office since the visit.
+DN-0623,Insurance,"My checkup went well, though the insurer denied the fluoride charge. The insurer told me to keep the estimate."
+DN-0624,Appointment,I was thinking about this on the way home. The office sent a reminder about my scheduled checkup. I am away for the long weekend.
+DN-0625,Appointment,I put the hygienist visit on my calendar for Monday.
+DN-0626,Insurance,Quick note after my dental visit: i need to check whether my plan covers a new crown. The online status is different from what I was told.
+DN-0627,Billing,There is a charge for an X-ray that I do not remember paying for.
+DN-0628,Insurance,The clinic said they would submit the claim electronically.
+DN-0629,Insurance,The claim was submitted but the reimbursement has not been processed; the paperwork is still sitting in my email.
+DN-0630,Insurance,The claim was submitted but the reimbursement has not been processed. I need to compare the details with my policy.
+DN-0631,Follow-up,I need to ask about the test result they said would come later.
+DN-0632,Follow-up,"The claim is still pending, and I should ask whether the temporary filling can wait; the dentist said it might take a few days to settle."
+DN-0633,Billing,I was thinking about this on the way home. I need an itemized invoice for my records. I need to reconcile this with my records.
+DN-0634,Insurance,I have an appointment for the crown but need to know whether insurance will pay for it.
+DN-0635,Treatment,I was thinking about this on the way home. They recommended a crown for the damaged molar. I did not catch the name of the material.
+DN-0636,Treatment,I was thinking about this on the way home. The dentist replaced my cracked filling today. I was nervous about what they might find.
+DN-0637,Treatment,Quick note after my dental visit: the dentist polished the chipped edge of my front tooth. I was nervous about what they might find.
+DN-0638,Insurance,I was thinking about this on the way home. The insurer says the waiting period applies to major work. I cannot tell which plan year they are using.
+DN-0639,Insurance,I received a bill for the filling and want to check how much the plan should cover; the receptionist gave me a reference number.
+DN-0640,Billing,Quick note after my dental visit: i still owe forty dollars from my cleaning. The receipt is in my email somewhere.
+DN-0641,Insurance,I was thinking about this on the way home. The insurance company requested more information about the X-ray. The portal has not updated since Friday.
+DN-0642,Appointment,I was thinking about this on the way home. The office offered me a cancellation slot for Tuesday. I need enough time to get across town.
+DN-0643,Insurance,I need to clarify whether my secondary insurance can be billed. I have not received a response to the claim yet.
+DN-0644,Insurance,I was thinking about this on the way home. The claim for my last visit was denied and I need an explanation. I have the benefits card in my wallet.
+DN-0645,Appointment,"Quick note after my dental visit: i still have questions about coverage, but the immediate task is cancelling Friday’s appointment. I am away for the long weekend."
+DN-0646,Treatment,The dentist took impressions for a replacement crown. They showed me the X-ray at the chair.
+DN-0647,Insurance,I have to follow up with the benefits provider about the missing claim payment. I need to compare the details with my policy.
+DN-0648,Follow-up,I was thinking about this on the way home. I want to check what the dentist thought of the X-rays from last week. I have the photos from last week if they need them.
+DN-0649,Treatment,Quick note after my dental visit: the dentist took impressions for a replacement crown. The tooth has been bothering me for weeks.
+DN-0650,Billing,"I kept the receipt from the front desk. I have a follow-up visit coming, and I need to settle the old balance first."
+DN-0651,Treatment,Quick note after my dental visit: i booked next Tuesday to have the broken filling repaired. The tooth has been bothering me for weeks.
+DN-0652,Appointment,I am on the waitlist for an earlier cleaning slot.
+DN-0653,Insurance,Quick note after my dental visit: the insurer says the waiting period applies to major work. I have the benefits card in my wallet.
+DN-0654,Appointment,The clinic sent an invoice while I was trying to reschedule the root canal; i can usually get to the clinic after school pickup.
+DN-0655,Follow-up,The insurer approved the crown; I still need to call the dentist back about the pain; the area looks better than it did on Monday.
+DN-0656,Follow-up,I was thinking about this on the way home. Need to ask whether the soreness after the filling is normal. I have the photos from last week if they need them.
+DN-0657,Appointment,I am waiting for a call about an available appointment.
+DN-0658,Treatment,"The dentist showed me where the damage was. The crown may not be covered, but the dentist recommended it for the cracked molar."
+DN-0659,Billing,I was thinking about this on the way home. I need to pay the remaining amount on my account. The receipt is in my email somewhere.
+DN-0660,Appointment,"The dentist suggested coming back soon, and I still need to arrange a time. I need enough time to get across town."
+DN-0661,Follow-up,I need to ask if the numb feeling should still be there; i was distracted during the last part of the visit.
+DN-0662,Treatment,The tooth has been bothering me for weeks. I am waiting for insurance approval before the dentist can place the permanent crown.
+DN-0663,Follow-up,"The claim is still pending, and I should ask whether the temporary filling can wait. I have not heard anything from the office since the visit."
+DN-0664,Follow-up,I have to report whether the jaw clicking is getting worse.
+DN-0665,Billing,There might be an extra charge on the bill; I need to compare receipts. The office emailed a copy of the invoice.
+DN-0666,Appointment,"Insurance may cover the X-ray, and I need to confirm the appointment time."
+DN-0667,Appointment,Need to move my checkup because I will be away that week.
+DN-0668,Treatment,I had a small cavity repaired this afternoon.
+DN-0669,Treatment,I was thinking about this on the way home. The hygienist cleaned below the gumline during my visit. I was relieved that the visit was finished.
+DN-0670,Insurance,The clinic can schedule the consultation once the coverage details are confirmed. The paperwork is still sitting in my email.
+DN-0671,Follow-up,I was thinking about this on the way home. I have not heard back about the specialist recommendation. I noticed it again while eating breakfast.
+DN-0672,Appointment,The dentist has an opening on the first Monday in June; the calendar on my phone might be wrong.
+DN-0673,Insurance,My benefits provider needs the procedure code for the estimate. I have the benefits card in my wallet.
+DN-0674,Follow-up,I was distracted during the last part of the visit. I need to ask about the test result they said would come later.
+DN-0675,Follow-up,I was thinking about this on the way home. I should call in a week to let them know how the gum is healing. I was distracted during the last part of the visit.
+DN-0676,Billing,I paid by card rather than cash. I have to ask reception about the deposit before my appointment.
+DN-0677,Billing,I was thinking about this on the way home. The office refunded the overpayment from last month. The office emailed a copy of the invoice.
+DN-0678,Appointment,Quick note after my dental visit: i have a referral for a specialist and need to book the consultation. I would prefer not to miss class.
+DN-0679,Appointment,I have to cancel tomorrow’s visit and choose another day.
+DN-0680,Billing,"I do not want to pay the same charge twice. I think I paid the balance, but the invoice still shows an amount due."
+DN-0681,Treatment,The dentist discussed extracting the tooth and said we can schedule it later. It feels different when I bite down now.
+DN-0682,Follow-up,I got a reminder for my checkup and still need to report the jaw clicking; the soreness was still there when I woke up.
+DN-0683,Follow-up,They said to contact the office if the bleeding starts again. I have not heard anything from the office since the visit.
+DN-0684,Billing,I want to ask whether I can split the payment into two parts. I do not want to pay the same charge twice.
+DN-0685,Follow-up,I need to ask if the numb feeling should still be there.
+DN-0686,Billing,"I submitted a claim, but the clinic charged me twice at checkout."
+DN-0687,Treatment,"Quick note after my dental visit: they asked me to return for a check, after adjusting the filling today. They explained the options before starting."
+DN-0688,Treatment,I need to check back on the healing after they removed the wisdom tooth; it feels different when I bite down now.
+DN-0689,Billing,I need an itemized invoice for my records; i am trying to sort out my monthly expenses.
+DN-0690,Appointment,The receptionist said the earliest opening is in three weeks. My work shifts have changed this month.
+DN-0691,Treatment,The dentist took impressions for a replacement crown.
+DN-0692,Treatment,Quick note after my dental visit: the dentist adjusted my bite after placing the new filling. I was relieved that the visit was finished.
+DN-0693,Follow-up,"I have not heard anything from the office since the visit. I paid the invoice, and now I need to check in about the soreness after treatment."
+DN-0694,Appointment,"I would prefer not to miss class. The reminder says Tuesday, but I had written Wednesday in my calendar."
+DN-0695,Insurance,The office sent the estimate for the bridge and is waiting for insurer approval; the online status is different from what I was told.
+DN-0696,Follow-up,I should message the clinic if the temporary filling starts to hurt.
+DN-0697,Billing,The office said I can split the charge for the bridge into monthly payments. I paid by card rather than cash.
+DN-0698,Follow-up,I have not heard anything from the office since the visit. Need to ask whether the soreness after the filling is normal.
+DN-0699,Billing,The clinic charged my card twice for the same visit.
+DN-0700,Treatment,I am waiting for insurance approval before the dentist can place the permanent crown. I had been avoiding chewing on that side.
+DN-0701,Billing,"Insurance covered part of the filling, but I need to pay the rest of the invoice; i paid by card rather than cash."
+DN-0702,Insurance,My dental benefits changed when I switched employers.
+DN-0703,Insurance,I need to compare the details with my policy. My plan only covers one cleaning within the benefit period.
+DN-0704,Insurance,I received an explanation of benefits but do not understand the coverage.
+DN-0705,Appointment,I was thinking about this on the way home. I can make the Wednesday appointment if it starts after four. I can take a morning off if necessary.
+DN-0706,Insurance,The clinic can schedule the consultation once the coverage details are confirmed.
+DN-0707,Appointment,My dental consultation is set for Friday at two. The office called while I was driving.
+DN-0708,Appointment,My work shifts have changed this month. Need to coordinate the kids’ dental appointments for the same day.
+DN-0709,Appointment,"I think the office moved my visit to the afternoon, though I need to check. I am trying to avoid missing another visit."
+DN-0710,Follow-up,I noticed it again while eating breakfast. I am supposed to check in after trying the fluoride rinse.
+DN-0711,Insurance,I cannot tell which plan year they are using. I cannot tell whether the payment from insurance is still processing or was denied.
+DN-0712,Billing,I still owe forty dollars from my cleaning.
+DN-0713,Appointment,"I can usually get to the clinic after school pickup. The filling has been uncomfortable, so I asked reception for a visit next week."
+DN-0714,Billing,I still owe forty dollars from my cleaning. The amount looked different on my statement.
+DN-0715,Follow-up,"I have the photos from last week if they need them. I have an appointment next month, though they asked for an update on the bleeding this week."
+DN-0716,Insurance,I need to compare the details with my policy. The benefits provider may need another document before deciding.
+DN-0717,Billing,Quick note after my dental visit: the estimate was lower than the final amount on my bill. The payment was supposed to go through last week.
+DN-0718,Appointment,The dentist has an opening on the first Monday in June. The reminder text arrived while I was at work.
+DN-0719,Follow-up,Quick note after my dental visit: i got a reminder for my checkup and still need to report the jaw clicking. The area looks better than it did on Monday.
+DN-0720,Insurance,I want to confirm the annual maximum remaining on my plan; the receptionist gave me a reference number.
+DN-0721,Appointment,I need enough time to get across town. My dental consultation is set for Friday at two.
+DN-0722,Billing,The estimate was lower than the final amount on my bill.
+DN-0723,Treatment,"Quick note after my dental visit: the crown may not be covered, but the dentist recommended it for the cracked molar. It feels different when I bite down now."
+DN-0724,Follow-up,"I am unsure whether the dentist has reviewed the referral, so I may need to ask. I have the photos from last week if they need them."
+DN-0725,Billing,"I think I paid the balance, but the invoice still shows an amount due. The amount looked different on my statement."
+DN-0726,Billing,The office emailed a copy of the invoice. I received a credit on my account after the adjustment.
+DN-0727,Insurance,"I paid the clinic, but the reimbursement claim has not appeared in my benefits portal. The online status is different from what I was told."
+DN-0728,Treatment,I booked next Tuesday to have the broken filling repaired; i had been avoiding chewing on that side.
+DN-0729,Billing,My cleaning is booked and there is still an unpaid balance on my account; the payment was supposed to go through last week.
+DN-0730,Follow-up,It only bothers me when I chew on that side. I had a filling yesterday and need to tell the dentist whether the ache settles.
+DN-0731,Appointment,"My gums still feel sore, so I want an earlier checkup slot; i can take a morning off if necessary."
+DN-0732,Billing,"The dentist recommended a crown, and I need an itemized estimate of the charges. The receipt is in my email somewhere."
+DN-0733,Insurance,Quick note after my dental visit: i want to confirm the annual maximum remaining on my plan. I have not received a response to the claim yet.
+DN-0734,Appointment,I am away for the long weekend. I can make the Wednesday appointment if it starts after four.
+DN-0735,Billing,"I have a follow-up visit coming, and I need to settle the old balance first."
+DN-0736,Follow-up,The hygienist wants to know whether the new brushing routine helped.
+DN-0737,Appointment,I was thinking about this on the way home. Need to coordinate the kids’ dental appointments for the same day. I need enough time to get across town.
+DN-0738,Treatment,I was thinking about this on the way home. The dentist took impressions for a replacement crown. I was nervous about what they might find.
+DN-0739,Billing,"Quick note after my dental visit: insurance covered part of the filling, but I need to pay the rest of the invoice. The receipt is in my email somewhere."
+DN-0740,Follow-up,I should call in a week to let them know how the gum is healing; the area looks better than it did on Monday.
+DN-0741,Insurance,My benefits portal still shows the dental claim as pending; i cannot tell which plan year they are using.
+DN-0742,Billing,I received a credit on my account after the adjustment; i need to reconcile this with my records.
+DN-0743,Follow-up,I was thinking about this on the way home. I need to ask if the numb feeling should still be there. The soreness was still there when I woke up.
+DN-0744,Appointment,The office sent a reminder about my scheduled checkup.
+DN-0745,Insurance,The claim for my last visit was denied and I need an explanation.
+DN-0746,Treatment,I cannot tell whether they recommended a deep cleaning or just more frequent regular cleanings. I was relieved that the visit was finished.
+DN-0747,Treatment,I was thinking about this on the way home. The dentist discussed whether a filling or crown would work better. The dentist showed me where the damage was.
+DN-0748,Follow-up,I was thinking about this on the way home. They asked me to keep track of the pain and call with an update. I was distracted during the last part of the visit.
+DN-0749,Treatment,The hygienist explained the periodontal treatment plan. I did not catch the name of the material.
+DN-0750,Appointment,"The reminder text arrived while I was at work. Insurance may cover the X-ray, and I need to confirm the appointment time."
+DN-0751,Treatment,I was told the old filling may have to be replaced if the sensitivity continues.
+DN-0752,Treatment,I was nervous about what they might find. I still owe for the visit when they replaced the temporary bridge.
+DN-0753,Treatment,Quick note after my dental visit: the hygienist cleaned below the gumline during my visit. The dentist showed me where the damage was.
+DN-0754,Appointment,I was thinking about this on the way home. I still need to call reception to arrange a consultation. I am trying to avoid missing another visit.
+DN-0755,Insurance,The office said coverage could depend on the procedure code.
+DN-0756,Insurance,I should verify whether the fluoride treatment is eligible.
+DN-0757,Billing,The office said I can split the charge for the bridge into monthly payments; i checked the banking app this morning.
+DN-0758,Insurance,I need to check whether my plan covers a new crown; i have not received a response to the claim yet.
+DN-0759,Insurance,"Quick note after my dental visit: the dentist recommended deep cleaning, and the insurer requested more documentation. The portal has not updated since Friday."
+DN-0760,Billing,I was thinking about this on the way home. There is a charge on my statement that I do not recognize. The amount looked different on my statement.
+DN-0761,Insurance,The insurer asked for a predetermination before the procedure; i need to compare the details with my policy.
+DN-0762,Treatment,I was thinking about this on the way home. They examined the cracked tooth and recommended a repair. They explained the options before starting.
+DN-0763,Appointment,I can usually get to the clinic after school pickup. My appointment was confirmed by text this morning.
+DN-0764,Follow-up,"I wrote down the symptoms over the weekend. I think I am supposed to check back about the night guard, but nothing is arranged yet."
+DN-0765,Appointment,I was thinking about this on the way home. I asked for a morning appointment because of work. I would prefer not to miss class.
+DN-0766,Treatment,"The crown may not be covered, but the dentist recommended it for the cracked molar; i was relieved that the visit was finished."
+DN-0767,Treatment,The hygienist explained the periodontal treatment plan; the dentist showed me where the damage was.
+DN-0768,Billing,Quick note after my dental visit: i paid the deposit for the dental work today. The amount looked different on my statement.
+DN-0769,Follow-up,I should follow up on the referral they mentioned last time.
+DN-0770,Treatment,I had been avoiding chewing on that side. I had a loose crown recemented at the clinic.
+DN-0771,Billing,The payment was supposed to go through last week. The root canal went fine; the problem is the extra fee on the bill.
+DN-0772,Insurance,"I think the plan might cover the crown, but the estimate has not been approved. I cannot tell which plan year they are using."
+DN-0773,Billing,"I submitted a claim, but the clinic charged me twice at checkout; the office emailed a copy of the invoice."
+DN-0774,Appointment,Quick note after my dental visit: i am on the waitlist for an earlier cleaning slot. I can usually get to the clinic after school pickup.
+DN-0775,Insurance,I was thinking about this on the way home. My benefits portal still shows the dental claim as pending. I have not received a response to the claim yet.
+DN-0776,Follow-up,I was thinking about this on the way home. I promised to send a photo if the redness does not improve. I wrote down the symptoms over the weekend.
+DN-0777,Appointment,Quick note after my dental visit: the clinic moved my appointment to the afternoon. I can take a morning off if necessary.
+DN-0778,Insurance,The insurance company requested more information about the X-ray. The paperwork is still sitting in my email.
+DN-0779,Billing,I was thinking about this on the way home. The estimate was lower than the final amount on my bill. I kept the receipt from the front desk.
+DN-0780,Insurance,My plan only covers one cleaning within the benefit period.
+DN-0781,Insurance,The portal has not updated since Friday. I need to find out whether the specialist is covered.
+DN-0782,Appointment,"Quick note after my dental visit: the filling has been uncomfortable, so I asked reception for a visit next week. I am trying to avoid missing another visit."
+DN-0783,Billing,The cashier said my account is now fully paid; i am trying to sort out my monthly expenses.
+DN-0784,Appointment,Not sure whether I booked the consultation or only asked about availability. I can usually get to the clinic after school pickup.
+DN-0785,Billing,I was thinking about this on the way home. The clinic sent a reminder about an unpaid invoice. I paid by card rather than cash.
+DN-0786,Billing,The invoice shows a balance that I thought I had already paid.
+DN-0787,Treatment,The hygienist said the stain might need polishing or another procedure. The dentist showed me where the damage was.
+DN-0788,Insurance,The insurance company requested more information about the X-ray.
+DN-0789,Appointment,Quick note after my dental visit: i need to book the next visit before the end of the month. The reminder text arrived while I was at work.
+DN-0790,Insurance,Quick note after my dental visit: i should verify whether the fluoride treatment is eligible. The paperwork is still sitting in my email.
+DN-0791,Billing,I checked the banking app this morning. I need a receipt for the payment I made yesterday.
+DN-0792,Appointment,My work shifts have changed this month. The dentist mentioned a possible extraction and asked me to book a consultation.
+DN-0793,Appointment,The receptionist said the earliest opening is in three weeks; the office called while I was driving.
+DN-0794,Billing,Quick note after my dental visit: the clinic sent a reminder about an unpaid invoice. I do not want to pay the same charge twice.
+DN-0795,Appointment,"I think reception pencilled me in, but they said they would call to confirm. The reminder text arrived while I was at work."
+DN-0796,Billing,Quick note after my dental visit: i have to ask reception about the deposit before my appointment. I checked the banking app this morning.
+DN-0797,Follow-up,"I am unsure whether the dentist has reviewed the referral, so I may need to ask."
+DN-0798,Follow-up,I was thinking about this on the way home. They said to contact the office if the bleeding starts again. I noticed it again while eating breakfast.
+DN-0799,Follow-up,It seems worse in the evenings. I should follow up on the referral they mentioned last time.
+DN-0800,Appointment,"The reminder says Tuesday, but I had written Wednesday in my calendar."
+DN-0801,Treatment,"My appointment was delayed, but they eventually fitted the new night guard. I was nervous about what they might find."
+DN-0802,Follow-up,I need to check whether the swelling has gone down since my last visit.
+DN-0803,Insurance,I was thinking about this on the way home. I should verify whether the fluoride treatment is eligible. My employer changed providers recently.
+DN-0804,Follow-up,Quick note after my dental visit: the dentist asked me to report back if the sensitivity continues. I noticed it again while eating breakfast.
+DN-0805,Insurance,I was told my annual dental maximum might already be used up.
+DN-0806,Follow-up,The office requested an update on the sore spot under my denture; i noticed it again while eating breakfast.
+DN-0807,Follow-up,I have to report whether the jaw clicking is getting worse. I wrote down the symptoms over the weekend.
+DN-0808,Appointment,I was thinking about this on the way home. I put the hygienist visit on my calendar for Monday. I can usually get to the clinic after school pickup.
+DN-0809,Billing,I paid by card rather than cash. I want to ask whether I can split the payment into two parts.
+DN-0810,Treatment,"They asked me to return for a check, after adjusting the filling today."
+DN-0811,Follow-up,I promised to send a photo if the redness does not improve; i noticed it again while eating breakfast.
+DN-0812,Treatment,Quick note after my dental visit: i still owe for the visit when they replaced the temporary bridge. My mouth was numb for a while afterward.
+DN-0813,Insurance,Quick note after my dental visit: i need to send the treatment estimate to my insurance company. The insurer told me to keep the estimate.
+DN-0814,Follow-up,They want an update on the irritation near my wisdom tooth.
+DN-0815,Follow-up,The hygienist wants to know whether the new brushing routine helped. I have the photos from last week if they need them.
+DN-0816,Appointment,I booked a cleaning for next Thursday morning; i need enough time to get across town.
+DN-0817,Insurance,I need to find out whether the specialist is covered.
+DN-0818,Insurance,Not sure whether the dentist is in my benefits network.
+DN-0819,Appointment,The office offered me a cancellation slot for Tuesday; i am away for the long weekend.
+DN-0820,Insurance,I cannot tell which plan year they are using. I received a bill for the filling and want to check how much the plan should cover.
+DN-0821,Insurance,The online status is different from what I was told. I need the insurer to explain why the crown claim was reduced.
+DN-0822,Follow-up,"I paid the invoice, and now I need to check in about the soreness after treatment; i wrote down the symptoms over the weekend."
+DN-0823,Billing,The amount looked different on my statement. I need a receipt for the visit so I can submit it to insurance.
+DN-0824,Insurance,"I have the benefits card in my wallet. I paid the clinic, but the reimbursement claim has not appeared in my benefits portal."
+DN-0825,Treatment,The hygienist cleaned below the gumline during my visit. It feels different when I bite down now.
+DN-0826,Follow-up,The crown feels high when I bite; I need to contact the dentist with an update.
+DN-0827,Appointment,"I still have questions about coverage, but the immediate task is cancelling Friday’s appointment; my work shifts have changed this month."
+DN-0828,Insurance,I was thinking about this on the way home. The insurer requested the dentist’s supporting notes. The portal has not updated since Friday.
+DN-0829,Treatment,They explained the options before starting. The dentist adjusted my bite after placing the new filling.
+DN-0830,Appointment,"I am away for the long weekend. The treatment estimate arrived, and now I need to arrange the first visit."
+DN-0831,Treatment,The dentist applied fluoride varnish after the cleaning.
+DN-0832,Treatment,Quick note after my dental visit: i had a loose crown recemented at the clinic. I was nervous about what they might find.
+DN-0833,Treatment,The dentist applied fluoride varnish after the cleaning. The tooth has been bothering me for weeks.
+DN-0834,Follow-up,I was thinking about this on the way home. I should message the clinic if the temporary filling starts to hurt. It seems worse in the evenings.
+DN-0835,Treatment,"The dentist said the molar might need a crown, but wants to look at it again."
+DN-0836,Insurance,The online status is different from what I was told. My dental benefits changed when I switched employers.
+DN-0837,Insurance,I need to send the treatment estimate to my insurance company. The portal has not updated since Friday.
+DN-0838,Treatment,Quick note after my dental visit: the dentist fitted a temporary bridge today. I had been avoiding chewing on that side.
+DN-0839,Follow-up,They said to contact the office if the bleeding starts again; the dentist said it might take a few days to settle.
+DN-0840,Treatment,"I had been avoiding chewing on that side. They mentioned periodontal treatment, though I do not know which option they recommend yet."
+DN-0841,Insurance,I need to ask about coverage before I book the extraction. The portal has not updated since Friday.
+DN-0842,Billing,The clinic sent a reminder about an unpaid invoice. The receipt is in my email somewhere.
+DN-0843,Appointment,I would prefer not to miss class. The clinic sent an invoice while I was trying to reschedule the root canal.
+DN-0844,Insurance,Quick note after my dental visit: i need to check if my dependent is listed on the dental plan. The insurer told me to keep the estimate.
+DN-0845,Appointment,"I still have questions about coverage, but the immediate task is cancelling Friday’s appointment."
+DN-0846,Follow-up,Quick note after my dental visit: the office requested an update on the sore spot under my denture. I have not heard anything from the office since the visit.
+DN-0847,Billing,The payment was supposed to go through last week. The office refunded the overpayment from last month.
+DN-0848,Follow-up,"I paid the invoice, and now I need to check in about the soreness after treatment."
+DN-0849,Follow-up,"The bill came through, but I am more concerned about checking whether the swelling has returned."
+DN-0850,Follow-up,It only bothers me when I chew on that side. I need to check whether the swelling has gone down since my last visit.
+DN-0851,Insurance,Quick note after my dental visit: the insurance company requested more information about the X-ray. I need to compare the details with my policy.
+DN-0852,Appointment,I would prefer not to miss class. I still need to call reception to arrange a consultation.
+DN-0853,Follow-up,Need to see whether the dentist reviewed the photos I sent. I was distracted during the last part of the visit.
+DN-0854,Follow-up,Quick note after my dental visit: i need to ask about the test result they said would come later. The soreness was still there when I woke up.
+DN-0855,Insurance,I received an explanation of benefits but do not understand the coverage. My employer changed providers recently.
+DN-0856,Follow-up,There was some discussion about contacting the specialist again if the symptoms remain. I was distracted during the last part of the visit.
+DN-0857,Insurance,The insurer says the waiting period applies to major work.
+DN-0858,Treatment,"I was nervous about what they might find. I think they adjusted the temporary restoration, but I am unsure what the procedure was called."
+DN-0859,Follow-up,I have not heard back about the specialist recommendation; the dentist said it might take a few days to settle.
+DN-0860,Insurance,I want to confirm the annual maximum remaining on my plan.
+DN-0861,Appointment,The dentist has an opening on the first Monday in June.
+DN-0862,Billing,I paid the deposit for the dental work today.
+DN-0863,Appointment,I may need to move the appointment if my work schedule changes.
+DN-0864,Treatment,My mouth was numb for a while afterward. The dentist took impressions for a replacement crown.
+DN-0865,Follow-up,I got a reminder for my checkup and still need to report the jaw clicking. I was distracted during the last part of the visit.
+DN-0866,Appointment,My dental consultation is set for Friday at two; i can take a morning off if necessary.
+DN-0867,Appointment,"The dentist suggested coming back soon, and I still need to arrange a time."
+DN-0868,Appointment,I need to reschedule the X-ray appointment. I need enough time to get across town.
+DN-0869,Billing,I need to pay the remaining amount on my account; i do not want to pay the same charge twice.
+DN-0870,Treatment,The dentist polished the chipped edge of my front tooth. My mouth was numb for a while afterward.
+DN-0871,Treatment,Quick note after my dental visit: the insurer wants more details about the periodontal cleaning they performed. I was nervous about what they might find.
+DN-0872,Billing,"I think the payment plan starts next month, though the statement is confusing. I checked the banking app this morning."
+DN-0873,Appointment,The clinic moved my appointment to the afternoon. I am away for the long weekend.
+DN-0874,Appointment,I was thinking about this on the way home. I need to confirm the time of my appointment. The office called while I was driving.
+DN-0875,Follow-up,"They suggested an extraction, but first I have to report whether the antibiotics helped; it seems worse in the evenings."
+DN-0876,Insurance,My benefits portal still shows the dental claim as pending. The online status is different from what I was told.
+DN-0877,Billing,There is a charge on my statement that I do not recognize. I do not want to pay the same charge twice.
+DN-0878,Treatment,They examined the cracked tooth and recommended a repair.
+DN-0879,Billing,"Quick note after my dental visit: i am waiting for a reimbursement, but the payment deadline is this Friday. The payment was supposed to go through last week."
+DN-0880,Insurance,"Quick note after my dental visit: i paid the clinic, but the reimbursement claim has not appeared in my benefits portal. The receptionist gave me a reference number."
+DN-0881,Insurance,I was thinking about this on the way home. I need to check whether my plan covers a new crown. I have the benefits card in my wallet.
+DN-0882,Follow-up,I have to check back about the mouth guard fitting properly; it only bothers me when I chew on that side.
+DN-0883,Insurance,"The insurer may have rejected the claim, though the portal still says pending."
+DN-0884,Treatment,They showed me the X-ray at the chair. The dentist fitted a temporary bridge today.
+DN-0885,Follow-up,I have to check back about the mouth guard fitting properly. The soreness was still there when I woke up.
+DN-0886,Treatment,I had been avoiding chewing on that side. The dentist polished the chipped edge of my front tooth.
+DN-0887,Treatment,"Quick note after my dental visit: the bill lists a root canal, which is the procedure I had on Monday. I was relieved that the visit was finished."
+DN-0888,Follow-up,I should message the clinic if the temporary filling starts to hurt; it only bothers me when I chew on that side.
+DN-0889,Treatment,I had the damaged sealant replaced on a molar.
+DN-0890,Insurance,I received an explanation of benefits but do not understand the coverage; i need to compare the details with my policy.
+DN-0891,Billing,Not sure whether the deposit was applied to the final invoice. The receipt is in my email somewhere.
+DN-0892,Insurance,Quick note after my dental visit: the office sent the estimate for the bridge and is waiting for insurer approval. I have the benefits card in my wallet.
+DN-0893,Insurance,The clinic said it is possible the waiting period applies to this treatment. I need to compare the details with my policy.
+DN-0894,Insurance,I was thinking about this on the way home. The clinic said they would submit the claim electronically. I cannot tell which plan year they are using.
+DN-0895,Appointment,I need enough time to get across town. The office sent a reminder about my scheduled checkup.
+DN-0896,Treatment,I was thinking about this on the way home. They put a temporary filling in while the tooth settles. They explained the options before starting.
+DN-0897,Treatment,They recommended a crown for the damaged molar. They explained the options before starting.
+DN-0898,Follow-up,"I thought they would contact me about the X-ray, but maybe I am meant to call them. I noticed it again while eating breakfast."
+DN-0899,Treatment,Quick note after my dental visit: i had a root canal on the lower left tooth. My mouth was numb for a while afterward.
+DN-0900,Insurance,Quick note after my dental visit: the claim for my last visit was denied and I need an explanation. The online status is different from what I was told.
+DN-0901,Insurance,I need to ask about coverage before I book the extraction.
+DN-0902,Follow-up,"The soreness was still there when I woke up. They mentioned checking how things are healing, although I cannot remember the exact instructions."
+DN-0903,Billing,"I am waiting for a reimbursement, but the payment deadline is this Friday; i need to reconcile this with my records."
+DN-0904,Appointment,"The filling has been uncomfortable, so I asked reception for a visit next week."
+DN-0905,Follow-up,I was thinking about this on the way home. The office requested an update on the sore spot under my denture. I wrote down the symptoms over the weekend.
+DN-0906,Insurance,My plan only covers one cleaning within the benefit period. The insurer told me to keep the estimate.
+DN-0907,Insurance,I need to ask about coverage before I book the extraction; my employer changed providers recently.
+DN-0908,Treatment,"My appointment was delayed, but they eventually fitted the new night guard."
+DN-0909,Appointment,"The filling has been uncomfortable, so I asked reception for a visit next week; the reminder text arrived while I was at work."
+DN-0910,Appointment,I was thinking about this on the way home. The clinic moved my appointment to the afternoon. My work shifts have changed this month.
+DN-0911,Treatment,The insurer wants more details about the periodontal cleaning they performed.
+DN-0912,Billing,I need to reconcile this with my records. My cleaning is booked and there is still an unpaid balance on my account.
+DN-0913,Treatment,I was told I may need an extraction for the broken tooth. I was nervous about what they might find.
+DN-0914,Follow-up,Need to see whether the dentist reviewed the photos I sent; the soreness was still there when I woke up.
+DN-0915,Treatment,Quick note after my dental visit: the dentist discussed whether a filling or crown would work better. They explained the options before starting.
+DN-0916,Insurance,I was thinking about this on the way home. The insurer asked for a predetermination before the procedure. The paperwork is still sitting in my email.
+DN-0917,Treatment,I had a root canal on the lower left tooth.
+DN-0918,Insurance,The insurer requested the dentist’s supporting notes.
+DN-0919,Treatment,I was thinking about this on the way home. They removed plaque buildup around the back teeth. I did not catch the name of the material.
+DN-0920,Insurance,My benefits provider needs the procedure code for the estimate; the receptionist gave me a reference number.
+DN-0921,Follow-up,The jaw pain comes and goes; I should probably update the office if it continues.
+DN-0922,Insurance,My employer changed providers recently. The clinic can schedule the consultation once the coverage details are confirmed.
+DN-0923,Follow-up,Quick note after my dental visit: need to ask whether the soreness after the filling is normal. The dentist said it might take a few days to settle.
+DN-0924,Appointment,Quick note after my dental visit: i am waiting for a call about an available appointment. The calendar on my phone might be wrong.
+DN-0925,Treatment,It feels different when I bite down now. The dentist discussed whether a filling or crown would work better.
+DN-0926,Insurance,I need to clarify whether my secondary insurance can be billed.
+DN-0927,Billing,The clinic sent a reminder about an unpaid invoice.
+DN-0928,Billing,I paid by card rather than cash. I cannot tell whether the refund has reached my card yet.
+DN-0929,Treatment,"I think they adjusted the temporary restoration, but I am unsure what the procedure was called. The tooth has been bothering me for weeks."
+DN-0930,Insurance,I was thinking about this on the way home. I need to clarify whether my secondary insurance can be billed. The receptionist gave me a reference number.
+DN-0931,Follow-up,"The dentist said it might take a few days to settle. My cleaning is booked, but I mainly need to ask whether the gum swelling is improving normally."
+DN-0932,Billing,I was thinking about this on the way home. The office offered a payment plan for the balance. The receipt is in my email somewhere.
+DN-0933,Follow-up,I was thinking about this on the way home. The dentist asked me to report back if the sensitivity continues. I have not heard anything from the office since the visit.
+DN-0934,Treatment,The tooth has been bothering me for weeks. They discussed using a night guard for grinding.
+DN-0935,Appointment,Quick note after my dental visit: need to coordinate the kids’ dental appointments for the same day. The office called while I was driving.
+DN-0936,Appointment,Need to coordinate the kids’ dental appointments for the same day.
+DN-0937,Billing,I need to reconcile this with my records. I was told the outstanding balance is due next week.
+DN-0938,Billing,"Quick note after my dental visit: i submitted a claim, but the clinic charged me twice at checkout. I need to reconcile this with my records."
+DN-0939,Billing,I kept the receipt from the front desk. The cashier said my account is now fully paid.
+DN-0940,Treatment,Quick note after my dental visit: i was told I may need an extraction for the broken tooth. I had been avoiding chewing on that side.
+DN-0941,Appointment,The office called while I was driving. The clinic moved my appointment to the afternoon.
+DN-0942,Appointment,My appointment was confirmed by text this morning; the reminder text arrived while I was at work.
+DN-0943,Follow-up,I need to check whether the swelling has gone down since my last visit. The area looks better than it did on Monday.
+DN-0944,Appointment,I am on the waitlist for an earlier cleaning slot. I am trying to avoid missing another visit.
+DN-0945,Appointment,I put the hygienist visit on my calendar for Monday; the calendar on my phone might be wrong.
+DN-0946,Treatment,"The dentist discussed a possible night guard, but nothing has been fitted."
+DN-0947,Billing,"The dentist recommended a crown, and I need an itemized estimate of the charges."
+DN-0948,Follow-up,I wrote down the symptoms over the weekend. I have not heard back about the specialist recommendation.
+DN-0949,Appointment,I need to confirm the time of my appointment. I need enough time to get across town.
+DN-0950,Treatment,They put a temporary filling in while the tooth settles.
+DN-0951,Billing,The payment terminal did not accept my card at checkout. The amount looked different on my statement.
+DN-0952,Follow-up,They asked me to keep track of the pain and call with an update; the area looks better than it did on Monday.
+DN-0953,Insurance,I have the benefits card in my wallet. The office is waiting for approval from my insurer.
+DN-0954,Treatment,Quick note after my dental visit: they recommended a crown for the damaged molar. It feels different when I bite down now.
+DN-0955,Follow-up,They want an update on the irritation near my wisdom tooth. It only bothers me when I chew on that side.
+DN-0956,Treatment,The dentist adjusted my bite after placing the new filling.
+DN-0957,Billing,I need a copy of the receipt showing the tax breakdown; i checked the banking app this morning.
+DN-0958,Follow-up,"It only bothers me when I chew on that side. I think the dentist wanted me to call back if the tooth still felt sensitive, but I am not sure when."
+DN-0959,Insurance,I need to check if my dependent is listed on the dental plan; my employer changed providers recently.
+DN-0960,Treatment,The dentist replaced my cracked filling today; i had been avoiding chewing on that side.
+DN-0961,Appointment,"My gums still feel sore, so I want an earlier checkup slot. The office called while I was driving."
+DN-0962,Billing,Quick note after my dental visit: i was told the outstanding balance is due next week. I kept the receipt from the front desk.
+DN-0963,Appointment,The clinic sent an invoice while I was trying to reschedule the root canal. The calendar on my phone might be wrong.
+DN-0964,Follow-up,I cannot remember whether they wanted a photo of the gum or just a phone update.
+DN-0965,Follow-up,I noticed it again while eating breakfast. The hygienist wants to know whether the new brushing routine helped.
+DN-0966,Appointment,I was thinking about this on the way home. The receptionist said the earliest opening is in three weeks. I can take a morning off if necessary.
+DN-0967,Follow-up,"Quick note after my dental visit: i paid the invoice, and now I need to check in about the soreness after treatment. The dentist said it might take a few days to settle."
+DN-0968,Billing,There is a charge for an X-ray that I do not remember paying for. I paid by card rather than cash.
+DN-0969,Insurance,Quick note after my dental visit: i need to ask about coverage before I book the extraction. The insurer told me to keep the estimate.
+DN-0970,Appointment,Quick note after my dental visit: i can make the Wednesday appointment if it starts after four. I need enough time to get across town.
+DN-0971,Insurance,I need to check if my dependent is listed on the dental plan. The portal has not updated since Friday.
+DN-0972,Follow-up,"I have an appointment next month, though they asked for an update on the bleeding this week."
+DN-0973,Appointment,I need to book the next visit before the end of the month. The calendar on my phone might be wrong.
+DN-0974,Treatment,"They explained the options before starting. The bill lists a root canal, which is the procedure I had on Monday."
+DN-0975,Appointment,"I owe a balance from my last visit, but I am trying to move tomorrow’s cleaning."
+DN-0976,Billing,I have to ask reception about the deposit before my appointment; the receipt is in my email somewhere.
+DN-0977,Treatment,I booked next Tuesday to have the broken filling repaired.
+DN-0978,Follow-up,Quick note after my dental visit: i want to check what the dentist thought of the X-rays from last week. The dentist said it might take a few days to settle.
+DN-0979,Follow-up,I had a filling yesterday and need to tell the dentist whether the ache settles.
+DN-0980,Follow-up,"Quick note after my dental visit: the claim is still pending, and I should ask whether the temporary filling can wait. I have the photos from last week if they need them."
+DN-0981,Billing,Quick note after my dental visit: i need to pay the remaining amount on my account. I paid by card rather than cash.
+DN-0982,Billing,I am unsure whether the account balance includes my last payment. The payment was supposed to go through last week.
+DN-0983,Billing,"The office emailed a copy of the invoice. I am waiting for a reimbursement, but the payment deadline is this Friday."
+DN-0984,Billing,"Insurance covered part of the filling, but I need to pay the rest of the invoice."
+DN-0985,Treatment,The hygienist cleaned below the gumline during my visit; they explained the options before starting.
+DN-0986,Appointment,I can make the Wednesday appointment if it starts after four; the office called while I was driving.
+DN-0987,Insurance,The office is waiting for approval from my insurer; i cannot tell which plan year they are using.
+DN-0988,Appointment,I can usually get to the clinic after school pickup. I am not certain whether the appointment request went through online.
+DN-0989,Appointment,I asked for a morning appointment because of work. I can usually get to the clinic after school pickup.
+DN-0990,Appointment,I need to confirm the time of my appointment; my work shifts have changed this month.
+DN-0991,Treatment,I was thinking about this on the way home. The dentist fitted a temporary bridge today. The tooth has been bothering me for weeks.
+DN-0992,Treatment,The dentist fitted a temporary bridge today. I was nervous about what they might find.
+DN-0993,Billing,The clinic charged my card twice for the same visit; the payment was supposed to go through last week.
+DN-0994,Insurance,My benefits provider needs the procedure code for the estimate.
+DN-0995,Appointment,The calendar on my phone might be wrong. I am on the waitlist for an earlier cleaning slot.
+DN-0996,Billing,The receipt shows a credit and I do not know whether I still owe anything. I am trying to sort out my monthly expenses.
+DN-0997,Treatment,The insurer wants more details about the periodontal cleaning they performed. My mouth was numb for a while afterward.
+DN-0998,Follow-up,The insurer approved the crown; I still need to call the dentist back about the pain. It seems worse in the evenings.
+DN-0999,Insurance,I was thinking about this on the way home. I want to confirm the annual maximum remaining on my plan. The online status is different from what I was told.
+DN-1000,Treatment,I had the damaged sealant replaced on a molar. I had been avoiding chewing on that side.
