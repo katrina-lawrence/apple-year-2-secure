@@ -20,7 +20,7 @@ Before your first session:
 |---|---|
 | [Technical Preparation Guide](technical-preparation.md) | Required software, development tools, and environment preparation before the program. |
 | [Daily Setup Guide](daily-setup.md) | Instructions for accessing and running the appropriate application version for each workshop day. |
-| **Student Activity Workbook** | Activities, challenges, worksheets, and spaces to document your findings throughout the five days. |
+| [Student Activity Workbook](student-activity-workbook.md)| Activities, challenges, worksheets, and spaces to document your findings throughout the five days. |
 
 ## Working with GitHub
 
