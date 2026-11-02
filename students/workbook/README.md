@@ -1,16 +1,23 @@
 
 # Year 2 — Student Activity Workbook
 
-Use the daily workbooks to document your investigations, implementation decisions, testing results, peer feedback, and reflections.
+This workbook supports the five-day My Dental Companion workshop. Use it to document your technical investigations, implementation decisions, security testing, evidence, peer feedback, and reflections.
 
-## Daily Workbooks
+Follow the relevant Activity Brief and [Student Daily Technical Setup](daily-setup.md) for instructions before beginning each activity.
 
-- [Day 1 — Hosted AI and Prompt Injection](day-1.md)
-- [Day 2 — Secure Architecture and Platform Protections](day-2.md)
-- [Day 3 — Create ML and Text Classification](day-3.md)
-- [Day 4 — On-Device AI and Application Security](day-4.md)
-- [Day 5 — Security Scanning and Remediation](day-5.md)
+## Workbook Contents
 
-Complete each workbook during the corresponding workshop, following your mentor's instructions.
+1. [Day 1 — Hosted AI and Prompt Injection](#day-1--hosted-ai-and-prompt-injection)
+2. [Day 2 — Secure Architecture and Platform Protections](#day-2--secure-architecture-and-platform-protections)
+3. [Day 3 — Create ML and Text Classification](#day-3--create-ml-and-text-classification)
+4. [Day 4 — On-Device AI and Application Security](#day-4--on-device-ai-and-application-security)
+5. [Day 5 — Security Scanning and Remediation](#day-5--security-scanning-and-remediation)
 
-[Back to Student Resources](../README.md)
+## How to Use This Workbook
+
+- Complete each section during the corresponding workshop activity.
+- Record your findings, changes, test results, and supporting evidence.
+- Use the tables to document implementation and verification.
+- Complete the peer review and reflection sections.
+- Check the evidence checklist at the end of each day.
+- Use only fictional dental information and approved training resources.
