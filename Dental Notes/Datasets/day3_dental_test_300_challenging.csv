@@ -1,0 +1,301 @@
+﻿id,label,text
+DT-0001,Follow-up,"I only caught part of the explanation. I am not sure whether the tingling is normal, but the instructions said to contact the office if it does not improve. I still have a small balance on the invoice."
+DT-0002,Follow-up,"After the deep cleaning, I was told to call if the gum tenderness did not settle."
+DT-0003,Appointment,I was in a hurry when they explained it. The clinic mentioned an opening next week; I cannot tell whether it was an offer or a confirmed booking. I have not paid the balance from the last visit.
+DT-0004,Follow-up,The sore spot under my denture is healing slowly and they wanted a progress update. The dentist mentioned that a crown might eventually be needed.
+DT-0005,Follow-up,"I have not had a chance to call back. I thought the dentist wanted an update before deciding about the crown, but I did not write down the exact timing. The dentist mentioned that a crown might eventually be needed."
+DT-0006,Appointment,The office offered me Thursday morning or Friday afternoon for the hygiene visit; I need to pick one. This is from my notes after the visit.
+DT-0007,Insurance,The office needs my updated policy details because my coverage changed this month. I have an appointment pencilled in for next month.
+DT-0008,Treatment,I will check the paperwork when I get home. The hygienist completed scaling around the lower molars and explained how to care for the gums afterward. They asked me to call if the discomfort persists.
+DT-0009,Follow-up,"I thought the dentist wanted an update before deciding about the crown, but I did not write down the exact timing. I also have to confirm the date of my next cleaning."
+DT-0010,Insurance,I received a letter saying my annual dental maximum has nearly been reached.
+DT-0011,Treatment,The clinician described a possible gum treatment and said the decision depends on the next examination.
+DT-0012,Billing,"The clinic refunded the overpayment to my card, but it has not appeared yet. This is what I remember from the conversation."
+DT-0013,Follow-up,I have not had a chance to call back. They said we might need another look if the soreness continues; for now I am supposed to let them know how it changes. The insurance company has not answered about the original procedure.
+DT-0014,Insurance,"I was told the plan might pay for part of the crown, but I have not received a coverage decision."
+DT-0015,Billing,"I think the amount on the statement is the remaining balance, but it may include a charge from an earlier visit. I am due for another cleaning in a few weeks."
+DT-0016,Follow-up,The hygienist asked me to report back on whether the new flossing routine stops the bleeding. The message came through while I was at work.
+DT-0017,Treatment,The dentist explained that the cracked tooth may need a crown rather than another filling.
+DT-0018,Insurance,The benefits company asked for additional x-rays before considering the claim.
+DT-0019,Follow-up,"I think the dentist wanted me to get back to them about the aching tooth, although I cannot remember whether they meant this week or after the holiday. The insurance company has not answered about the original procedure. I made a note of it on my phone."
+DT-0020,Treatment,"I think they smoothed the rough edge today, but I am not certain whether they also replaced part of the filling. I need to pay the remainder of the procedure fee. I will check the paperwork when I get home."
+DT-0021,Insurance,"This is from my notes after the visit. The receptionist thought the procedure was eligible, but I need the insurer to confirm. I should update the clinic if the pain continues."
+DT-0022,Billing,The office agreed to split the remaining balance into two payments. I have not had a chance to call back.
+DT-0023,Follow-up,I promised to update the dentist about the jaw clicking after trying the night guard for a week. I also have to confirm the date of my next cleaning.
+DT-0024,Appointment,"I think the hygienist visit was moved, though the calendar invitation still shows the original date. I should report back if the gum soreness continues."
+DT-0025,Appointment,I moved my checkup because of work and now need to confirm the replacement time. I should report back if the gum soreness continues.
+DT-0026,Treatment,The dentist placed a temporary crown while the permanent one is being made. I want to keep track of this before I forget.
+DT-0027,Appointment,"I want to keep track of this before I forget. I need to book separate appointments for myself and my daughter, preferably on the same morning. I have not paid the balance from the last visit."
+DT-0028,Insurance,The insurer denied the night guard and I need to understand the reason.
+DT-0029,Follow-up,They said we might need another look if the soreness continues; for now I am supposed to let them know how it changes. I still have a small balance on the invoice. I have not had a chance to call back.
+DT-0030,Appointment,The receptionist said there is an opening on the cancellation list tomorrow. I have not paid the balance from the last visit.
+DT-0031,Billing,"The clinic refunded the overpayment to my card, but it has not appeared yet."
+DT-0032,Treatment,"The x-ray showed decay beneath the existing filling, and treatment options were discussed."
+DT-0033,Billing,"The receptionist mentioned a credit, though I cannot tell whether it was applied to this invoice. The dentist suggested a repair to the cracked filling. I was in a hurry when they explained it."
+DT-0034,Billing,This is from my notes after the visit. The billing desk says my last payment was applied to the wrong account. I am due for another cleaning in a few weeks.
+DT-0035,Treatment,The dentist placed a temporary crown while the permanent one is being made.
+DT-0036,Follow-up,They asked me to monitor the sensitivity rather than make another decision today. I also have to confirm the date of my next cleaning.
+DT-0037,Treatment,I need to sort this out before my next visit. Today they took an impression for a replacement night guard. They asked me to call if the discomfort persists.
+DT-0038,Insurance,The explanation of benefits lists a different eligible amount than the dentist quoted.
+DT-0039,Billing,The office agreed to split the remaining balance into two payments. The insurance reimbursement is still pending.
+DT-0040,Treatment,The dentist explained that the cracked tooth may need a crown rather than another filling. I want to keep track of this before I forget.
+DT-0041,Appointment,"They suggested returning for the tooth check, but we did not settle on a day."
+DT-0042,Follow-up,The sore spot under my denture is healing slowly and they wanted a progress update. The message came through while I was at work.
+DT-0043,Insurance,"I was in a hurry when they explained it. I was told the plan might pay for part of the crown, but I have not received a coverage decision. The dentist recommended replacing the old crown."
+DT-0044,Follow-up,I promised to update the dentist about the jaw clicking after trying the night guard for a week. I made a note of it on my phone.
+DT-0045,Treatment,The root canal was completed and the dentist placed a temporary restoration.
+DT-0046,Billing,"The amount due looks higher than expected, but I have not checked the individual charges. The insurance reimbursement is still pending."
+DT-0047,Appointment,"I will check the paperwork when I get home. I may have agreed to a Tuesday slot for the consultation, but I need to confirm before arranging time off. The estimate for the proposed filling is still being reviewed by insurance."
+DT-0048,Treatment,"I only caught part of the explanation. I think they smoothed the rough edge today, but I am not certain whether they also replaced part of the filling. The insurance decision has not come through yet."
+DT-0049,Insurance,The insurer denied the night guard and I need to understand the reason. The dentist recommended replacing the old crown.
+DT-0050,Follow-up,They said we might need another look if the soreness continues; for now I am supposed to let them know how it changes. I still have a small balance on the invoice.
+DT-0051,Follow-up,The temporary filling feels rough at the edge; I need to tell the office whether it gets worse.
+DT-0052,Appointment,"I was in a hurry when they explained it. My calendar shows two different dates for the dental cleaning, so I need to confirm which one is correct. The dentist also wants to discuss whether the tooth needs a crown."
+DT-0053,Insurance,I need to check whether the new dental plan includes major restorative work.
+DT-0054,Treatment,"I think they smoothed the rough edge today, but I am not certain whether they also replaced part of the filling."
+DT-0055,Treatment,Today they took an impression for a replacement night guard. I need to sort this out before my next visit.
+DT-0056,Appointment,Please remind me to arrange a visit for the chipped front tooth when I am back in town. This is what I remember from the conversation.
+DT-0057,Treatment,The clinician applied fluoride varnish to help with exposed-root sensitivity. The receptionist asked me to arrange a review appointment afterward.
+DT-0058,Billing,I may have paid the deposit twice; I need the billing desk to reconcile the account.
+DT-0059,Appointment,This is from my notes after the visit. Please remind me to arrange a visit for the chipped front tooth when I am back in town. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0060,Billing,"I want to keep track of this before I forget. The receptionist mentioned a credit, though I cannot tell whether it was applied to this invoice. I am due for another cleaning in a few weeks."
+DT-0061,Follow-up,I only caught part of the explanation. They asked me to monitor the sensitivity rather than make another decision today. I also have to confirm the date of my next cleaning.
+DT-0062,Follow-up,I need to sort this out before my next visit. The temporary filling feels rough at the edge; I need to tell the office whether it gets worse. The insurance company has not answered about the original procedure.
+DT-0063,Billing,"I wrote this down after speaking with reception. I think the amount on the statement is the remaining balance, but it may include a charge from an earlier visit. The insurance reimbursement is still pending."
+DT-0064,Appointment,The clinic texted asking whether I can come half an hour earlier for the exam. The dentist also wants to discuss whether the tooth needs a crown.
+DT-0065,Follow-up,The bite adjustment helped a little; I should give the clinic an update before the end of the week.
+DT-0066,Insurance,I need to sort this out before my next visit. My benefits provider wants the procedure code before it can review the estimate. The front desk also mentioned an unpaid balance.
+DT-0067,Insurance,I cannot tell whether the insurer rejected the estimate or simply has not reviewed it yet. I should update the clinic if the pain continues.
+DT-0068,Appointment,"The follow-on visit is not yet on the calendar, and I need to find a time that works. I should report back if the gum soreness continues."
+DT-0069,Treatment,The dentist talked about either repairing the filling or covering the tooth with a crown; nothing has been decided. The insurance decision has not come through yet.
+DT-0070,Follow-up,The temporary filling feels rough at the edge; I need to tell the office whether it gets worse. The insurance company has not answered about the original procedure.
+DT-0071,Follow-up,"I am trying to keep everything organized. I am not sure whether the tingling is normal, but the instructions said to contact the office if it does not improve. I still have a small balance on the invoice."
+DT-0072,Appointment,"I think the hygienist visit was moved, though the calendar invitation still shows the original date."
+DT-0073,Appointment,The message came through while I was at work. The office offered me Thursday morning or Friday afternoon for the hygiene visit; I need to pick one. The dentist also wants to discuss whether the tooth needs a crown.
+DT-0074,Follow-up,"It has been four days since the extraction and the swelling has gone down, but I should let the clinic know if the throbbing returns. I wrote this down after speaking with reception."
+DT-0075,Follow-up,"I thought the dentist wanted an update before deciding about the crown, but I did not write down the exact timing."
+DT-0076,Appointment,"I need to book separate appointments for myself and my daughter, preferably on the same morning. I have not paid the balance from the last visit."
+DT-0077,Follow-up,I will check the paperwork when I get home. Need to tell the dental team whether the new mouthguard is still rubbing my cheek. The insurance company has not answered about the original procedure.
+DT-0078,Appointment,The clinic mentioned an opening next week; I cannot tell whether it was an offer or a confirmed booking. The dentist also wants to discuss whether the tooth needs a crown. I made a note of it on my phone.
+DT-0079,Treatment,Today they took an impression for a replacement night guard.
+DT-0080,Appointment,"I wrote this down after speaking with reception. The follow-on visit is not yet on the calendar, and I need to find a time that works. I should report back if the gum soreness continues."
+DT-0081,Billing,The office agreed to split the remaining balance into two payments.
+DT-0082,Treatment,"I wrote this down after speaking with reception. I think they smoothed the rough edge today, but I am not certain whether they also replaced part of the filling. The insurance decision has not come through yet."
+DT-0083,Insurance,I was in a hurry when they explained it. I cannot tell whether the insurer rejected the estimate or simply has not reviewed it yet. The front desk also mentioned an unpaid balance.
+DT-0084,Appointment,They said to schedule the imaging visit before the specialist consultation.
+DT-0085,Follow-up,Could someone check in with me about the numbness? It has lasted longer than I expected. I wrote this down after speaking with reception.
+DT-0086,Billing,I wrote this down after speaking with reception. I was quoted one amount at reception and a different total on the bill. The insurance reimbursement is still pending.
+DT-0087,Treatment,They adjusted the denture so it no longer presses against the sore area. I was in a hurry when they explained it.
+DT-0088,Treatment,"This is from my notes after the visit. The x-ray showed decay beneath the existing filling, and treatment options were discussed. They asked me to call if the discomfort persists."
+DT-0089,Follow-up,"It has been four days since the extraction and the swelling has gone down, but I should let the clinic know if the throbbing returns. I still have a small balance on the invoice."
+DT-0090,Insurance,The insurer said the preauthorization for the crown is still pending.
+DT-0091,Billing,I may have paid the deposit twice; I need the billing desk to reconcile the account. I was told to report any ongoing sensitivity.
+DT-0092,Insurance,This is from my notes after the visit. The explanation of benefits lists a different eligible amount than the dentist quoted. The front desk also mentioned an unpaid balance.
+DT-0093,Treatment,"They said the tooth might need root canal treatment if the pain continues, but first they want to observe it. They asked me to call if the discomfort persists."
+DT-0094,Treatment,"I think they smoothed the rough edge today, but I am not certain whether they also replaced part of the filling. I need to pay the remainder of the procedure fee."
+DT-0095,Billing,I have not had a chance to call back. I have to settle the outstanding balance before the end of the month. The dentist suggested a repair to the cracked filling.
+DT-0096,Billing,"The receipt shows a payment that I do not recognize, so I need an itemized statement. The dentist suggested a repair to the cracked filling."
+DT-0097,Treatment,They adjusted the denture so it no longer presses against the sore area. The insurance decision has not come through yet.
+DT-0098,Follow-up,"It has been four days since the extraction and the swelling has gone down, but I should let the clinic know if the throbbing returns."
+DT-0099,Insurance,I need to confirm whether both dental plans can be coordinated for this procedure. The dentist recommended replacing the old crown.
+DT-0100,Billing,"I made a note of it on my phone. The receptionist mentioned a credit, though I cannot tell whether it was applied to this invoice. I am due for another cleaning in a few weeks."
+DT-0101,Follow-up,"I am trying to keep everything organized. After the deep cleaning, I was told to call if the gum tenderness did not settle. I also have to confirm the date of my next cleaning."
+DT-0102,Appointment,"I may have agreed to a Tuesday slot for the consultation, but I need to confirm before arranging time off."
+DT-0103,Treatment,The dentist polished a rough edge on the bonded front tooth. I need to pay the remainder of the procedure fee.
+DT-0104,Treatment,I was in a hurry when they explained it. The dentist recommended a small repair to the chipped incisor instead of replacing the whole veneer. The insurance decision has not come through yet.
+DT-0105,Billing,I am trying to keep everything organized. I would like to know whether the office can issue separate receipts for the two visits. The insurance reimbursement is still pending.
+DT-0106,Appointment,The clinic texted asking whether I can come half an hour earlier for the exam.
+DT-0107,Appointment,"They suggested returning for the tooth check, but we did not settle on a day. The estimate for the proposed filling is still being reviewed by insurance."
+DT-0108,Insurance,I need to sort this out before my next visit. The benefits portal has a status I do not understand; it might mean the claim needs more information. I have an appointment pencilled in for next month.
+DT-0109,Treatment,"I have not had a chance to call back. They said the tooth might need root canal treatment if the pain continues, but first they want to observe it. I need to pay the remainder of the procedure fee."
+DT-0110,Treatment,The dentist talked about either repairing the filling or covering the tooth with a crown; nothing has been decided. The insurance decision has not come through yet. I have not had a chance to call back.
+DT-0111,Follow-up,I am supposed to send a photo of the irritated area once the redness has faded.
+DT-0112,Follow-up,The dentist wants to know how the tooth responds to cold before deciding what to do next.
+DT-0113,Treatment,The dentist recommended a small repair to the chipped incisor instead of replacing the whole veneer. The insurance decision has not come through yet.
+DT-0114,Insurance,I received a letter saying my annual dental maximum has nearly been reached. The front desk also mentioned an unpaid balance.
+DT-0115,Insurance,"The benefits portal says the claim was processed, but the coverage percentage is unclear. I have an appointment pencilled in for next month."
+DT-0116,Treatment,I am trying to keep everything organized. The clinician described a possible gum treatment and said the decision depends on the next examination. They asked me to call if the discomfort persists.
+DT-0117,Billing,I want to keep track of this before I forget. I need a copy of the paid invoice for my records. The dentist suggested a repair to the cracked filling.
+DT-0118,Billing,I would like to know whether the office can issue separate receipts for the two visits. The insurance reimbursement is still pending.
+DT-0119,Appointment,I made a note of it on my phone. The receptionist said there is an opening on the cancellation list tomorrow. I have not paid the balance from the last visit.
+DT-0120,Insurance,I made a note of it on my phone. The benefits company asked for additional x-rays before considering the claim. I should update the clinic if the pain continues.
+DT-0121,Treatment,The clinician described a possible gum treatment and said the decision depends on the next examination. The receptionist asked me to arrange a review appointment afterward.
+DT-0122,Insurance,I need to check whether the new dental plan includes major restorative work. I wrote this down after speaking with reception.
+DT-0123,Treatment,The dentist explained that the cracked tooth may need a crown rather than another filling. I need to pay the remainder of the procedure fee.
+DT-0124,Billing,"I think the amount on the statement is the remaining balance, but it may include a charge from an earlier visit. I am due for another cleaning in a few weeks. I only caught part of the explanation."
+DT-0125,Treatment,The message came through while I was at work. The root canal was completed and the dentist placed a temporary restoration. The insurance decision has not come through yet.
+DT-0126,Follow-up,I wrote this down after speaking with reception. I promised to update the dentist about the jaw clicking after trying the night guard for a week. I also have to confirm the date of my next cleaning.
+DT-0127,Appointment,This is what I remember from the conversation. The clinic texted asking whether I can come half an hour earlier for the exam. The dentist also wants to discuss whether the tooth needs a crown.
+DT-0128,Appointment,The office offered me Thursday morning or Friday afternoon for the hygiene visit; I need to pick one.
+DT-0129,Insurance,I want to keep track of this before I forget. The carrier is reviewing whether the specialist visit is eligible under my plan. I should update the clinic if the pain continues.
+DT-0130,Follow-up,The hygienist asked me to report back on whether the new flossing routine stops the bleeding.
+DT-0131,Appointment,"I will check the paperwork when I get home. I think the hygienist visit was moved, though the calendar invitation still shows the original date. The dentist also wants to discuss whether the tooth needs a crown."
+DT-0132,Appointment,"This is from my notes after the visit. I may have agreed to a Tuesday slot for the consultation, but I need to confirm before arranging time off. The estimate for the proposed filling is still being reviewed by insurance."
+DT-0133,Treatment,The hygienist completed scaling around the lower molars and explained how to care for the gums afterward.
+DT-0134,Treatment,The root canal was completed and the dentist placed a temporary restoration. The insurance decision has not come through yet.
+DT-0135,Billing,"I only caught part of the explanation. I think the amount on the statement is the remaining balance, but it may include a charge from an earlier visit. The insurance reimbursement is still pending."
+DT-0136,Appointment,I have not had a chance to call back. They said to schedule the imaging visit before the specialist consultation. I have not paid the balance from the last visit.
+DT-0137,Follow-up,Need to tell the dental team whether the new mouthguard is still rubbing my cheek. The insurance company has not answered about the original procedure.
+DT-0138,Treatment,The old composite filling was removed and replaced because the edge had fractured. I am trying to keep everything organized.
+DT-0139,Treatment,I wrote this down after speaking with reception. The clinician described a possible gum treatment and said the decision depends on the next examination. They asked me to call if the discomfort persists.
+DT-0140,Appointment,Please remind me to arrange a visit for the chipped front tooth when I am back in town.
+DT-0141,Appointment,"I was in a hurry when they explained it. They suggested returning for the tooth check, but we did not settle on a day. I should report back if the gum soreness continues."
+DT-0142,Treatment,I have not had a chance to call back. The dentist talked about either repairing the filling or covering the tooth with a crown; nothing has been decided. The receptionist asked me to arrange a review appointment afterward.
+DT-0143,Billing,"The receptionist mentioned a credit, though I cannot tell whether it was applied to this invoice."
+DT-0144,Billing,I was quoted one amount at reception and a different total on the bill.
+DT-0145,Follow-up,"I want to keep track of this before I forget. It has been four days since the extraction and the swelling has gone down, but I should let the clinic know if the throbbing returns. I still have a small balance on the invoice."
+DT-0146,Billing,I paid the deposit last week but the invoice still lists the full amount due. I was told to report any ongoing sensitivity.
+DT-0147,Appointment,I missed the reminder call and need to check whether my appointment is still reserved. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0148,Appointment,"My calendar shows two different dates for the dental cleaning, so I need to confirm which one is correct. This is from my notes after the visit."
+DT-0149,Appointment,"I need to sort this out before my next visit. I think the hygienist visit was moved, though the calendar invitation still shows the original date. The dentist also wants to discuss whether the tooth needs a crown."
+DT-0150,Treatment,I want to keep track of this before I forget. The dentist talked about either repairing the filling or covering the tooth with a crown; nothing has been decided. The receptionist asked me to arrange a review appointment afterward.
+DT-0151,Follow-up,"I am trying to keep everything organized. I think the dentist wanted me to get back to them about the aching tooth, although I cannot remember whether they meant this week or after the holiday. I also have to confirm the date of my next cleaning."
+DT-0152,Billing,"I think the amount on the statement is the remaining balance, but it may include a charge from an earlier visit."
+DT-0153,Insurance,The benefits company asked for additional x-rays before considering the claim. I should update the clinic if the pain continues.
+DT-0154,Follow-up,"I made a note of it on my phone. I thought the dentist wanted an update before deciding about the crown, but I did not write down the exact timing. The dentist mentioned that a crown might eventually be needed."
+DT-0155,Follow-up,They said we might need another look if the soreness continues; for now I am supposed to let them know how it changes.
+DT-0156,Billing,"The payment terminal declined my card, so the invoice is still open. I was told to report any ongoing sensitivity."
+DT-0157,Follow-up,I want to keep track of this before I forget. They said we might need another look if the soreness continues; for now I am supposed to let them know how it changes. The insurance company has not answered about the original procedure.
+DT-0158,Appointment,I moved my checkup because of work and now need to confirm the replacement time.
+DT-0159,Billing,I paid the deposit last week but the invoice still lists the full amount due. This is what I remember from the conversation.
+DT-0160,Insurance,My benefits provider wants the procedure code before it can review the estimate. The message came through while I was at work.
+DT-0161,Billing,The billing desk says my last payment was applied to the wrong account.
+DT-0162,Follow-up,This is from my notes after the visit. The dentist wants to know how the tooth responds to cold before deciding what to do next. The insurance company has not answered about the original procedure.
+DT-0163,Insurance,The carrier is reviewing whether the specialist visit is eligible under my plan. I should update the clinic if the pain continues.
+DT-0164,Follow-up,"I think the dentist wanted me to get back to them about the aching tooth, although I cannot remember whether they meant this week or after the holiday."
+DT-0165,Treatment,Today they took an impression for a replacement night guard. They asked me to call if the discomfort persists.
+DT-0166,Treatment,The dentist recommended a small repair to the chipped incisor instead of replacing the whole veneer.
+DT-0167,Insurance,The clinic submitted the claim but the plan administrator says it cannot find it. I will check the paperwork when I get home.
+DT-0168,Billing,I need a copy of the paid invoice for my records. The dentist suggested a repair to the cracked filling.
+DT-0169,Insurance,The benefits company asked for additional x-rays before considering the claim. I made a note of it on my phone.
+DT-0170,Follow-up,Could someone check in with me about the numbness? It has lasted longer than I expected.
+DT-0171,Appointment,I am trying to keep everything organized. I moved my checkup because of work and now need to confirm the replacement time. I should report back if the gum soreness continues.
+DT-0172,Insurance,This is what I remember from the conversation. I cannot tell whether the insurer rejected the estimate or simply has not reviewed it yet. The front desk also mentioned an unpaid balance.
+DT-0173,Appointment,The clinic mentioned an opening next week; I cannot tell whether it was an offer or a confirmed booking. The dentist also wants to discuss whether the tooth needs a crown.
+DT-0174,Billing,"The payment terminal declined my card, so the invoice is still open."
+DT-0175,Follow-up,The message came through while I was at work. The sore spot under my denture is healing slowly and they wanted a progress update. The dentist mentioned that a crown might eventually be needed.
+DT-0176,Appointment,The receptionist said there is an opening on the cancellation list tomorrow.
+DT-0177,Appointment,"I may have agreed to a Tuesday slot for the consultation, but I need to confirm before arranging time off. I have not paid the balance from the last visit."
+DT-0178,Insurance,"I will check the paperwork when I get home. The receptionist thought the procedure was eligible, but I need the insurer to confirm. I should update the clinic if the pain continues."
+DT-0179,Treatment,I have not had a chance to call back. The clinician applied fluoride varnish to help with exposed-root sensitivity. The receptionist asked me to arrange a review appointment afterward.
+DT-0180,Billing,The billing desk says my last payment was applied to the wrong account. I am due for another cleaning in a few weeks.
+DT-0181,Appointment,The clinic mentioned an opening next week; I cannot tell whether it was an offer or a confirmed booking.
+DT-0182,Follow-up,The hygienist asked me to report back on whether the new flossing routine stops the bleeding. The dentist mentioned that a crown might eventually be needed.
+DT-0183,Follow-up,Need to tell the dental team whether the new mouthguard is still rubbing my cheek.
+DT-0184,Follow-up,The temporary filling feels rough at the edge; I need to tell the office whether it gets worse. I will check the paperwork when I get home.
+DT-0185,Billing,"I want to keep track of this before I forget. The amount due looks higher than expected, but I have not checked the individual charges. I was told to report any ongoing sensitivity."
+DT-0186,Appointment,The office offered me Thursday morning or Friday afternoon for the hygiene visit; I need to pick one. The dentist also wants to discuss whether the tooth needs a crown.
+DT-0187,Appointment,I can only get to the clinic after school pickup; I need an afternoon slot. I only caught part of the explanation.
+DT-0188,Insurance,The benefits portal has a status I do not understand; it might mean the claim needs more information. The front desk also mentioned an unpaid balance. I will check the paperwork when I get home.
+DT-0189,Follow-up,The bite adjustment helped a little; I should give the clinic an update before the end of the week. The dentist mentioned that a crown might eventually be needed.
+DT-0190,Treatment,I wrote this down after speaking with reception. The dentist explained that the cracked tooth may need a crown rather than another filling. I need to pay the remainder of the procedure fee.
+DT-0191,Billing,I have to settle the outstanding balance before the end of the month.
+DT-0192,Insurance,"The receptionist thought the procedure was eligible, but I need the insurer to confirm."
+DT-0193,Insurance,The message came through while I was at work. The clinic submitted the claim but the plan administrator says it cannot find it. The dentist recommended replacing the old crown.
+DT-0194,Insurance,"I was told the plan might pay for part of the crown, but I have not received a coverage decision. I have an appointment pencilled in for next month. I made a note of it on my phone."
+DT-0195,Appointment,I can only get to the clinic after school pickup; I need an afternoon slot.
+DT-0196,Insurance,I will check the paperwork when I get home. I received a letter saying my annual dental maximum has nearly been reached. The front desk also mentioned an unpaid balance.
+DT-0197,Treatment,The surgeon removed the impacted wisdom tooth and gave aftercare instructions. The receptionist asked me to arrange a review appointment afterward.
+DT-0198,Insurance,I am trying to keep everything organized. I need to check whether the new dental plan includes major restorative work. I have an appointment pencilled in for next month.
+DT-0199,Treatment,The old composite filling was removed and replaced because the edge had fractured.
+DT-0200,Follow-up,The dentist wants to know how the tooth responds to cold before deciding what to do next. The insurance company has not answered about the original procedure.
+DT-0201,Insurance,My benefits provider wants the procedure code before it can review the estimate. The front desk also mentioned an unpaid balance.
+DT-0202,Insurance,The benefits portal has a status I do not understand; it might mean the claim needs more information. The front desk also mentioned an unpaid balance.
+DT-0203,Insurance,I was in a hurry when they explained it. The insurer denied the night guard and I need to understand the reason. The dentist recommended replacing the old crown.
+DT-0204,Appointment,The consultation has been moved to the following Tuesday and I should update my calendar. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0205,Insurance,The benefits portal has a status I do not understand; it might mean the claim needs more information.
+DT-0206,Treatment,The dentist talked about either repairing the filling or covering the tooth with a crown; nothing has been decided.
+DT-0207,Follow-up,I promised to update the dentist about the jaw clicking after trying the night guard for a week.
+DT-0208,Insurance,"I was told the plan might pay for part of the crown, but I have not received a coverage decision. I have an appointment pencilled in for next month."
+DT-0209,Appointment,I only caught part of the explanation. I can only get to the clinic after school pickup; I need an afternoon slot. I should report back if the gum soreness continues.
+DT-0210,Insurance,I only caught part of the explanation. The office needs my updated policy details because my coverage changed this month. I have an appointment pencilled in for next month.
+DT-0211,Billing,"I made a note of it on my phone. The receipt shows a payment that I do not recognize, so I need an itemized statement. The dentist suggested a repair to the cracked filling."
+DT-0212,Billing,There seems to be a duplicate charge for the same dental visit. I am due for another cleaning in a few weeks.
+DT-0213,Appointment,I will check the paperwork when I get home. The consultation has been moved to the following Tuesday and I should update my calendar. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0214,Billing,"The clinic refunded the overpayment to my card, but it has not appeared yet. I was told to report any ongoing sensitivity."
+DT-0215,Insurance,"The message came through while I was at work. I was told the plan might pay for part of the crown, but I have not received a coverage decision. The dentist recommended replacing the old crown."
+DT-0216,Follow-up,"I think the dentist wanted me to get back to them about the aching tooth, although I cannot remember whether they meant this week or after the holiday. The insurance company has not answered about the original procedure."
+DT-0217,Billing,The account statement includes a late fee that I want to ask about. I am due for another cleaning in a few weeks.
+DT-0218,Treatment,They adjusted the denture so it no longer presses against the sore area.
+DT-0219,Treatment,This is what I remember from the conversation. They adjusted the denture so it no longer presses against the sore area. The insurance decision has not come through yet.
+DT-0220,Insurance,The explanation of benefits lists a different eligible amount than the dentist quoted. The front desk also mentioned an unpaid balance.
+DT-0221,Appointment,The receptionist said there is an opening on the cancellation list tomorrow. I have not had a chance to call back.
+DT-0222,Insurance,I cannot tell whether the insurer rejected the estimate or simply has not reviewed it yet.
+DT-0223,Treatment,The hygienist completed scaling around the lower molars and explained how to care for the gums afterward. I need to sort this out before my next visit.
+DT-0224,Appointment,I missed the reminder call and need to check whether my appointment is still reserved.
+DT-0225,Billing,I will check the paperwork when I get home. There seems to be a duplicate charge for the same dental visit. I am due for another cleaning in a few weeks.
+DT-0226,Insurance,The clinic submitted the claim but the plan administrator says it cannot find it.
+DT-0227,Follow-up,"I wrote this down after speaking with reception. I think the dentist wanted me to get back to them about the aching tooth, although I cannot remember whether they meant this week or after the holiday. I also have to confirm the date of my next cleaning."
+DT-0228,Appointment,I need to sort this out before my next visit. I missed the reminder call and need to check whether my appointment is still reserved. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0229,Appointment,Please remind me to arrange a visit for the chipped front tooth when I am back in town. The estimate for the proposed filling is still being reviewed by insurance.
+DT-0230,Follow-up,"I am not sure whether the tingling is normal, but the instructions said to contact the office if it does not improve."
+DT-0231,Insurance,I have not had a chance to call back. The insurer said the preauthorization for the crown is still pending. I should update the clinic if the pain continues.
+DT-0232,Billing,"The receipt shows a payment that I do not recognize, so I need an itemized statement. I only caught part of the explanation."
+DT-0233,Billing,I need a copy of the paid invoice for my records.
+DT-0234,Billing,I wrote this down after speaking with reception. I may have paid the deposit twice; I need the billing desk to reconcile the account. The dentist suggested a repair to the cracked filling.
+DT-0235,Insurance,I need to confirm whether both dental plans can be coordinated for this procedure.
+DT-0236,Insurance,This is from my notes after the visit. The benefits portal has a status I do not understand; it might mean the claim needs more information. I have an appointment pencilled in for next month.
+DT-0237,Billing,"I have not had a chance to call back. The amount due looks higher than expected, but I have not checked the individual charges. I was told to report any ongoing sensitivity."
+DT-0238,Billing,I paid the deposit last week but the invoice still lists the full amount due.
+DT-0239,Insurance,This is what I remember from the conversation. I need to confirm whether both dental plans can be coordinated for this procedure. The dentist recommended replacing the old crown.
+DT-0240,Follow-up,This is what I remember from the conversation. The hygienist asked me to report back on whether the new flossing routine stops the bleeding. The dentist mentioned that a crown might eventually be needed.
+DT-0241,Treatment,The dentist placed a temporary crown while the permanent one is being made. I need to pay the remainder of the procedure fee.
+DT-0242,Billing,I need a copy of the paid invoice for my records. I only caught part of the explanation.
+DT-0243,Treatment,"I made a note of it on my phone. They said the tooth might need root canal treatment if the pain continues, but first they want to observe it. I need to pay the remainder of the procedure fee."
+DT-0244,Appointment,"I may have agreed to a Tuesday slot for the consultation, but I need to confirm before arranging time off. I have not paid the balance from the last visit. This is from my notes after the visit."
+DT-0245,Insurance,The carrier is reviewing whether the specialist visit is eligible under my plan.
+DT-0246,Follow-up,I am supposed to send a photo of the irritated area once the redness has faded. I still have a small balance on the invoice.
+DT-0247,Follow-up,Could someone check in with me about the numbness? It has lasted longer than I expected. I still have a small balance on the invoice.
+DT-0248,Appointment,I moved my checkup because of work and now need to confirm the replacement time. I only caught part of the explanation.
+DT-0249,Insurance,I need to check whether the new dental plan includes major restorative work. I have an appointment pencilled in for next month.
+DT-0250,Appointment,They said to schedule the imaging visit before the specialist consultation. I have not paid the balance from the last visit.
+DT-0251,Appointment,"I need to book separate appointments for myself and my daughter, preferably on the same morning."
+DT-0252,Treatment,The clinician applied fluoride varnish to help with exposed-root sensitivity.
+DT-0253,Appointment,"The follow-on visit is not yet on the calendar, and I need to find a time that works."
+DT-0254,Treatment,The dentist polished a rough edge on the bonded front tooth.
+DT-0255,Insurance,The insurer said the preauthorization for the crown is still pending. I should update the clinic if the pain continues.
+DT-0256,Insurance,"I wrote this down after speaking with reception. The benefits portal says the claim was processed, but the coverage percentage is unclear. I have an appointment pencilled in for next month."
+DT-0257,Appointment,"My calendar shows two different dates for the dental cleaning, so I need to confirm which one is correct."
+DT-0258,Insurance,The explanation of benefits lists a different eligible amount than the dentist quoted. The message came through while I was at work.
+DT-0259,Billing,There seems to be a duplicate charge for the same dental visit. This is from my notes after the visit.
+DT-0260,Billing,"The message came through while I was at work. The payment terminal declined my card, so the invoice is still open. I was told to report any ongoing sensitivity."
+DT-0261,Billing,I have to settle the outstanding balance before the end of the month. The dentist suggested a repair to the cracked filling.
+DT-0262,Appointment,The message came through while I was at work. The clinic mentioned an opening next week; I cannot tell whether it was an offer or a confirmed booking. I have not paid the balance from the last visit.
+DT-0263,Follow-up,I made a note of it on my phone. I am supposed to send a photo of the irritated area once the redness has faded. I still have a small balance on the invoice.
+DT-0264,Billing,I only caught part of the explanation. The office agreed to split the remaining balance into two payments. The insurance reimbursement is still pending.
+DT-0265,Billing,I need to sort this out before my next visit. The account statement includes a late fee that I want to ask about. I am due for another cleaning in a few weeks.
+DT-0266,Follow-up,The sore spot under my denture is healing slowly and they wanted a progress update.
+DT-0267,Treatment,"They said the tooth might need root canal treatment if the pain continues, but first they want to observe it."
+DT-0268,Billing,I would like to know whether the office can issue separate receipts for the two visits.
+DT-0269,Billing,"The receptionist mentioned a credit, though I cannot tell whether it was applied to this invoice. The dentist suggested a repair to the cracked filling."
+DT-0270,Billing,"This is what I remember from the conversation. The clinic refunded the overpayment to my card, but it has not appeared yet. I was told to report any ongoing sensitivity."
+DT-0271,Insurance,"The benefits portal says the claim was processed, but the coverage percentage is unclear."
+DT-0272,Treatment,The old composite filling was removed and replaced because the edge had fractured. The receptionist asked me to arrange a review appointment afterward.
+DT-0273,Billing,There seems to be a duplicate charge for the same dental visit.
+DT-0274,Treatment,I made a note of it on my phone. The surgeon removed the impacted wisdom tooth and gave aftercare instructions. The receptionist asked me to arrange a review appointment afterward.
+DT-0275,Billing,"The amount due looks higher than expected, but I have not checked the individual charges."
+DT-0276,Insurance,The office needs my updated policy details because my coverage changed this month.
+DT-0277,Billing,I was quoted one amount at reception and a different total on the bill. The insurance reimbursement is still pending.
+DT-0278,Insurance,My benefits provider wants the procedure code before it can review the estimate.
+DT-0279,Insurance,"The receptionist thought the procedure was eligible, but I need the insurer to confirm. The dentist recommended replacing the old crown."
+DT-0280,Treatment,I only caught part of the explanation. The dentist placed a temporary crown while the permanent one is being made. I need to pay the remainder of the procedure fee.
+DT-0281,Follow-up,"After the deep cleaning, I was told to call if the gum tenderness did not settle. I also have to confirm the date of my next cleaning."
+DT-0282,Follow-up,I have not had a chance to call back. Could someone check in with me about the numbness? It has lasted longer than I expected. I still have a small balance on the invoice.
+DT-0283,Follow-up,I was in a hurry when they explained it. The bite adjustment helped a little; I should give the clinic an update before the end of the week. The dentist mentioned that a crown might eventually be needed.
+DT-0284,Appointment,I can only get to the clinic after school pickup; I need an afternoon slot. I should report back if the gum soreness continues.
+DT-0285,Appointment,"My calendar shows two different dates for the dental cleaning, so I need to confirm which one is correct. The dentist also wants to discuss whether the tooth needs a crown."
+DT-0286,Treatment,"The x-ray showed decay beneath the existing filling, and treatment options were discussed. They asked me to call if the discomfort persists."
+DT-0287,Billing,"The receipt shows a payment that I do not recognize, so I need an itemized statement."
+DT-0288,Treatment,The hygienist completed scaling around the lower molars and explained how to care for the gums afterward. They asked me to call if the discomfort persists.
+DT-0289,Billing,I am trying to keep everything organized. I may have paid the deposit twice; I need the billing desk to reconcile the account. The dentist suggested a repair to the cracked filling.
+DT-0290,Treatment,I want to keep track of this before I forget. The old composite filling was removed and replaced because the edge had fractured. The receptionist asked me to arrange a review appointment afterward.
+DT-0291,Follow-up,They asked me to monitor the sensitivity rather than make another decision today.
+DT-0292,Treatment,The surgeon removed the impacted wisdom tooth and gave aftercare instructions.
+DT-0293,Insurance,The insurer said the preauthorization for the crown is still pending. I made a note of it on my phone.
+DT-0294,Appointment,"This is what I remember from the conversation. They suggested returning for the tooth check, but we did not settle on a day. I should report back if the gum soreness continues."
+DT-0295,Billing,I was in a hurry when they explained it. I paid the deposit last week but the invoice still lists the full amount due. I was told to report any ongoing sensitivity.
+DT-0296,Appointment,The consultation has been moved to the following Tuesday and I should update my calendar.
+DT-0297,Billing,The account statement includes a late fee that I want to ask about.
+DT-0298,Follow-up,"I am not sure whether the tingling is normal, but the instructions said to contact the office if it does not improve. The dentist mentioned that a crown might eventually be needed."
+DT-0299,Treatment,I am trying to keep everything organized. The dentist polished a rough edge on the bonded front tooth. I need to pay the remainder of the procedure fee.
+DT-0300,Insurance,The clinic submitted the claim but the plan administrator says it cannot find it. The dentist recommended replacing the old crown.
