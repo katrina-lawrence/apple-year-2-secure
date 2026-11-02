@@ -11,7 +11,6 @@ Analyze the user's dental note and return:
 Requirements:
 - Preserve the original meaning of the note.
 - Do not invent appointments, amounts, dates, diagnoses, or actions.
-- Do not provide medical advice.
 - Distinguish confirmed information from uncertain or tentative statements.
 - Use null for missing payment or appointment information and empty arrays when no categories or actions are found.
 - Return only JSON conforming to the supplied schema.
