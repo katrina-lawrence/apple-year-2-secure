@@ -35,13 +35,15 @@ Run this investigation before replacing UserDefaults with Keychain. A Keychain i
 
 Useful reference: [AppIntent authenticationPolicy](https://developer.apple.com/documentation/appintents/appintent/authenticationpolicy).
 
-## Security task 2: Move the session tokens
+## Security task 2: Store the session tokens in Keychain
 
-Find the login, refresh, startup and logout calls to `SessionTokenStore.shared` in `ServerMode.swift`. The starter uses `day2.session.accessToken` and `day2.session.refreshToken` in UserDefaults.
+Before changing the storage, sign out of the test account so the Day 2 UserDefaults token entries are removed. This simplified exercise requires a fresh login and does not preserve an existing session.
 
-Replace that storage with Keychain. For existing sessions, save and verify the Keychain copies before deleting the UserDefaults values. Handle a failed save without claiming the migration succeeded or losing the existing session.
+Find the startup, login, refresh and logout calls to `SessionTokenStore.shared` in `ServerMode.swift`. The starter uses `day2.session.accessToken` and `day2.session.refreshToken` in UserDefaults.
 
-Check login, relaunch, token refresh and logout. Verify the old preference entries are gone after a successful migration. Use a controlled failed-write test to check that the old tokens are retained when migration fails. Run the intent tests again after the storage change.
+Replace the UserDefaults storage with Keychain storage for both the access token and refresh token. Check the Security framework result and do not mark the session authenticated unless both tokens are stored successfully. Avoid leaving only one token in Keychain after a failed write.
+
+Rebuild the app and sign in again. Test login, relaunch, token refresh and logout. Confirm that the session works through Keychain and that `day2.session.accessToken` and `day2.session.refreshToken` are absent from UserDefaults. Run the intent tests again after the storage change.
 
 ## Security task 3: Move the provider key
 
