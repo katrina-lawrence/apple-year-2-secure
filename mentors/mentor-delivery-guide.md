@@ -1,9 +1,6 @@
-
 **Mentor Training & Module 1 Delivery Guide**
 
----
-
-# Purpose of This Document
+## Purpose of This Document 
 
 This guide serves two complementary purposes:
 
