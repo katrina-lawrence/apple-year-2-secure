@@ -40,7 +40,7 @@ Complete the setup for the relevant day with your mentor before beginning the ac
 
 **Application branch:** `Day-3-server`
 
-1. Open the approved Day 3 application.
+1. Open the approved Day 3 application and clone it locally.
 2. Download the supplied training and testing datasets.
 3. Open the datasets in Apple Numbers.
 4. Confirm that Create ML is available.
