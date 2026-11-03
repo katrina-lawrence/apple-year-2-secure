@@ -18,8 +18,6 @@ This section serves as a reference for mentors before, during, and after deliver
 
 ---
 
-# Module 1 Mentor Delivery Guide
-
 ## Module & Challenge Walkthrough
 
 In Year 2 Module 1, learners work with My Dental Companion, a SwiftUI application, to explore AI integration, secure architecture, on-device machine learning, and application security. Across five days, they investigate vulnerabilities, implement improvements, test their solutions, and evaluate security decisions. Mentors provide technical guidance and use reference implementations to demonstrate possible solutions.
