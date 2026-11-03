@@ -256,7 +256,7 @@ Learners need only the Simulator. They run the App Intent from the Shortcuts app
 
 #### Before Students Begin
 
-1. Open the `Day-3-server` application and confirm that it builds.
+1. Open the `Day-3-server` application, clone it before starting and confirm that it builds.
 2. Verify that Apple Numbers and Create ML are available.
 3. Open the supplied training and testing datasets.
 4. Review the data-cleaning instructions and expected transformations.
