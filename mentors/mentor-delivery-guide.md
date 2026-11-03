@@ -1,6 +1,4 @@
 
-# Year 2 Cybersecurity Program
-
 **Mentor Training & Module 1 Delivery Guide**
 
 ---
