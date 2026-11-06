@@ -247,3 +247,10 @@ What security risk remains even after all three improvements?
 What would you prioritize before deploying this feature in a production environment?
 
 **Your response:**
+
+https://developer.apple.com/documentation/appintents/appintent/authenticationpolicy
+https://developer.apple.com/documentation/localauthentication/logging-a-user-into-your-app-with-face-id-or-touch-id
+https://developer.apple.com/documentation/security/restricting-keychain-item-accessibility
+https://developer.apple.com/documentation/security/protecting-keys-with-the-secure-enclave
+https://developer.apple.com/documentation/uikit/encrypting-your-app-s-files
+
