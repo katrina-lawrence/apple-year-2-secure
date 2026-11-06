@@ -335,3 +335,9 @@ Update it to show:
 Your application successfully processes dental notes, handles API failures, preserves useful information, and no longer includes the planted secret in the model input.
 
 Your testing demonstrates the effect of the security improvement, evaluates the quality of the AI-generated results, and identifies a security risk that remains.
+
+### Resources
+https://genai.owasp.org/llmrisk/llm01-prompt-injection/
+https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
+https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks
+https://platform.claude.com/docs/en/api/messages/create
